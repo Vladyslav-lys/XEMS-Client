@@ -1,0 +1,251 @@
+@font-face {
+  font-family: typography_machine;
+  src: url(assets/font/CholoSperry.TTF) format("opentype");
+}
+
+@font-face {
+  font-family: totry0;
+  src: url(assets/font/BarcodeFont.ttf) format("opentype");
+}
+
+@font-face {
+  font-family: totry1;
+  src: url(assets/font/Goobascript.ttf) format("opentype");
+}
+
+@font-face {
+  font-family: totry2;
+  src: url(assets/font/Wenceslas.ttf) format("opentype");
+}
+
+html {
+	background-color:rgb(248, 248, 255);
+}
+
+.container {
+	padding-top:20px;
+}
+
+.row-fill {
+	display:grid;
+	margin: 0 auto;
+	grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+	font-family:Cambria;
+}
+
+.row-fit {
+	display:grid;
+	margin: 0 auto;
+	grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+	font-family:Cambria;
+}
+
+.row-fit-users {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  font-family: Cambria;
+}
+
+.fit-users-notify-form {
+  display: grid;
+  grid-template-columns: 4fr 1fr;
+  justify-self: flex-end;
+  font-family: Cambria;
+}
+
+.row-another {
+	display:grid;
+	grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+	font-family:Cambria;
+}
+
+.col-login {
+	
+}
+
+.col {
+	
+}
+
+.left-side-col {
+	padding-left:60%;
+	position:sticky;
+}
+
+.right-side-col {
+	text-align:center;
+}
+
+.list {
+	display:grid;
+	grid-template-rows: repeat(auto-fill, 1fr);
+}
+
+.list-link {
+	padding: 5px 0px 5px 0px;
+	color: rgb(211, 211, 211);
+	text-decoration:none;
+	width:1em;
+	transition: all 0.5s ease;
+}
+
+.list-link:hover {
+	color: rgb(50, 50, 50);
+	text-decoration:none;
+}
+
+.link {
+	color: rgb(0, 0, 0);
+	text-decoration:none;
+}
+
+.line {
+	border:none;
+	background-color:rgb(211, 211, 211);
+	width:1fr;
+	height:1px;
+}
+
+.h3{
+	font-family:Courier New;
+}
+
+.use-elem-input {
+	border:1px solid rgb(211, 211, 211);
+	margin-bottom:5px;
+	padding:15px 15px 15px 15px;
+}
+
+.use-elem-input-users {
+  border: 1px solid rgb(211, 211, 211);
+  padding: 10px 15px 10px 15px;
+  margin-bottom: 20px;
+  margin-right: 5px;
+}
+
+.use-elem-textarea {
+	border:1px solid rgb(211, 211, 211);
+	margin-bottom:5px;
+	padding:15px 15px 15px 15px;
+}
+
+.use-elem-button {
+	border:1px solid rgb(150, 150, 150);
+	margin-top:30px;
+	margin-bottom:30px;
+	width:50%;
+	margin-left:25%;
+	padding:15px 5px 15px 5px;
+}
+
+.use-elem-file-choosing {
+	border:1px solid rgb(150, 150, 150);
+	margin-top:130px;
+	margin-bottom:30px;
+	width:130px;
+	padding:10px 15px 10px 15px;
+}
+
+.use-elem input, button, textarea {
+	background-color:transparent;
+	border: none;
+	outline:none;
+	width:100%;
+}
+
+.use-elem-select {
+  border: 1px solid rgb(211, 211, 211);
+  margin-bottom: 5px;
+  padding: 15px 15px 15px 15px;
+  background-color: transparent;
+  outline: none;
+  width: 70%;
+  cursor: pointer;
+}
+
+.use-active {
+  display: block;
+  font-size: 20px;
+  margin-right:50px;
+}
+
+.use-active input {
+  position: absolute;
+  opacity: 0;
+  height: 0;
+  width: 0;
+}
+
+.use-active .checkmark:after {
+  border-width: 0;
+}
+
+.use-active input:checked ~ .checkmark:after {
+  left: 9px;
+  top: 5px;
+  width: 5px;
+  height: 10px;
+  border: solid black;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.use-active-span {
+  margin-right: 5px;
+}
+
+.checkmark {
+  position: absolute;
+  height: 25px;
+  width: 25px;
+  background-color: transparent;
+  border: 1px solid rgb(211, 211, 211);
+  cursor:pointer;
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+}
+
+.error-block {
+	border: 1px solid rgb(240, 128, 128);
+}
+
+.error-text {
+	color:rgb(240, 128, 128);
+	text-align:right;
+	font-size: small;
+}
+
+.error-area {
+	height:18px;
+}
+
+.file-choosing input {
+	width: 0px;
+	height: 0px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	z-index: -1;
+}
+
+.file-choosing {
+	margin-top:15px;
+	margin-bottom:20px;
+}
+
+.photo {
+	margin-top:10px;
+	text-align:center;
+}
+
+.note-date-changing {
+  font-size:1em;
+	text-align:left;
+}
+
+.btn:hover {
+	cursor: pointer;
+}

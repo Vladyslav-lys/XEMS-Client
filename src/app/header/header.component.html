@@ -1,0 +1,11 @@
+
+<div class="header-flex">
+ <div class="header">
+   <nav class="nav">
+     <a class="link" routerLink="/">EDUCATION MENEGMENT SYSTEM</a>
+   </nav>
+ </div>
+ <div *ngIf="user != null" class="use-elem btn-pos btn logout-btn">
+    <button (click)="logout()" class="btn-primary btn">Log out</button>
+ </div>
+</div>

@@ -1,0 +1,50 @@
+.users {
+  display: flex;
+  flex-direction: row;
+  margin: 0 auto;
+  justify-content: center;
+  flex-wrap: wrap;
+  font-family: Cambria;
+}
+
+.col-users {
+  width: 90%;
+}
+
+.another-side {
+  width: 100px;
+}
+
+table {
+  border: 1px solid rgb(150, 150, 150);
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.border-style td, th {
+  border-bottom: 1px solid rgb(150, 150, 150);
+  border-right: 1px solid rgb(150, 150, 150);
+}
+
+.border-style td {
+  font-size:14px;
+}
+
+.border-style th {
+  font-size: 14px;
+}
+
+.user-btn {
+  background-color: transparent;
+  width: 90%;
+  border: 1px solid rgb(150, 150, 150);
+  padding-top: 7px;
+  padding-bottom: 7px;
+}
+
+.add-user-btn {
+  border: 1px solid rgb(150, 150, 150);
+  width:70px;
+  margin-bottom: 20px;
+  padding: 10px 10px 10px 10px;
+}

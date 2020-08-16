@@ -1,0 +1,46 @@
+<div class="users">
+  <div class="">
+    <app-leftmenu></app-leftmenu>
+  </div>
+  <div class="col-users">
+    <div class="row-fit-users">
+      <form class="fit-users-notify-form" [formGroup]="notifyForm">
+        <div class="use-elem use-elem-input-users">
+          <input type="text" class="form-control" formControlName="messageText" placeholder="Type a message here..." value="{{messageText}}">
+        </div>
+        <div class="use-elem add-user-btn btn">
+          <button type="button" class="use-elem btn" (click)="sendNotifyAllText()">Send All</button>
+        </div>
+      </form>
+    </div>
+    <table>
+      <tr class="border-style">
+        <td>№</td>
+        <td>FIRST NAME</td>
+        <td>LAST NAME</td>
+        <td>NICKNAME</td>
+        <td>PHOTO</td>
+        <td></td>
+      </tr>
+      <tr *ngFor="let user of users; let row_no = index" class="border-style">
+        <td>{{row_no + 1}}</td>
+        <td>{{user.account.firstName}}</td>
+        <td>{{user.account.lastName}}</td>
+        <td>{{user.account.nickname}}</td>
+        <td><img width="50" height="50" src="{{user.account.photo}}" /></td>
+        <td>
+			<div class="cell-grid">
+				<div class="use-elem use-elem-input notify-pos">
+					<textarea #txt cols="20" rows="2" class="textarea-notify" placeholder="Type a message here..."></textarea>
+				</div>
+				<div class="use-elem div-send-one-btn ">
+					<button class="send-one-btn btn btn-primary" (click)="sendNotifyOneText(user, txt.value)">Send</button>
+				</div>
+			</div>
+		</td>
+      </tr>
+    </table>
+  </div>
+  <div class="another-side">
+  </div>
+</div>

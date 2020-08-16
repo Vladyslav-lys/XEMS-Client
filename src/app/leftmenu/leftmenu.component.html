@@ -1,0 +1,11 @@
+<div class="list">
+  <a routerLink="/" class="list-link">Home</a>
+  <a routerLink="/profile" class="list-link">Profile</a>
+  <a routerLink="/" class="list-link">About</a>
+  <a routerLink="/" class="list-link">Contact</a>
+  <a *ngIf="user.accessLevel == 4" routerLink="/users" class="list-link">Users</a>
+  <a *ngIf="user.accessLevel == 3" routerLink="/students" class="list-link">Students</a>
+</div>
+<!--<div class="list">
+  <a [routerLink]="['/note', note.id]" class="list-group-item list-group-item-action" *ngFor="let note of notes">{{ note.title }}</a>
+</div>-->

@@ -1,0 +1,17 @@
+.list {
+	width:100px;
+	margin-top:40px;
+}
+
+.list-link {
+	padding: 5px 0px 5px 0px;
+	color: rgb(211, 211, 211);
+	text-decoration:none;
+	width:1em;
+	transition: all 0.5s ease;
+}
+
+.list-link:hover {
+	color: rgb(50, 50, 50);
+	text-decoration:none;
+}

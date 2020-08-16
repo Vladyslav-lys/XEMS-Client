@@ -1,0 +1,113 @@
+<div class="full-profile">
+  <div class="">
+    <app-leftmenu></app-leftmenu>
+  </div>
+  <div class="col-full-profile">
+
+    <form [formGroup]="profileForm">
+      <div class="row-another">
+        <h3 class="h3">Login</h3>
+        <div class="form-group">
+          <div class="error-area">
+            <div class="error-text" *ngIf="(submitted || this.profileForm.controls.username.touched) && this.profileForm.controls.username.errors">Username is required</div>
+          </div>
+          <div [class.error-block]="(submitted || this.profileForm.controls.username.touched) && this.profileForm.controls.username.errors" class="use-elem use-elem-input">
+            <input type="text" formControlName="username" class="form-control" [ngClass]="{ 'is-invalid': submitted && this.profileForm.controls.username.errors }" placeholder="Username" />
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="error-area">
+            <div class="error-text" *ngIf="(submitted || this.profileForm.controls.password.touched) && this.profileForm.controls.password.errors">Password is required</div>
+          </div>
+          <div [class.error-block]="(submitted || this.profileForm.controls.password.touched) && this.profileForm.controls.password.errors" class="use-elem use-elem-input">
+            <input type="password" formControlName="password" class="form-control" [ngClass]="{ 'is-invalid': submitted && this.profileForm.controls.password.errors }" placeholder="Password" />
+          </div>
+        </div>
+
+        ﻿<h3 class="h3">Profile</h3>
+        <div>
+          <div class="photo">
+            <div class="error-area">
+              <div class="error-text" *ngIf="submitted && this.currentPhoto.length < 24">Photo is required</div>
+            </div>
+            <div class="image-block-full-profile">
+              <img class="image-full-profile" src="{{this.currentPhoto}}" alt="Choose the image" /> <br>
+            </div>
+            <div class="file-choosing">
+              <input type="file" id="file" (change)="onFileChanged($event)">
+              <label for="file" class="use-elem-file-choosing btn">Choose a file</label>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="input-group">
+            <div class="error-area">
+              <div class="error-text" *ngIf="(submitted || this.profileForm.controls.lastName.touched) && this.profileForm.controls.lastName.errors">Last name is required</div>
+            </div>
+            <div [class.error-block]="(submitted || this.profileForm.controls.lastName.touched) && this.profileForm.controls.lastName.errors" class="use-elem use-elem-input">
+              <input type="text" class="form-control" placeholder="Last name" formControlName="lastName" value="">
+            </div>
+          </div>
+          <div class="input-group">
+            <div class="error-area">
+              <div class="error-text" *ngIf="(submitted || this.profileForm.controls.firstName.touched) && this.profileForm.controls.firstName.errors">First name is required</div>
+            </div>
+            <div [class.error-block]="(submitted || this.profileForm.controls.firstName.touched) && this.profileForm.controls.firstName.errors" class="use-elem use-elem-input">
+              <input type="text" class="form-control" placeholder="First name" formControlName="firstName" value="">
+            </div>
+          </div>
+          <div class="input-group">
+            <div class="error-area">
+              <div class="error-text" *ngIf="(submitted || this.profileForm.controls.nickName.touched) && this.profileForm.controls.nickName.errors">Nick name is required</div>
+            </div>
+            <div [class.error-block]="(submitted || this.profileForm.controls.nickName.touched) && this.profileForm.controls.nickName.errors" class="use-elem use-elem-input">
+              <input type="text" class="form-control" placeholder="Nick name" formControlName="nickName" value="">
+            </div>
+          </div>
+          <div class="input-group">
+            <div class="error-area">
+              <div class="error-text" *ngIf="(submitted || this.profileForm.controls.email.touched) && this.profileForm.controls.email.errors">E-mail is required</div>
+            </div>
+            <div [class.error-block]="(submitted || this.profileForm.controls.email.touched) && this.profileForm.controls.email.errors" class="use-elem use-elem-input">
+              <input type="text" class="form-control" placeholder="E-mail" formControlName="email" value="">
+            </div>
+          </div>
+          <div class="input-group">
+            <div class="error-area">
+              <div class="error-text" *ngIf="(submitted || this.profileForm.controls.birthday.touched) && this.profileForm.controls.birthday.errors">Birthday is required</div>
+            </div>
+            <div [class.error-block]="(submitted || this.profileForm.controls.birthday.touched) && this.profileForm.controls.birthday.errors" class="use-elem use-elem-input">
+              <input type="date" class="form-control" formControlName="birthday" [valueAsDate]="currentUser.account.birthday" />
+            </div>
+          </div>
+          <div class="input-group">
+            <div class="error-area"></div>
+            <select class="use-elem use-elem-select" formControlName="accessLevel">
+              <option value="1">Guest</option>
+              <option value="2">Student</option>
+              <option value="3">Teacher</option>
+              <option value="4">Administrator</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <div class="error-area"></div>
+            <label class="use-active">
+              <span class="use-active-span">Active</span>
+              <input type="checkbox" formControlName="active" value="true">
+              <span class="checkmark"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <div [class.btn]="enableBtn()" class="use-elem use-elem-button">
+          <button type="submit" [class.btn]="enableBtn()" [disabled]="loading" class="btn-primary" (click)="EditProfile()">Edit</button>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="another-side">
+  </div>
+</div>

@@ -1,0 +1,36 @@
+<div class="col-login">
+  ﻿<h3 class="h3">Login</h3>
+
+  <alert class="error-text"></alert>
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+		<div class="error-area">
+			<div class="error-text" *ngIf="(submitted || f.username.touched) && f.username.errors">Username is required</div>
+		</div>
+		<div [class.error-block]="(submitted || f.username.touched) && f.username.errors" class="use-elem use-elem-input">
+			<input type="text" formControlName="username" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.username.errors }" placeholder="Username" />
+		</div>
+      <!--<div *ngIf="submitted && f.username.errors" class="invalid-feedback">
+        <div *ngIf="f.username.errors.required">Username is required</div>
+      </div>-->
+    </div>
+    <div class="form-group">
+		<div class="error-area">
+			<div class="error-text" *ngIf="(submitted || f.password.touched) && f.password.errors">Password is required</div>
+		</div>
+		<div [class.error-block]="(submitted || f.password.touched) && f.password.errors" class="use-elem use-elem-input">
+			<input type="password" formControlName="password" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.password.errors }" placeholder="Password" />
+		</div>
+      <!--<div *ngIf="submitted && f.password.errors" class="invalid-feedback">
+        <div *ngIf="f.password.errors.required">Password is required</div>
+      </div>-->
+    </div>
+    <div class="form-group">
+		<div [class.btn]="enableBtn()" class="use-elem use-elem-button btn">
+			<button [disabled]="loading" [class.btn]="enableBtn()" class="btn-primary btn">
+				Login
+			</button>
+	  </div>
+    </div>
+  </form>
+</div>
