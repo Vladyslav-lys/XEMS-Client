@@ -59,12 +59,10 @@ export class LoginComponent implements OnInit {
 	  .then(function (operationStatus : operationStatusInfo){
       if (operationStatus.operationStatus == 1) {
         localStorage.setItem('currentUser', JSON.stringify(operationStatus.attachedObject));
-		console.log(JSON.parse(localStorage.currentUser));
-        th.authenticationService.setAuth(true);
 		var user = JSON.parse(localStorage.currentUser);
-		th.getAccessPrifle(user );
-		th.getAccessTeacher(user );
-        console.log(operationStatus.attachedObject);
+        th.authenticationService.setAuth(true);
+		th.getAccessPrifle(user);
+		th.getAccessTeacher(user);
         th.router.navigate(['/users']);
       }
       else {
