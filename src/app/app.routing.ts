@@ -11,7 +11,7 @@ import { ProfileGuard } from './_services/profile.guard';
 import { TeacherGuard } from './_services/teacher.guard';
 
 const routes: Routes = [
-  { path: '', component: UsersComponent, canActivate: [AuthGuard]},
+  { path: '', component: UsersComponent, canActivate: [AuthGuard, ProfileGuard]},
   { path: 'login', component: LoginComponent },
   { path: 'users', component: UsersComponent, canActivate: [AuthGuard, ProfileGuard] },
   { path: 'register', component: SignUpComponent, canActivate: [AuthGuard, ProfileGuard] },

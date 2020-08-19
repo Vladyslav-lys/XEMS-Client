@@ -18,7 +18,7 @@ export class ProfileGuard implements CanActivate {
       if (this.access.getAccessProfile()) {
         return true;
       } else {
-        this.router.navigate(['/'], {
+        this.router.navigate(['/login'], {
           queryParams: {
             access: false
           }

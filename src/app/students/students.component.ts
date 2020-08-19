@@ -107,7 +107,7 @@ export class StudentsComponent implements OnInit {
     message.senderName = this.getAccessLevel(this.user.accessLevel);
     message.text = this.notifyForm.controls.messageText.value;
 	
-	this.notifySerivce.sendNotifyAllEnteredText(message)
+	this.stub.sendNotifyAllEnteredText(message)
 	  .then(function (operationStatus: operationStatusInfo) {
 		console.log("Message is sent:" + th.notifyForm.controls.messageText.value);
         th.messageText = "";
@@ -126,7 +126,7 @@ export class StudentsComponent implements OnInit {
     message.senderName = this.getAccessLevel(this.user.accessLevel);
     message.text = txt;
 	
-	this.notifySerivce.sendNotifyOneText(user.id, message)
+	this.stub.sendNotifyOneText(user.id, message)
 	  .then(function (operationStatus: operationStatusInfo) {
 		console.log("Message is sent:" + txt);
         th.messageText = "";

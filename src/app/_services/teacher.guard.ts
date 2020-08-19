@@ -18,7 +18,7 @@ export class TeacherGuard implements CanActivate {
       if (this.access.getAccessTeacher()) {
         return true;
       } else {
-        this.router.navigate(['/'], {
+        this.router.navigate(['/login'], {
           queryParams: {
             access: false
           }
