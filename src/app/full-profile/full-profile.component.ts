@@ -85,7 +85,6 @@ export class FullProfileComponent implements OnInit {
       if (user.id == currentUserId) {
         th.currentUser = user;
         th.currentPhoto = user.account.photo;
-        console.log(user);
       }
     });
   }
@@ -147,10 +146,10 @@ export class FullProfileComponent implements OnInit {
   }
 
   enableBtn(): boolean {
-    if (this.currentPhoto.length > 24 && this.profileForm.controls.username.value.length > 0 && this.profileForm.controls.password.value.length > 0
-      && this.profileForm.controls.lastName.value.length > 0 && this.profileForm.controls.firstName.value.length > 0
-      && this.profileForm.controls.nickName.value.length > 0 && this.profileForm.controls.email.value.length > 0
-      && this.profileForm.controls.birthday.value != null)
+    if (this.currentPhoto != null && this.currentPhoto.length > 24 && this.profileForm.controls.username.value.length > 0 
+	  && this.profileForm.controls.password.value.length > 0 && this.profileForm.controls.lastName.value.length > 0 
+	  && this.profileForm.controls.firstName.value.length > 0 && this.profileForm.controls.nickName.value.length > 0 
+	  && this.profileForm.controls.email.value.length > 0 && this.profileForm.controls.birthday.value != null)
       return true;
     return false;
   }

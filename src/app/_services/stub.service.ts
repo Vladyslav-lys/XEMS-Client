@@ -17,12 +17,15 @@ export class StubService {
     constructor(
 	  private router: Router
     ) {
-		this.users = JSON.parse(sessionStorage.users);
+		this.users = new Array<User>();
+		if(sessionStorage.users != null)
+			this.users = JSON.parse(sessionStorage.users);
 		this.students = new Array<User>();
 		
-		this.user = JSON.parse(localStorage.currentUser);
+		if(localStorage.currentUser != null)
+			this.user = JSON.parse(localStorage.currentUser);
 		
-		if(this.users == null || this.users === undefined)
+		if(this.users == null || this.users === undefined || this.users.length < 1)
 		{
 		let account1 = new Account();
 		account1.id = 1;
@@ -134,10 +137,7 @@ export class StubService {
     }
 
     logout(id) {
-	  localStorage.setItem('isLoggedIn', null);
-	  localStorage.setItem('isAllowedProfile', null);
-	  localStorage.setItem('isAllowedTeacher', null);
-	  localStorage.setItem('currentUser', JSON.stringify(null));
+	  localStorage.clear();
 	  this.router.navigate(['/login']);
 	
 	  return new Promise(function (resolve, reject) {

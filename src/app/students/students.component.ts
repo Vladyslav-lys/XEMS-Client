@@ -81,12 +81,14 @@ export class StudentsComponent implements OnInit {
 		var users = operationStatus.attachedObject;
         for (let user of users) {
 			var fileInBase64 = user.account.photo;
-			var splitted = fileInBase64.split(",", 2);
-			if(splitted[0] != 'data:image/png;base64')
-				user.account.photo = 'data:image/png;base64,' + user.account.photo;
+			if(fileInBase64 != null)
+			{
+				var splitted = fileInBase64.split(",", 2);
+				if(splitted[0] != 'data:image/png;base64')
+					user.account.photo = 'data:image/png;base64,' + user.account.photo;
+			}
         }
         th.users = users;
-        console.log(th.users);
         sessionStorage.setItem("students", JSON.stringify(users));
         th.users2 = JSON.parse(sessionStorage.students).map(i => ({
           idx: i,
@@ -94,7 +96,7 @@ export class StudentsComponent implements OnInit {
           account: i.account
         }));
       }).catch(function(err) {
-        console.log("Error while adding new user");
+        console.log("Error while fetching students");
         alert(err);
       });
   }

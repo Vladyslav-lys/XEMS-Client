@@ -78,7 +78,7 @@
               <div class="error-text" *ngIf="(submitted || this.profileForm.controls.birthday.touched) && this.profileForm.controls.birthday.errors">Birthday is required</div>
             </div>
             <div [class.error-block]="(submitted || this.profileForm.controls.birthday.touched) && this.profileForm.controls.birthday.errors" class="use-elem use-elem-input">
-              <input type="date" class="form-control" formControlName="birthday" [valueAsDate]="currentUser.account.birthday" />
+              <input type="date" class="form-control" formControlName="birthday" [ngModel] ="currentUser.account.birthday | date:'yyyy-MM-dd'"/>
             </div>
           </div>
           <div class="input-group">
