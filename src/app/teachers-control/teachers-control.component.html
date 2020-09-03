@@ -1,0 +1,64 @@
+<div class="users">
+  <div class="">
+    <app-leftmenu></app-leftmenu>
+  </div>
+  <div class="col-users">
+    <div class="row-fit-users">
+      <div class="use-elem add-user-btn btn">
+        <button type="button" class="use-elem btn" (click)="openAdd()">New teacher</button>
+      </div>
+      <form class="fit-users-notify-form" [formGroup]="notifyForm">
+        <div class="use-elem use-elem-input-users">
+          <input type="text" class="form-control" formControlName="messageText" placeholder="Type a message here..." value="{{messageText}}">
+        </div>
+        <div class="use-elem add-user-btn btn">
+          <button type="button" class="use-elem btn" (click)="sendNotifyAllText()">Send</button>
+        </div>
+      </form>
+    </div>
+    <table>
+      <tr class="border-style">
+        <td>№</td>
+        <td>LOGIN</td>
+        <td>PASSWORD</td>
+		<td>LAST NAME</td>
+        <td>FIRST NAME</td>
+        <td>SECONDNAME</td>
+        <td>BIRTHDAY</td>
+        <td>PHONE</td>
+		<td>ADDRESS</td>
+		<td>RANK</td>
+        <td>PHOTO</td>
+		<td>GROUP</td>
+        <td>CREATE TIME</td>
+        <td>MODIFY TIME</td>
+        <td>ACTIVE</td>
+        <td>ACCESS LEVEL</td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr *ngFor="let teacher of teachers; let row_no = index" class="border-style">
+        <td>{{row_no + 1}}</td>
+        <td>{{teacher.login}}</td>
+        <td>{{teacher.password}}</td>
+		<td>{{teacher.account.lastName}}</td>
+        <td>{{teacher.account.firstName}}</td>
+        <td>{{teacher.account.secondName}}</td>
+        <td>{{teacher.account.birthday | date : "dd.MM.y"}}</td>
+        <td>{{teacher.account.phone}}</td>
+		<td>{{teacher.account.address}}</td>
+		<td>{{teacher.account.rank}}</td>
+        <td><img width="50" height="50" src="{{teacher.account.photo}}" /></td>
+		<td>{{teacher.account.group.name}}</td>
+        <td>{{teacher.account.createTime | date : "dd.MM.y h:mm"}}</td>
+        <td>{{teacher.account.modifyTime | date : "dd.MM.y h:mm"}}</td>
+        <td>{{getActive(teacher.isActive)}}</td>
+        <td>{{getAccessLevel(teacher.accessLevel)}}</td>
+        <td><button class="user-btn btn btn-primary" [routerLink]="['/full-profile-teacher', teacher.id]">Edit</button></td>
+        <td><button class="user-btn btn btn-primary" (click)="deleteTeacher(teacher)">Delete</button></td>
+      </tr>
+    </table>
+  </div>
+  <div class="another-side">
+  </div>
+</div>

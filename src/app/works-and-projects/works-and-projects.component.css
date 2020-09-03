@@ -1,0 +1,73 @@
+.users {
+  display: flex;
+  flex-direction: row;
+  margin: 0 auto;
+  justify-content: center;
+  flex-wrap: wrap;
+  font-family: Cambria;
+}
+
+.col-users {
+  width: 60%;
+}
+
+.another-side {
+  width: 100px;
+}
+
+table {
+  border: 1px solid rgb(150, 150, 150);
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.border-style td, th {
+  border-bottom: 1px solid rgb(150, 150, 150);
+  border-right: 1px solid rgb(150, 150, 150);
+}
+
+.border-style td {
+  font-size:14px;
+}
+
+.border-style th {
+  font-size: 14px;
+}
+
+.user-btn {
+  background-color: transparent;
+  width: 90%;
+  border: 1px solid rgb(150, 150, 150);
+  padding-top: 7px;
+  padding-bottom: 7px;
+}
+
+.send-one-btn {
+  background-color: transparent;
+  border: 1px solid rgb(150, 150, 150);
+  height: 30px;
+}
+
+.div-send-one-btn {
+	margin: 0px 5px 5px 5px;
+}
+
+.add-user-btn {
+  border: 1px solid rgb(150, 150, 150);
+  width:70px;
+  margin-bottom: 20px;
+  padding: 10px 10px 10px 10px;
+}
+
+.cell-grid {
+	display:grid;
+	grid-template-columns:repeat(auto-fit, 1fr);
+}
+
+.notify-pos {
+	margin:5px 5px 5px 5px;
+}
+
+.textarea-notify {
+	resize:none;
+}

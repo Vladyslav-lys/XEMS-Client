@@ -5,14 +5,15 @@ import { Router } from '@angular/router';
 import { User } from '../_models/user';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { operationStatusInfo } from '../_models/operationStatusInfo';
-import { Account } from '../_models/accounts';
+import { Teacher } from '../_models/teacher';
+import { Group } from '../_models/group';
 
 @Component({
-  selector: 'app-sign-up',
-  templateUrl: './sign-up.component.html',
-  styleUrls: ['./sign-up.component.css']
+  selector: 'app-sign-up-teacher',
+  templateUrl: './sign-up-teacher.component.html',
+  styleUrls: ['./sign-up-teacher.component.css']
 })
-export class SignUpComponent implements OnInit {
+export class SignUpTeacherComponent implements OnInit {
 
   /*file: File;
   fileName: string = "Choose file";*/
@@ -36,13 +37,16 @@ export class SignUpComponent implements OnInit {
     this.user.account.birthday = new Date(this.user.account.birthday);*/
 
     this.registerForm = this.formBuilder.group({
-      username: ["", Validators.required],
+      login: ["", Validators.required],
       password: ["", Validators.required],
       lastName: ["", Validators.required],
       firstName: ["", Validators.required],
-      nickName: ["", Validators.required],
-      email: ["", Validators.required],
+      secondName: ["", Validators.required],
       birthday: ["", Validators.required],
+	  phone: ["", Validators.required],
+	  address: ["", Validators.required],
+	  rank: ["", Validators.required],
+	  group: [1],
       accessLevel: [1],
       active: [true]
     });
@@ -75,55 +79,66 @@ export class SignUpComponent implements OnInit {
 
     this.loading = true;
 
-    var newUser: User;
-    newUser = new User();
-    newUser.account = new Account();
+    var newTeacher: User;
+    newTeacher = new User();
+    newTeacher.account = new Teacher();
+	newTeacher.account.group = null;
 
-    if (this.registerForm.controls.username.value != null)
-      newUser.login = this.registerForm.controls.username.value;
+    if (this.registerForm.controls.login.value != null)
+      newTeacher.login = this.registerForm.controls.login.value;
     if (this.registerForm.controls.password.value != null)
-      newUser.password = this.registerForm.controls.password.value;
+      newTeacher.password = this.registerForm.controls.password.value;
     if (this.registerForm.controls.lastName.value != null)
-      newUser.account.lastName = this.registerForm.controls.lastName.value;
+      newTeacher.account.lastName = this.registerForm.controls.lastName.value;
     if (this.registerForm.controls.firstName.value != null)
-      newUser.account.firstName = this.registerForm.controls.firstName.value;
-    if (this.registerForm.controls.nickName.value != null)
-      newUser.account.nickname = this.registerForm.controls.nickName.value;
-    if (this.registerForm.controls.email.value != null)
-      newUser.account.email = this.registerForm.controls.email.value;
+      newTeacher.account.firstName = this.registerForm.controls.firstName.value;
+    if (this.registerForm.controls.secondName.value != null)
+      newTeacher.account.secondName = this.registerForm.controls.secondName.value;
     if (this.registerForm.controls.birthday.value != null)
-      newUser.account.birthday = this.registerForm.controls.birthday.value;
+      newTeacher.account.birthday = this.registerForm.controls.birthday.value;
+    if (this.registerForm.controls.phone.value != null)
+      newTeacher.account.phone = this.registerForm.controls.phone.value;
+    if (this.registerForm.controls.address.value != null)
+      newTeacher.account.address = this.registerForm.controls.address.value;
+    if (this.registerForm.controls.rank.value != null)
+      newTeacher.account.rank = this.registerForm.controls.rank.value;
+    if (this.registerForm.controls.group.value != null && this.registerForm.controls.address.value.length > 0 )
+	{
+	  var id = this.registerForm.controls.address.value;
+	  newTeacher.account.group = this.stub.getGroupById(id);
+	}
     if (this.registerForm.controls.accessLevel.value != null)
-      newUser.accessLevel = this.registerForm.controls.accessLevel.value;
+      newTeacher.accessLevel = this.registerForm.controls.accessLevel.value;
     if (this.registerForm.controls.active.value != null)
-      newUser.isActive = this.registerForm.controls.active.value;
+      newTeacher.isActive = this.registerForm.controls.active.value;
     if (this.fileInBase64 != null) {
       var splitted = this.fileInBase64.split(",", 2);
-      newUser.account.photo = splitted[1];
+      newTeacher.account.photo = splitted[1];
     }
-    newUser.account.createTime = new Date();
-    newUser.account.modifyTime = new Date();
+    newTeacher.account.createTime = new Date();
+    newTeacher.account.modifyTime = new Date();
 
     var th = this;
 	  
-	this.stub.addUser(newUser)
+	this.stub.addTeacher(newTeacher)
 	  .then(function (operationStatus: operationStatusInfo) {
-		var message = "User added successfully";
+		var message = "Teacher added successfully";
         console.log(message);
         alert(message);
-        th.router.navigate(['/users']);
+        th.router.navigate(['/teacher-control']);
       }).catch(function(err) {
-        console.log("Error while adding new user");
+        console.log("Error while adding new teacher");
         alert(err);
 	    th.loading = false;
       });
   }
 
   enableBtn(): boolean {
-    if (this.photo.length > 24 && this.registerForm.controls.username.value.length > 0 && this.registerForm.controls.password.value.length > 0
+    if (this.photo.length > 24 && this.registerForm.controls.login.value.length > 0 && this.registerForm.controls.password.value.length > 0
       && this.registerForm.controls.lastName.value.length > 0 && this.registerForm.controls.firstName.value.length > 0
-      && this.registerForm.controls.nickName.value.length > 0 && this.registerForm.controls.email.value.length > 0
-      && this.registerForm.controls.birthday.value != null)
+      && this.registerForm.controls.secondName.value.length > 0 && this.registerForm.controls.phone.value.length > 0
+      && this.registerForm.controls.birthday.value != null && this.registerForm.controls.address.value.length > 0
+	  && this.registerForm.controls.rank.value.length > 0)
       return true;
     return false;
   }

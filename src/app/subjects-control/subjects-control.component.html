@@ -1,0 +1,28 @@
+<div class="users">
+  <div class="">
+    <app-leftmenu></app-leftmenu>
+  </div>
+  <div class="col-users">
+    <div class="row-fit-users">
+      <div class="use-elem add-user-btn btn">
+        <button type="button" class="use-elem btn" (click)="openAdd()">New subject</button>
+      </div>
+    </div>
+    <table>
+      <tr class="border-style">
+        <td>№</td>
+        <td>NAME</td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr *ngFor="let subject of subjects; let row_no = index" class="border-style">
+        <td>{{row_no + 1}}</td>
+        <td>{{subject.name}}</td>
+        <td><button class="user-btn btn btn-primary" [routerLink]="['/full-profile-subject', subject.id]">Edit</button></td>
+        <td><button class="user-btn btn btn-primary" (click)="deleteSubject(subject)">Delete</button></td>
+      </tr>
+    </table>
+  </div>
+  <div class="another-side">
+  </div>
+</div>

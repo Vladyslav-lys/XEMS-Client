@@ -29,8 +29,12 @@ export class HeaderComponent implements OnInit, OnChanges, DoCheck {
   }
   
   ngDoCheck(): void {
-	  if(localStorage.currentUser != null)
+	if(localStorage.currentUser != null)
+	{
 		this.user = JSON.parse(localStorage.currentUser);
+		return;
+	}
+	this.user = null;
   }
   
   logout() {

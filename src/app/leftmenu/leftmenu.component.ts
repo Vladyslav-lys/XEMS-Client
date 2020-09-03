@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import {Account} from '../_models/accounts';
 import { User } from '../_models/user';
 
 @Component({

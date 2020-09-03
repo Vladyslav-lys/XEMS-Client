@@ -63,7 +63,8 @@ export class LoginComponent implements OnInit {
         th.authenticationService.setAuth(true);
 		th.getAccessPrifle(user);
 		th.getAccessTeacher(user);
-        th.router.navigate(['/users']);
+		th.getAccessStudent(user);
+        th.router.navigate(['/']);
       }
       else {
         th.alertService.error(operationStatus.attachedInfo);
@@ -95,6 +96,14 @@ export class LoginComponent implements OnInit {
 	if(user.accessLevel == 3)
 	{
 		this.authenticationService.setAccessTeacher(true);
+	}  
+  }
+  
+  getAccessStudent(user:User)
+  {
+	if(user.accessLevel == 2)
+	{
+		this.authenticationService.setAccessStudent(true);
 	}  
   }
 }

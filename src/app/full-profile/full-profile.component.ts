@@ -5,7 +5,6 @@ import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { User } from '../_models/user';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { operationStatusInfo } from '../_models/operationStatusInfo';
-import { Account } from '../_models/accounts';
 
 @Component({
   selector: 'app-full-profile',
@@ -30,21 +29,10 @@ export class FullProfileComponent implements OnInit {
     private userService: UserService,
     private formBuilder: FormBuilder
   ) {
-    this.router.events.subscribe(
-      (event) => {
-        if (event instanceof NavigationEnd) {
-          this.route
-            .queryParams
-            .subscribe(params => {
-              // Defaults to 0 if no query param provided.
-              this.currentUserId = +this.route.snapshot.paramMap.get('id');
-              this.LoadUserInfo(this.currentUserId);
-            });
-        }
-      });
   }
 
   ngOnInit(): void {
+	this.currentUser = JSON.parse(localStorage.currentUser);
     this.currentUser.account.birthday = new Date(this.currentUser.account.birthday);
     this.fileInBase64 = this.currentUser.account.photo;
 
@@ -76,17 +64,6 @@ export class FullProfileComponent implements OnInit {
       }
       fr.readAsDataURL(file);
     }
-  }
-
-  LoadUserInfo(currentUserId: number) {
-    var th = this;
-    var users = JSON.parse(sessionStorage.users);
-    users.forEach(function (user: User) {
-      if (user.id == currentUserId) {
-        th.currentUser = user;
-        th.currentPhoto = user.account.photo;
-      }
-    });
   }
 
   EditProfile() {
@@ -134,7 +111,7 @@ export class FullProfileComponent implements OnInit {
           var message = "User info updated successfully";
           console.log(message);
           alert(message);
-          th.router.navigate(['/users']);
+          th.router.navigate(['/students-control']);
         }
         else {
           alert(operationStatus.attachedInfo);

@@ -49,6 +49,19 @@ export class AuthenticationService {
     public setAccessTeacher(value: boolean){
       localStorage.setItem('isAllowedTeacher', JSON.stringify(value));
     }
+	
+	public getAccessStudent(): boolean {
+      var result: boolean;
+      if(localStorage.getItem('isAllowedStudent') != null)
+        result = JSON.parse(localStorage.isAllowedStudent);
+      else
+        result = false;
+      return result;
+    }
+
+    public setAccessStudent(value: boolean){
+      localStorage.setItem('isAllowedStudent', JSON.stringify(value));
+    }
 
     login(username, password, serviceClient = this.serviceClient) {
       var th = this;

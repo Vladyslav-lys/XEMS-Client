@@ -1,8 +1,14 @@
 <div class="list">
   <a routerLink="/" class="list-link">Home</a>
-  <a *ngIf="user.accessLevel == 4" routerLink="/users" class="list-link">Users</a>
+  <a *ngIf="user.accessLevel == 4" routerLink="/full-profile" class="list-link">Profile</a>
+   <a *ngIf="user.accessLevel == 4" routerLink="/students-control" class="list-link">Students</a>
+   <a *ngIf="user.accessLevel == 4" routerLink="/teachers-control" class="list-link">Teachers</a>
+   <a *ngIf="user.accessLevel == 4" routerLink="/subjects-control" class="list-link">Subjects</a>
+   <a *ngIf="user.accessLevel == 4" routerLink="/work-plans-control" class="list-link">Work plans</a>
+   <a *ngIf="user.accessLevel == 4" routerLink="/schedule-control" class="list-link">Work plans</a>
   <a *ngIf="user.accessLevel == 3" routerLink="/students" class="list-link">Students</a>
+  <a *ngIf="user.accessLevel == 3" routerLink="/work-plans" class="list-link">Work plans</a>
+  <a *ngIf="user.accessLevel == 3" routerLink="/modules" class="list-link">Modules</a>
+  <a *ngIf="user.accessLevel == 2" routerLink="/schedule" class="list-link">Schedule</a>
+  <a *ngIf="user.accessLevel == 2" routerLink="/works-and-projects" class="list-link">Works and projects</a>
 </div>
-<!--<div class="list">
-  <a [routerLink]="['/note', note.id]" class="list-group-item list-group-item-action" *ngFor="let note of notes">{{ note.title }}</a>
-</div>-->

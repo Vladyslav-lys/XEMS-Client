@@ -18,7 +18,6 @@ export class NotificationComponent implements OnInit {
   }
 
   ngOnInit(){
-	this.callNotificationEnteredText();
 	this.callNotificationUnicastText();
   }
 

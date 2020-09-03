@@ -1,0 +1,29 @@
+<div class="register">
+  <div class="">
+    <app-leftmenu></app-leftmenu>
+  </div>
+  <div class="col-register">
+
+    <form [formGroup]="registerForm">
+      <div class="row-another">
+        <h3 class="h3">Subject</h3>
+        <div class="form-group">
+          <div class="error-area">
+            <div class="error-text" *ngIf="(submitted || this.registerForm.controls.name.touched) && this.registerForm.controls.name.errors">Name is required</div>
+          </div>
+          <div [class.error-block]="(submitted || this.registerForm.controls.name.touched) && this.registerForm.controls.name.errors" class="use-elem use-elem-input">
+            <input type="text" formControlName="name" class="form-control" [ngClass]="{ 'is-invalid': submitted && this.registerForm.controls.name.errors }" placeholder="Name" />
+          </div>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <div [class.btn]="enableBtn()" class="use-elem use-elem-button">
+          <button type="submit" [class.btn]="enableBtn()" [disabled]="loading" class="btn-primary" (click)="AddSubject()">Add</button>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="another-side">
+  </div>
+</div>

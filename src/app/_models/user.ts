@@ -1,8 +1,6 @@
-import {Account} from './accounts';
-
 export class User {
     id: number;
-    account: Account;
+    account: any;
     login: string;
     password: string;
 	isActive: boolean;

@@ -1,0 +1,62 @@
+<div class="users">
+  <div class="">
+    <app-leftmenu></app-leftmenu>
+  </div>
+  <div class="col-users">
+    <div class="row-fit-users">
+      <div class="use-elem add-user-btn btn">
+        <button type="button" class="use-elem btn" (click)="openAdd()">New student</button>
+      </div>
+	  <form class="fit-users-notify-form" [formGroup]="notifyForm">
+        <div class="use-elem use-elem-input-users">
+          <input type="text" class="form-control" formControlName="messageText" placeholder="Type a message here..." value="{{messageText}}">
+        </div>
+        <div class="use-elem add-user-btn btn">
+          <button type="button" class="use-elem btn" (click)="sendNotifyAllText()">Send</button>
+        </div>
+      </form>
+    </div>
+    <table>
+      <tr class="border-style">
+        <td>№</td>
+        <td>LOGIN</td>
+        <td>PASSWORD</td>
+		<td>LAST NAME</td>
+        <td>FIRST NAME</td>
+        <td>SECONDNAME</td>
+        <td>BIRTHDAY</td>
+        <td>PHONE</td>
+		<td>ADDRESS</td>
+        <td>PHOTO</td>
+		<td>GROUP</td>
+        <td>CREATE TIME</td>
+        <td>MODIFY TIME</td>
+        <td>ACTIVE</td>
+        <td>ACCESS LEVEL</td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr *ngFor="let student of students; let row_no = index" class="border-style">
+        <td>{{row_no + 1}}</td>
+        <td>{{student.login}}</td>
+        <td>{{student.password}}</td>
+        <td>{{student.account.lastName}}</td>
+        <td>{{student.account.firstName}}</td>
+        <td>{{student.account.secondName}}</td>
+        <td>{{student.account.birthday | date : "dd.MM.y"}}</td>
+        <td>{{student.account.phone}}</td>
+		<td>{{student.account.address}}</td>
+        <td><img width="50" height="50" src="{{student.account.photo}}" /></td>
+		<td>{{student.account.group.name}}</td>
+        <td>{{student.account.createTime | date : "dd.MM.y h:mm"}}</td>
+        <td>{{student.account.modifyTime | date : "dd.MM.y h:mm"}}</td>
+        <td>{{getActive(student.isActive)}}</td>
+        <td>{{getAccessLevel(student.accessLevel)}}</td>
+        <td><button class="user-btn btn btn-primary" [routerLink]="['/full-profile-student', student.id]">Edit</button></td>
+        <td><button class="user-btn btn btn-primary" (click)="deleteStudent(student)">Delete</button></td>
+      </tr>
+    </table>
+  </div>
+  <div class="another-side">
+  </div>
+</div>
