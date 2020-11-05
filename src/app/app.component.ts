@@ -1,9 +1,9 @@
 import { Component, HostListener, OnDestroy } from '@angular/core';
 import {AuthenticationService} from './_services/authentication.service';
-import {User} from './_models/user';
+import {Authorization} from './_models/authorization';
 import {Router} from '@angular/router';
 import {SignalRService} from './_services/signalR.service';
-import { operationStatusInfo } from './_models/operationStatusInfo';
+import { operationStatusInfo } from './_helpers/operationStatusInfo';
 
 @Component({
   selector: 'app-root',
@@ -12,7 +12,7 @@ import { operationStatusInfo } from './_models/operationStatusInfo';
 })
 export class AppComponent {
 	title = 'app';
-  currentUser: User;
+  currentAuthorization: Authorization;
 
   constructor(private serviceClient: SignalRService,
   ) {

@@ -1,0 +1,38 @@
+<div class="users">
+  <div class="">
+    <app-leftmenu></app-leftmenu>
+  </div>
+  <div class="col-users">
+	<div class="row-fit-users">
+      <div class="use-elem add-user-btn btn">
+        <button type="button" class="use-elem btn" (click)="openAdd()">New working plan</button>
+      </div>
+    </div>
+    <table>
+      <tr class="border-style">
+        <td>№</td>
+		<td>TEACHER</td>
+		<td>DISCIPLINE</td>
+		<td>HOURS</td>
+		<td>ROLE</td>
+		<td>YEAR</td>
+		<td>SEMESTER</td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr *ngFor="let workingPlan of workingPlans; let row_no = index" class="border-style">
+        <td>{{row_no + 1}}</td>
+		<td>{{workingPlan.teacher.lastName}} + " " + {{workingPlan.teacher.firstName}}</td>
+		<td>{{workingPlan.discipline.title}}</td>
+		<td>{{workingPlan.hours}}</td>
+		<td>{{getRole(workingPlan.role)}}</td>
+		<td>{{workingPlan.year}}</td>
+		<td>{{getSemester(workingPlan.semester)}}</td>
+        <td><button class="user-btn btn btn-primary" [routerLink]="['/full-profile-working-plan', workingPlan.id]">Edit</button></td>
+        <td><button class="user-btn btn btn-primary" (click)="deleteWorkingPlan(workingPlan)">Delete</button></td>
+      </tr>
+    </table>
+  </div>
+  <div class="another-side">
+  </div>
+</div>

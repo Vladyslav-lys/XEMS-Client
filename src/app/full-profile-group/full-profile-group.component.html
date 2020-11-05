@@ -1,0 +1,62 @@
+<div class="full-profile">
+  <div class="">
+    <app-leftmenu></app-leftmenu>
+  </div>
+  <div class="col-full-profile">
+
+    <form [formGroup]="profileForm">
+      <div class="row-another">
+	  <h3 class="h3">Group</h3>
+      <div>
+          <div class="input-group">
+            <div class="error-area">
+              <div class="error-text" *ngIf="(submitted || this.profileForm.controls.name.touched) && this.profileForm.controls.name.errors">Name is required</div>
+            </div>
+            <div [class.error-block]="(submitted || this.profileForm.controls.name.touched) && this.profileForm.controls.name.errors" class="use-elem use-elem-input">
+              <input type="text" class="form-control" placeholder="Name" formControlName="name" value="">
+            </div>
+          </div>
+		  <div class="input-group">
+            <div class="error-area"></div>
+            <select class="use-elem use-elem-select" formControlName="curator">
+			  <option *ngFor="let teacher of teachers2" [ngValue]="{{teacher.id}}">{{teacher.lastName}} + " " + {{teacher.firstName}}</option>
+            </select>
+          </div>
+		  <div class="input-group">
+           <div class="error-area">
+              <div class="error-text" *ngIf="(submitted || this.profileForm.controls.learningStartDate.touched) && this.profileForm.controls.learningStartDate.errors">Learning Start Date is required</div>
+            </div>
+            <div [class.error-block]="(submitted || this.profileForm.controls.learningStartDate.touched) && this.profileForm.controls.learningStartDate.errors" class="use-elem use-elem-input">
+              <input type="date" class="form-control" formControlName="learningStartDate" [valueAsDate]="currentGroup.learningStartDate | date:'yyyy-MM-dd'" />
+            </div>
+          </div>
+          <div class="input-group">
+           <div class="error-area">
+              <div class="error-text" *ngIf="(submitted || this.profileForm.controls.learningEndDate.touched) && this.profileForm.controls.learningEndDate.errors">Learning End Date is required</div>
+            </div>
+            <div [class.error-block]="(submitted || this.profileForm.controls.blearningEndDate.touched) && this.profileForm.controls.learningEndDate.errors" class="use-elem use-elem-input">
+              <input type="date" class="form-control" formControlName="learningEndDate" [valueAsDate]="currentGroup.learningEndDate | date:'yyyy-MM-dd'" />
+            </div>
+          </div>
+          <div class="input-group">
+            <div class="error-area"></div>
+            <select class="use-elem use-elem-select" formControlName="degree">
+              <option value="1">Specialist</option>
+              <option value="2">Bachelor</option>
+              <option value="3">Master</option>
+              <option value="4">DoctorOfPhilosophy</option>
+			  <option value="5">DoctorOfScience</option>
+            </select>
+          </div>
+        </div>
+	  </div>
+      <div class="input-group">
+        <div [class.btn]="enableBtn()" class="use-elem use-elem-button">
+          <button type="submit" [class.btn]="enableBtn()" [disabled]="loading" class="btn-primary" (click)="EditGroup()">Edit</button>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="another-side">
+  </div>
+</div>

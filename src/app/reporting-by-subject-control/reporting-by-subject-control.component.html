@@ -1,0 +1,42 @@
+ <div class="designed-home">
+	<div class="menu">
+		<app-leftmenu></app-leftmenu>
+    </div>
+	<div class="use-elem add-user-btn btn">
+        <button type="button" class="use-elem btn" [routerLink]="['/register-reporting-by-subject']">New reporting</button>
+      </div>
+	<div class="master-detail">
+		<app-master-detail #master2>
+			<div *ngIf="items2 == null" class="no-note-text">
+				<p>There is no note here</p>
+			</div>
+			<ul>
+				<li *ngFor="let item of items2" (click)="master2.open(item)" class="use-elem">
+					<a href="javascript:void(0);">
+						<div class="use-elem-link">
+							{{ item.id }}. {{ item.reportingBySubject.title }}
+						</div>
+					</a>
+				</li>
+			</ul>
+			<div *appDetailView="let item; let ctrl = controller">
+				<h3 class="h3">{{ item.reportingBySubject.title }}</h3>
+				<p class="note-text note-marging">Discipline: {{ item.reportingBySubject.discipline.title }}</p>
+				<p class="note-text note-marging">{{ item.reportingBySubject.description }}</p>
+				<p class="note-text note-marging">To whom: {{ item.reportingBySubject.student.lastName }} {{ item.reportingBySubject.student.firstName }}</p>
+				<p class="note-text note-marging">From who: {{ item.reportingBySubject.teacher.lastName }} {{ item.reportingBySubject.teacher.firstName }}</p>
+				<div class="note-date-changing note-marging note-p">
+					<p type="text">Due date: {{ item.dueDate | date : "dd.MM.y h:mm" }}</p>
+					<p type="text">Real due date: {{ item.realDueDate| date : "dd.MM.y h:mm" }}</p>
+				</div>
+				<p class="note-text note-marging">Reporting type: {{ getReportingBySubjectType(item.reportingBySubject.reporting) }}</p>
+				<p class="note-text note-marging">Completed: {{ getIsCompleted(item.reportingBySubject.isCompleted) }}</p>
+				<p class="note-text note-marging">Grade: {{ item.reportingBySubject.grade }}</p>
+				<!--<button (click)="ctrl.close()">Close</button>-->
+				<div class="use-elem use-elem-button-md btn">
+					<button [routerLink]="['/full-profile-reporting-by-subject', item.id]" class="btn">Edit</button>
+				</div>
+			</div>
+		</app-master-detail>
+	</div>
+</div>

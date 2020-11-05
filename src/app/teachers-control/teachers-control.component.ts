@@ -1,14 +1,16 @@
 import { Component, OnInit } from '@angular/core';
-import { UserService } from '../_services/user.service';
+import { TeacherService } from '../_services/teacher.service';
+import { AuthenticationService } from '../_services/authentication.service';
 import { StubService } from '../_services/stub.service';
 import { Router } from '@angular/router';
-import { User } from '../_models/user';
+import { Authorization } from '../_models/authorization';
 import { Teacher } from '../_models/teacher';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { operationStatusInfo } from '../_models/operationStatusInfo';
+import { operationStatusInfo } from '../_helpers/operationStatusInfo';
 import { NotifyService } from '../_services/notify.service';
 import { Message } from '../_models/message';
 import { Group } from '../_models/group';
+import { AccessLevel } from '../_enums/accessLevel';
 import {HubConnectionState} from '@microsoft/signalr';
 import {SignalRService} from '../_services/signalR.service';
 
@@ -19,19 +21,18 @@ import {SignalRService} from '../_services/signalR.service';
 })
 export class TeachersControlComponent implements OnInit {
 
-  user: User;
+  authorization: Authorization;
   messageText: string;
   notifyForm: FormGroup;
 
-  teachers: User[];
-  teachers2: User[];
-  
-  groups: Group[];
-  groups2: Group[];
+  teachers: Teacher[];
+  teachers2: Teacher[];
+  isActives: boolean[];
 
   constructor(
     private router: Router,
-    private userService: UserService,
+    private teacherService: TeacherService,
+	private authenticationService: AuthorizationService,
 	private stub:StubService,
 	private serviceClient: SignalRService,
     private notifySerivce: NotifyService,
@@ -40,15 +41,14 @@ export class TeachersControlComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void>{
-    this.user = JSON.parse(localStorage.currentUser);
 	
 	if(this.serviceClient.hubConnection.state == HubConnectionState.Connected){
-	  await this.getAllGroups();
+	  await this.getActive();
 	  await this.getAllTeachers();
     }
     else {
       setTimeout(async () => {
-		  await this.getAllGroups();
+		  await this.getActive();
 		  await this.getAllTeachers();
 		}, 500);
     }
@@ -57,51 +57,37 @@ export class TeachersControlComponent implements OnInit {
       messageText: [this.messageText],
     });
   }
-  
-  async getAllGroups()
-  {
-	var th = this;
-	await this.stub.getAllGroups()
-	  .then(function (operationStatus: operationStatusInfo) {
-		var groups = operationStatus.attachedObject;
-        th.groups = groups;
-        sessionStorage.setItem("groups", JSON.stringify(groups));
-        th.groups2 = JSON.parse(sessionStorage.groups).map(i => ({
-          idx: i,
-          id: i.id,
-          name: i.name
-        }));
-      }).catch(function(err) {
-        console.log("Error while fetching groups");
-        alert(err);
-      });  
-  }
 
   async getAllTeachers() {
     var th = this;
-	await this.stub.getAllTeachers()
+	await this.teacherService.getAllTeachers()
 	  .then(function (operationStatus: operationStatusInfo) {
 		var teachers = operationStatus.attachedObject;
-        for (let teacher of teachers) {
-			var fileInBase64 = teacher.account.photo;
-			if(fileInBase64 != null)
-			{
-				var splitted = fileInBase64.split(",", 2);
-				if(splitted[0] != 'data:image/png;base64')
-					teacher.account.photo = 'data:image/png;base64,' + teacher.account.photo;
-			}
-        }
         th.teachers = teachers;
         sessionStorage.setItem("teachers", JSON.stringify(teachers));
         th.teachers2 = JSON.parse(sessionStorage.teachers).map(i => ({
           idx: i,
           id: i.id,
-          account: i.account,
-          login: i.login,
-          password: i.password,
-          isActive: i.isActive,
-          accessLevel:i.accessLevel
+          firstName: i.firstName,
+		  lastName: i.lastName,
+		  birthday: i.birthday,
+		  phone: i.phone,
+		  address: i.address,
+		  createTime: i.createTime,
+		  modifyTime: i.modifyTime
         }));
+      }).catch(function(err) {
+        console.log("Error while fetching teachers");
+        alert(err);
+      });
+  }
+  
+  async getActive() {
+    var th = this;
+    
+	await this.authenticationService.getAllActives(AccessLevel.Teacher)
+	  .then(function (operationStatus: operationStatusInfo) {
+		th.isActives = operationStatus.attachedObject;
       }).catch(function(err) {
         console.log("Error while fetching teachers");
         alert(err);
@@ -112,16 +98,13 @@ export class TeachersControlComponent implements OnInit {
     var s = "";
 
     switch (accessLevel) {
-      case 1:
-        s = "Analitic";
-        break;
-      case 2:
+      case AccessLevel.Student:
         s = "Student";
         break;
-      case 3:
+      case AccessLevel.Teacher:
         s = "Teacher";
         break;
-      case 4:
+      case AccessLevel.Admin:
         s = "Administrator";
         break;
     }
@@ -150,7 +133,16 @@ export class TeachersControlComponent implements OnInit {
 
   deleteTeacher(teacher) {
     var th = this;
-	this.stub.deleteTeacher(teacher.id)
+	this.authenticationService.deleteTeacherAuthorization(teacher.id)
+	  .then(function (operationStatus: operationStatusInfo) {
+		console.log(operationStatus.attachedObject);
+        if (!JSON.stringify(operationStatus.operationStatus))
+          window.location.reload();
+      }).catch(function(err) {
+        console.log("Error while deleting the teacher");
+        alert(err);
+      });
+	this.teacherService.deleteTeacher(teacher.id)
 	  .then(function (operationStatus: operationStatusInfo) {
 		console.log(operationStatus.attachedObject);
         if (!JSON.stringify(operationStatus.operationStatus))
@@ -170,7 +162,7 @@ export class TeachersControlComponent implements OnInit {
 
     var message: Message;
     message = new Message();
-    message.senderName = this.getAccessLevel(this.user.accessLevel);
+    message.senderName = this.getAccessLevel(AccessLevel.Admin);
     message.text = this.notifyForm.controls.messageText.value;
 	
 	this.notifySerivce.sendNotifyAllEnteredText(message)

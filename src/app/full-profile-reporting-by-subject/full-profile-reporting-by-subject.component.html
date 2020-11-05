@@ -1,0 +1,103 @@
+<div class="full-profile">
+  <div class="">
+    <app-leftmenu></app-leftmenu>
+  </div>
+  <div class="col-full-profile">
+
+    <form [formGroup]="profileForm">
+      <div class="row-another">
+	  <h3 class="h3">Reporting by subject</h3>
+		<div class="input-group">
+          <div class="error-area"></div>
+          <select class="use-elem use-elem-select" formControlName="student">
+            <option *ngFor="let student of students2" [ngValue]="{{student.id}}">{{student.lastName}} + " " + {{student.firstName}}</option>
+          </select>
+        </div>
+		<div class="input-group">
+            <div class="error-area"></div>
+            <select class="use-elem use-elem-select" formControlName="teacher">>
+			  <option *ngFor="let teacher of teachers2" [ngValue]="{{teacher.id}}">{{teacher.lastName}} + " " + {{teacher.firstName}}</option>
+            </select>
+          </div>
+		<div class="input-group">
+          <div class="error-area"></div>
+          <select class="use-elem use-elem-select" formControlName="discipline">
+            <option *ngFor="let discipline of disciplines2" [ngValue]="{{discipline.id}}">{{discipline.title}}</option>
+          </select>
+        </div>
+        <div class="input-group">
+            <div class="error-area">
+              <div class="error-text" *ngIf="(submitted || this.profileForm.controls.title.touched) && this.profileForm.controls.title.errors">Title is required</div>
+            </div>
+            <div [class.error-block]="(submitted || this.profileForm.controls.title.touched) && this.profileForm.controls.title.errors" class="use-elem use-elem-input">
+              <input type="text" class="form-control" placeholder="Title" formControlName="title">
+            </div>
+          </div>
+		  <div class="input-group">
+            <div class="error-area">
+              <div class="error-text" *ngIf="(submitted || this.profileForm.controls.description.touched) && this.profileForm.controls.description.errors">Description is required</div>
+            </div>
+            <div [class.error-block]="(submitted || this.profileForm.controls.description.touched) && this.profileForm.controls.description.errors" class="use-elem use-elem-input">
+              <input type="text" class="form-control" placeholder="Description" formControlName="description">
+            </div>
+          </div>
+		<div class="input-group">
+            <div class="error-area"></div>
+            <select class="use-elem use-elem-select" formControlName="reporting">
+              <option value="1">Module</option>
+              <option value="2">CourseTask</option>
+			  <option value="3">Exam</option>
+			  <option value="4">Credit</option>
+			  <option value="5">DifferentialCredit</option>
+            </select>
+        </div>
+		<div class="input-group">
+            <div class="error-area">
+              <div class="error-text" *ngIf="(submitted || this.profileForm.controls.dueDate.touched) && this.profileForm.controls.dueDate.errors">Due date is required</div>
+            </div>
+            <div [class.error-block]="(submitted || this.profileForm.controls.dueDate.touched) && this.profileForm.controls.dueDate.errors" class="use-elem use-elem-input">
+              <input type="date" class="form-control" formControlName="dueDate" [valueAsDate]="currentReporting.reportingBySubject.dueDate" />
+            </div>
+          </div>
+		<div class="input-group">
+            <div class="error-area">
+              <div class="error-text" *ngIf="(submitted || this.profileForm.controls.realDueDate.touched) && this.profileForm.controls.realDueDate.errors">Real due date is required</div>
+            </div>
+            <div [class.error-block]="(submitted || this.profileForm.controls.realDueDate.touched) && this.profileForm.controls.realDueDate.errors" class="use-elem use-elem-input">
+              <input type="date" class="form-control" formControlName="realDueDate" [valueAsDate]="currentReporting.reportingBySubject.realDueDate" />
+            </div>
+          </div>
+		<div class="input-group">
+            <div class="error-area"></div>
+            <label class="use-active">
+              <span class="use-active-span">Is Completed</span>
+              <input type="checkbox" formControlName="isCompleted">
+              <span class="checkmark"></span>
+            </label>
+          </div>
+		<div class="form-group">
+          <div class="error-area">
+            <div class="error-text" *ngIf="(submitted || this.profileForm.controls.grade.touched) && this.profileForm.controls.grade.errors">Grade is required</div>
+          </div>
+          <div [class.error-block]="(submitted || this.profileForm.controls.grade.touched) && this.profileForm.controls.grade.errors" class="use-elem use-elem-input">
+            <input type="number" formControlName="grade" class="form-control" [ngClass]="{ 'is-invalid': submitted && this.profileForm.controls.grade.errors }" placeholder="Grade"/>
+          </div>
+        </div>
+		<div class="photo">
+            <div class="file-choosing">
+              <input type="file" id="file" (change)="onFileChanged($event)" [ngValue]="{{currentMaterial}}">
+              <label for="file" class="use-elem-file-choosing btn">Choose a file</label>
+            </div>
+          </div>
+      </div>
+	  
+      <div class="input-group">
+        <div [class.btn]="enableBtn()" class="use-elem use-elem-button">
+          <button type="submit" [class.btn]="enableBtn()" [disabled]="loading" class="btn-primary" (click)="EditReporting()">Edit</button>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="another-side">
+  </div>
+</div>

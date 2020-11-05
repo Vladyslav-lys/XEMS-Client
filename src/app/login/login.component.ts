@@ -1,12 +1,13 @@
 import {Component, Input, OnInit} from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthenticationService } from '../_services/authentication.service';
-import { StubService } from '../_services/stub.service';
+//import { StubService } from '../_services/stub.service';
 import { SignalRService } from '../_services/signalR.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { operationStatusInfo } from '../_models/operationStatusInfo';
+import {operationStatusInfo, OperationStatus} from '../_helpers/operationStatusInfo';
 import { AlertService } from '../_services/alert.service';
-import { User } from '../_models/user';
+import { Authorization } from '../_models/authorization';
+import { AccessLevel } from "../_enums/accessLevel";
 
 @Component({
   selector: 'app-login',
@@ -23,7 +24,7 @@ export class LoginComponent implements OnInit {
   constructor(
     private serviceConnectionClient: SignalRService,
     private authenticationService: AuthenticationService,
-	private stub:StubService,
+	//private stub:StubService,
     private route: ActivatedRoute,
     private router: Router,
     private alertService: AlertService,
@@ -55,19 +56,22 @@ export class LoginComponent implements OnInit {
 
     var th = this;
 
-    this.stub.login(this.f.username.value, this.f.password.value)
-	  .then(function (operationStatus : operationStatusInfo){
-      if (operationStatus.operationStatus == 1) {
-        localStorage.setItem('currentUser', JSON.stringify(operationStatus.attachedObject));
-		var user = JSON.parse(localStorage.currentUser);
+    this.authenticationService.login(this.f.username.value, this.f.password.value)
+	  .then(function (operationStatusInfo : operationStatusInfo){
+      if (operationStatusInfo.operationStatus == OperationStatus.Done) {
+		  var auth = operationStatusInfo.attachedObject;
+		  var currentDate = new Date();
+		  auth[4] = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDay() + 8);
+        localStorage.setItem('currentAuthentication', JSON.stringify(auth));
+		var authentication = JSON.parse(localStorage.currentAuthentication);
         th.authenticationService.setAuth(true);
-		th.getAccessPrifle(user);
-		th.getAccessTeacher(user);
-		th.getAccessStudent(user);
+		th.getAccessAdmin(authentication[1]);
+		th.getAccessTeacher(authentication[1]);
+		th.getAccessStudent(authentication[1]);
         th.router.navigate(['/']);
       }
       else {
-        th.alertService.error(operationStatus.attachedInfo);
+        th.alertService.error(operationStatusInfo.attachedInfo);
         th.loading = false;
       }
     }).catch(err => {
@@ -83,25 +87,25 @@ export class LoginComponent implements OnInit {
 		return false;
 	}
 	
-  getAccessPrifle(user:User)
+  getAccessAdmin(authentication)
   {
-	  if(user.accessLevel == 4)
+	  if(authentication[1] == AccessLevel.Admin)
 	  {
-		  this.authenticationService.setAccessProfile(true);
+		  this.authenticationService.setAccessAdmin(true);
 	  }
   }
   
-  getAccessTeacher(user:User)
+  getAccessTeacher(authentication)
   {
-	if(user.accessLevel == 3)
+	if(authentication[1] == AccessLevel.Teacher)
 	{
 		this.authenticationService.setAccessTeacher(true);
 	}  
   }
   
-  getAccessStudent(user:User)
+  getAccessStudent(authentication)
   {
-	if(user.accessLevel == 2)
+	if(authentication[1] == AccessLevel.Student)
 	{
 		this.authenticationService.setAccessStudent(true);
 	}  

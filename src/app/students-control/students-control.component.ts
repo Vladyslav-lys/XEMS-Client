@@ -1,13 +1,16 @@
 import { Component, OnInit } from '@angular/core';
-import { UserService } from '../_services/user.service';
-import { StubService } from '../_services/stub.service';
+import { StudentService } from '../_services/student.service';
+import { AuthenticationService } from '../_services/authentication.service';
+//import { StubService } from '../_services/stub.service';
 import { Router } from '@angular/router';
-import { User } from '../_models/user';
+import { Authorization } from '../_models/authorization';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { operationStatusInfo } from '../_models/operationStatusInfo';
+import { operationStatusInfo } from '../_helpers/operationStatusInfo';
 import { NotifyService } from '../_services/notify.service';
 import { Message } from '../_models/message';
 import { Group } from '../_models/group';
+import { Student } from '../_models/student';
+import { AccessLevel } from '../_enums/accessLevel';
 import {HubConnectionState} from '@microsoft/signalr';
 import {SignalRService} from '../_services/signalR.service';
 
@@ -18,20 +21,19 @@ import {SignalRService} from '../_services/signalR.service';
 })
 export class StudentsControlComponent implements OnInit {
 
-  user: User;
   messageText: string;
   notifyForm: FormGroup;
 
-  students: User[];
-  students2: User[];
+  students: Student[];
+  students2: Student[];
   
-  groups: Group[];
-  groups2: Group[];
+  isActives: boolean[];
 
   constructor(
     private router: Router,
-    private userService: UserService,
-	private stub:StubService,
+    private studentService: StudentService,
+	private authenticationService: AuthenticationService,
+	//private stub:StubService,
 	private serviceClient: SignalRService,
     private notifySerivce: NotifyService,
     private formBuilder: FormBuilder
@@ -39,15 +41,14 @@ export class StudentsControlComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void>{
-    this.user = JSON.parse(localStorage.currentUser);
 	
 	if(this.serviceClient.hubConnection.state == HubConnectionState.Connected){
-	  await this.getAllGroups();
+	  await this.getActiveAsync();
 	  await this.getAllStudents();
     }
     else {
       setTimeout(async () => {
-		  await this.getAllGroups();
+		  await this.getActiveAsync();
 		  await this.getAllStudents();
 		}, 500);
     }
@@ -57,50 +58,37 @@ export class StudentsControlComponent implements OnInit {
     });
   }
   
-  async getAllGroups()
-  {
-	var th = this;
-	await this.stub.getAllGroups()
+  async getActiveAsync() {
+    var th = this;
+    
+	await this.authenticationService.getAllActives(AccessLevel.Teacher)
 	  .then(function (operationStatus: operationStatusInfo) {
-		var groups = operationStatus.attachedObject;
-        th.groups = groups;
-        sessionStorage.setItem("groups", JSON.stringify(groups));
-        th.groups2 = JSON.parse(sessionStorage.groups).map(i => ({
-          idx: i,
-          id: i.id,
-          name: i.name
-        }));
+		th.isActives = operationStatus.attachedObject;
       }).catch(function(err) {
-        console.log("Error while fetching groups");
+        console.log("Error while fetching students");
         alert(err);
-      });  
+      });
   }
 
   async getAllStudents() {
     var th = this;
     
-	await this.stub.getAllStudents()
+	await this.studentService.getAllStudents()
 	  .then(function (operationStatus: operationStatusInfo) {
 		var students = operationStatus.attachedObject;
-        for (let student of students) {
-			var fileInBase64 = student.account.photo;
-			if(fileInBase64 != null)
-			{
-				var splitted = fileInBase64.split(",", 2);
-				if(splitted[0] != 'data:image/png;base64')
-					student.account.photo = 'data:image/png;base64,' + student.account.photo;
-			}
-        }
         th.students = students;
         sessionStorage.setItem("students", JSON.stringify(students));
         th.students2 = JSON.parse(sessionStorage.students).map(i => ({
           idx: i,
           id: i.id,
-          account: i.account,
-          login: i.login,
-          password: i.password,
-          isActive: i.isActive,
-          accessLevel:i.accessLevel
+          firstName: i.firstName,
+		  lastName: i.lastName,
+		  birthday: i.birthday,
+		  phone: i.phone,
+		  address: i.address,
+		  group: i.group,
+		  createTime: i.createTime,
+		  modifyTime: i.modifyTime
         }));
       }).catch(function(err) {
         console.log("Error while fetching students");
@@ -112,16 +100,13 @@ export class StudentsControlComponent implements OnInit {
     var s = "";
 
     switch (accessLevel) {
-      case 1:
-        s = "Analitic";
-        break;
-      case 2:
+      case AccessLevel.Student:
         s = "Student";
         break;
-      case 3:
+      case AccessLevel.Teacher:
         s = "Teacher";
         break;
-      case 4:
+      case AccessLevel.Admin:
         s = "Administrator";
         break;
     }
@@ -150,7 +135,16 @@ export class StudentsControlComponent implements OnInit {
 
   deleteStudent(student) {
     var th = this;
-	this.stub.deleteStudent(student.id)
+	this.studentService.deleteStudentAuthorization(student.id)
+	  .then(function (operationStatus: operationStatusInfo) {
+		console.log(operationStatus.attachedObject);
+        if (!JSON.stringify(operationStatus.operationStatus))
+          window.location.reload();
+      }).catch(function(err) {
+        console.log("Error while deleting the student");
+        alert(err);
+      });
+	this.studentService.deleteStudent(student.id)
 	  .then(function (operationStatus: operationStatusInfo) {
 		console.log(operationStatus.attachedObject);
         if (!JSON.stringify(operationStatus.operationStatus))
@@ -170,7 +164,7 @@ export class StudentsControlComponent implements OnInit {
 
     var message: Message;
     message = new Message();
-    message.senderName = this.getAccessLevel(this.user.accessLevel);
+    message.senderName = this.getAccessLevel(AccessLevel.Admin);
     message.text = this.notifyForm.controls.messageText.value;
 	
 	this.notifySerivce.sendNotifyAllEnteredText(message)

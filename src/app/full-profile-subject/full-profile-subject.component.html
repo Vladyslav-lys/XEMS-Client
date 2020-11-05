@@ -4,19 +4,85 @@
   </div>
   <div class="col-full-profile">
 
-    <form [formGroup]="subjectForm">
+    <form [formGroup]="profileForm">
       <div class="row-another">
-        <h3 class="h3">Subject</h3>
+		<h3 class="h3">Subject</h3>
+		<div class="input-group">
+          <div class="error-area"></div>
+          <select class="use-elem use-elem-select" formControlName="student">
+            <option *ngFor="let student of students2" [ngValue]="{{student.id}}">{{student.lastName}} + " " + {{student.firstName}}</option>
+          </select>
+        </div>
+		<div class="input-group">
+          <div class="error-area"></div>
+          <select class="use-elem use-elem-select" formControlName="discipline">
+            <option *ngFor="let discipline of disciplines2" [ngValue]="{{discipline.id}}">{{discipline.title}}</option>
+          </select>
+        </div>
         <div class="form-group">
           <div class="error-area">
-            <div class="error-text" *ngIf="(submitted || this.subjectForm.controls.name.touched) && this.subjectForm.controls.name.errors">Name is required</div>
+            <div class="error-text" *ngIf="(submitted || this.profileForm.controls.year.touched) && this.profileForm.controls.year.errors">Year is required</div>
           </div>
-          <div [class.error-block]="(submitted || this.subjectForm.controls.name.touched) && this.subjectForm.controls.name.errors" class="use-elem use-elem-input">
-            <input type="text" formControlName="name" class="form-control" [ngClass]="{ 'is-invalid': submitted && this.subjectForm.controls.name.errors }" placeholder="Name" />
+          <div [class.error-block]="(submitted || this.profileForm.controls.year.touched) && this.profileForm.controls.year.errors" class="use-elem use-elem-input">
+            <input type="number" formControlName="year" class="form-control" [ngClass]="{ 'is-invalid': submitted && this.profileForm.controls.year.errors }" placeholder="Year"/>
+          </div>
+        </div>
+		<div class="input-group">
+            <div class="error-area"></div>
+            <select class="use-elem use-elem-select" formControlName="semester">
+              <option value="1">First with winter session</option>
+              <option value="2">Second with summer session</option>
+            </select>
+        </div>
+		<div class="form-group">
+          <div class="error-area">
+            <div class="error-text" *ngIf="(submitted || this.profileForm.controls.lectureHours.touched) && this.profileForm.controls.lectureHours.errors">Lecture hours is required</div>
+          </div>
+          <div [class.error-block]="(submitted || this.profileForm.controls.lectureHours.touched) && this.profileForm.controls.lectureHours.errors" class="use-elem use-elem-input">
+            <input type="number" formControlName="lectureHours" class="form-control" [ngClass]="{ 'is-invalid': submitted && this.profileForm.controls.lectureHours.errors }" placeholder="Lecture hours"/>
+          </div>
+        </div>
+		<div class="form-group">
+          <div class="error-area">
+            <div class="error-text" *ngIf="(submitted || this.profileForm.controls.practiceHours.touched) && this.profileForm.controls.practiceHours.errors">Practice hours is required</div>
+          </div>
+          <div [class.error-block]="(submitted || this.profileForm.controls.practiceHours.touched) && this.profileForm.controls.practiceHours.errors" class="use-elem use-elem-input">
+            <input type="number" formControlName="practiceHours" class="form-control" [ngClass]="{ 'is-invalid': submitted && this.profileForm.controls.practiceHours.errors }" placeholder="Practice hours"/>
+          </div>
+        </div>
+		<div class="form-group">
+          <div class="error-area">
+            <div class="error-text" *ngIf="(submitted || this.profileForm.controls.laboratoryHours.touched) && this.profileForm.controls.laboratoryHours.errors">Laboratory hours is required</div>
+          </div>
+          <div [class.error-block]="(submitted || this.profileForm.controls.laboratoryHours.touched) && this.profileForm.controls.laboratoryHours.errors" class="use-elem use-elem-input">
+            <input type="number" formControlName="laboratoryHours" class="form-control" [ngClass]="{ 'is-invalid': submitted && this.profileForm.controls.laboratoryHours.errors }" placeholder="Laboratory hours"/>
+          </div>
+        </div>
+		<div class="input-group">
+            <div class="error-area"></div>
+            <select class="use-elem use-elem-select" formControlName="reporting">
+              <option value="1">Credit</option>
+              <option value="2">Differential credit</option>
+			  <option value="3">Exam</option>
+            </select>
+        </div>
+		<div class="input-group">
+            <div class="error-area"></div>
+            <select class="use-elem use-elem-select" formControlName="courseTask">
+			  <option value="0">None</option>
+              <option value="1">Course work</option>
+              <option value="2">Course project</option>
+            </select>
+        </div>
+		<div class="form-group">
+          <div class="error-area">
+            <div class="error-text" *ngIf="(submitted || this.profileForm.controls.semesterGrade.touched) && this.profileForm.controls.semesterGrade.errors">Semester grade is required</div>
+          </div>
+          <div [class.error-block]="(submitted || this.profileForm.controls.semesterGrade.touched) && this.profileForm.controls.semesterGrade.errors" class="use-elem use-elem-input">
+            <input type="number" formControlName="semesterGrade" class="form-control" [ngClass]="{ 'is-invalid': submitted && this.profileForm.controls.semesterGrade.errors }" placeholder="Semester grade"/>
           </div>
         </div>
       </div>
-
       <div class="input-group">
         <div [class.btn]="enableBtn()" class="use-elem use-elem-button">
           <button type="submit" [class.btn]="enableBtn()" [disabled]="loading" class="btn-primary" (click)="EditSubject()">Edit</button>

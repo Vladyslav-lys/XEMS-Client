@@ -1,0 +1,87 @@
+<div class="full-profile">
+  <div class="">
+    <app-leftmenu></app-leftmenu>
+  </div>
+  <div class="col-full-profile">
+
+    <form [formGroup]="profileForm">
+      <div class="row-another">
+	    <h3 class="h3">Login</h3>
+        <div class="form-group">
+          <div class="error-area">
+            <div class="error-text" *ngIf="(submitted || this.profileForm.controls.login.touched) && this.profileForm.controls.login.errors">Login is required</div>
+          </div>
+          <div [class.error-block]="(submitted || this.profileForm.controls.login.touched) && this.profileForm.controls.login.errors" class="use-elem use-elem-input">
+            <input type="text" formControlName="login" class="form-control" [ngClass]="{ 'is-invalid': submitted && this.profileForm.controls.login.errors }" placeholder="Login" />
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="error-area">
+            <div class="error-text" *ngIf="(submitted || this.profileForm.controls.password.touched) && this.profileForm.controls.password.errors">Password is required</div>
+          </div>
+          <div [class.error-block]="(submitted || this.profileForm.controls.password.touched) && this.profileForm.controls.password.errors" class="use-elem use-elem-input">
+            <input type="password" formControlName="password" class="form-control" [ngClass]="{ 'is-invalid': submitted && this.profileForm.controls.password.errors }" placeholder="Password" />
+          </div>
+        </div>
+	    
+        ﻿<h3 class="h3">Profile</h3>
+        <div>
+          <div class="input-group">
+            <div class="error-area">
+              <div class="error-text" *ngIf="(submitted || this.profileForm.controls.lastName.touched) && this.profileForm.controls.lastName.errors">Last name is required</div>
+            </div>
+            <div [class.error-block]="(submitted || this.profileForm.controls.lastName.touched) && this.profileForm.controls.lastName.errors" class="use-elem use-elem-input">
+              <input type="text" class="form-control" placeholder="Last name" formControlName="lastName" value="">
+            </div>
+          </div>
+          <div class="input-group">
+            <div class="error-area">
+              <div class="error-text" *ngIf="(submitted || this.profileForm.controls.firstName.touched) && this.profileForm.controls.firstName.errors">First name is required</div>
+            </div>
+            <div [class.error-block]="(submitted || this.profileForm.controls.firstName.touched) && this.profileForm.controls.firstName.errors" class="use-elem use-elem-input">
+              <input type="text" class="form-control" placeholder="First name" formControlName="firstName" value="">
+            </div>
+          </div>
+          <div class="input-group">
+            <div class="error-area">
+              <div class="error-text" *ngIf="(submitted || this.profileForm.controls.phone.touched) && this.profileForm.controls.phone.errors">Phone is required</div>
+            </div>
+            <div [class.error-block]="(submitted || this.profileForm.controls.phone.touched) && this.profileForm.controls.phone.errors" class="use-elem use-elem-input">
+              <input type="text" class="form-control" placeholder="Phone" formControlName="phone" value="">
+            </div>
+          </div>
+          <div class="input-group">
+            <div class="error-area">
+              <div class="error-text" *ngIf="(submitted || this.profileForm.controls.birthday.touched) && this.profileForm.controls.birthday.errors">Birthday is required</div>
+            </div>
+            <div [class.error-block]="(submitted || this.profileForm.controls.birthday.touched) && this.profileForm.controls.birthday.errors" class="use-elem use-elem-input">
+              <input type="date" class="form-control" formControlName="birthday" [ngModel]="currentStudent.birthday | date:'yyyy-MM-dd'"/>
+            </div>
+          </div>
+		  <div class="input-group">
+            <div class="error-area">
+              <div class="error-text" *ngIf="(submitted || this.profileForm.controls.address.touched) && this.profileForm.controls.address.errors">Address is required</div>
+            </div>
+            <div [class.error-block]="(submitted || this.profileForm.controls.address.touched) && this.profileForm.controls.address.errors" class="use-elem use-elem-input">
+              <input type="text" class="form-control" placeholder="Address" formControlName="address" value="">
+            </div>
+          </div>
+		  <div class="input-group">
+            <div class="error-area"></div>
+            <select class="use-elem use-elem-select" formControlName="group">
+              <option *ngFor="let group of groups2" [ngValue]="{{group.id}}">{{group.name}}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <div [class.btn]="enableBtn()" class="use-elem use-elem-button">
+          <button type="submit" [class.btn]="enableBtn()" [disabled]="loading" class="btn-primary" (click)="EditProfile()">Edit</button>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="another-side">
+  </div>
+</div>

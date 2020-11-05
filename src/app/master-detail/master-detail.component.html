@@ -1,0 +1,20 @@
+<div class="master">
+  <ng-content></ng-content>
+</div>
+<div class="detail-panel" *ngIf="_displayDetail || _displayLoader">
+  <div [class.hidden]="_displayLoader" class="detail-view">
+    <!--<div class="header">
+      <span>Detail</span>
+      <button (click)="close()" class="close-btn">&times;</button>
+    </div>-->
+    <div class="content">
+      <div *ngIf="detailValue == null" class="no-note-text">
+        <p>No note has been choosen</p>
+      </div>
+      <ng-container #detailView></ng-container>
+    </div>
+  </div>
+  <div *ngIf="_displayLoader" class="loader-container">
+    <div class="loader"></div>
+  </div>
+</div>

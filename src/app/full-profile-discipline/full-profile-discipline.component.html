@@ -1,0 +1,29 @@
+<div class="full-profile">
+  <div class="">
+    <app-leftmenu></app-leftmenu>
+  </div>
+  <div class="col-full-profile">
+
+    <form [formGroup]="disciplineForm">
+      <div class="row-another">
+        <h3 class="h3">Discipline</h3>
+        <div class="form-group">
+          <div class="error-area">
+            <div class="error-text" *ngIf="(submitted || this.disciplineForm.controls.title.touched) && this.disciplineForm.controls.title.errors">Title is required</div>
+          </div>
+          <div [class.error-block]="(submitted || this.disciplineForm.controls.title.touched) && this.disciplineForm.controls.title.errors" class="use-elem use-elem-input">
+            <input type="text" formControlName="title" class="form-control" [ngClass]="{ 'is-invalid': submitted && this.disciplineForm.controls.title.errors }" placeholder="Title" />
+          </div>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <div [class.btn]="enableBtn()" class="use-elem use-elem-button">
+          <button type="submit" [class.btn]="enableBtn()" [disabled]="loading" class="btn-primary" (click)="EditDiscipline()">Edit</button>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="another-side">
+  </div>
+</div>

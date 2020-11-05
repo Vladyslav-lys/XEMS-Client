@@ -24,17 +24,17 @@ export class AuthenticationService {
       localStorage.setItem('isLoggedIn', JSON.stringify(value));
     }
 	
-	public getAccessProfile(): boolean {
+	public getAccessAdmin(): boolean {
       var result: boolean;
-      if(localStorage.getItem('isAllowedProfile') != null)
-        result = JSON.parse(localStorage.isAllowedProfile);
+      if(localStorage.getItem('isAllowedAdmin') != null)
+        result = JSON.parse(localStorage.isAllowedAdmin);
       else
         result = false;
       return result;
     }
 
-    public setAccessProfile(value: boolean){
-      localStorage.setItem('isAllowedProfile', JSON.stringify(value));
+    public setAccessAdmin(value: boolean){
+      localStorage.setItem('isAllowedAdmin', JSON.stringify(value));
     }
 	
 	public getAccessTeacher(): boolean {
@@ -77,9 +77,10 @@ export class AuthenticationService {
 
     logout(id, serviceClient = this.serviceClient) {
 	  this.setAuth(null);
-	  this.setAccessProfile(null);
+	  this.setAccessAdmin(null);
 	  this.setAccessTeacher(null);
-	  localStorage.setItem('currentUser', JSON.stringify(null));
+	  this.setAccessStudent(null);
+	  localStorage.setItem('currentAuthentication', JSON.stringify(null));
 	  this.router.navigate(['/login']);
 	
 	  return new Promise(function (resolve, reject) {
@@ -91,4 +92,60 @@ export class AuthenticationService {
         });
       });
     }
+	
+  invokeUpdateAuthorizationInfo(authorization, serviceClient = this.serviceClient) {
+    return new Promise(function (resolve, reject) {
+      serviceClient.hubConnection.invoke("UpdateAuthorization", authorization)
+        .then(function (operationStatus) {
+          resolve(operationStatus);
+        }).catch(function (err) {
+        reject(err);
+      });
+    });
+  }
+  
+  getAllActives(accessLevel, serviceClient = this.serviceClient) {
+	return new Promise(function (resolve, reject) {
+      serviceClient.hubConnection.invoke("GetAllActives", accessLevel)
+        .then(function (operationStatus) {
+          resolve(operationStatus);
+        }).catch(function (err) {
+        reject(err);
+      });
+    });  
+  }
+	
+	getAuthorizationById(id, serviceClient = this.serviceClient) {
+		var th = this;
+        return new Promise(function (resolve, reject) {
+          serviceClient.hubConnection.invoke("GetAuthorizationById", id)
+            .then(function (operationStatus) {
+              resolve(operationStatus);
+            }).catch(function (err) {
+              reject(err);
+          });
+      });
+	}
+
+  addAuthorization(authorization, serviceClient = this.serviceClient) {
+    return new Promise(function (resolve, reject) {
+      serviceClient.hubConnection.invoke("RegistrationAuthorization", authorization)
+        .then(function (operationStatus) {
+          resolve(operationStatus);
+        }).catch(function (err) {
+        reject(err);
+      });
+    });
+  }
+
+  deleteAuthorization(id, serviceClient = this.serviceClient) {
+    return new Promise(function (resolve, reject) {
+      serviceClient.hubConnection.invoke("DeleteAuthorization", id)
+        .then(function (operationStatus) {
+          resolve(operationStatus);
+        }).catch(function (err) {
+        reject(err);
+      });
+    });
+  }
 }

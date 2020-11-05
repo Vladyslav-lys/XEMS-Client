@@ -1,14 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import { UserService } from '../_services/user.service';
-import { StubService } from '../_services/stub.service';
+import { StudentService } from '../_services/student.service';
+//import { StubService } from '../_services/stub.service';
 import { Router } from '@angular/router';
-import { User } from '../_models/user';
+import { Student } from '../_models/student';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { operationStatusInfo } from '../_models/operationStatusInfo';
+import { operationStatusInfo } from '../_helpers/operationStatusInfo';
 import { NotifyService } from '../_services/notify.service';
 import { Message } from '../_models/message';
 import {HubConnectionState} from '@microsoft/signalr';
 import {SignalRService} from '../_services/signalR.service';
+import { AccessLevel } from '../_enums/accessLevel';
 
 @Component({
   selector: 'app-students',
@@ -17,18 +18,16 @@ import {SignalRService} from '../_services/signalR.service';
 })
 export class StudentsComponent implements OnInit {
 
-  user: User;
   messageText: string;
   notifyForm: FormGroup;
 
-  users: User[];
-
-  users2: User[];
+  students: Student[];
+  students2: Student[];
 
   constructor(
     private router: Router,
-    private userService: UserService,
-	private stub:StubService,
+    private studentService: StudentService,
+	//private stub:StubService,
 	private serviceClient: SignalRService,
     private notifySerivce: NotifyService,
     private formBuilder: FormBuilder
@@ -36,14 +35,13 @@ export class StudentsComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void>  {
-	this.user = JSON.parse(localStorage.currentUser);
 	  
 	if(this.serviceClient.hubConnection.state == HubConnectionState.Connected){
-	  await this.getAllUsers();
+	  await this.getAllStudents();
     }
     else {
       setTimeout(async () => {
-		  await this.getAllUsers();
+		  await this.getAllStudents();
 		}, 500);
     };
 	
@@ -56,16 +54,13 @@ export class StudentsComponent implements OnInit {
     var s = "";
 
     switch (accessLevel) {
-      case 1:
-        s = "Analitic";
-        break;
-      case 2:
+      case AccessLevel.Student:
         s = "Student";
         break;
-      case 3:
+      case AccessLevel.Teacher:
         s = "Teacher";
         break;
-      case 4:
+      case AccessLevel.Admin:
         s = "Administrator";
         break;
     }
@@ -73,27 +68,23 @@ export class StudentsComponent implements OnInit {
     return s;
   }
 
-  async getAllUsers() {
+  async getAllStudents() {
     var th = this;
     
-	await this.stub.getAllStudents()
+	await this.studentService.getAllStudents()
 	  .then(function (operationStatus: operationStatusInfo) {
-		var users = operationStatus.attachedObject;
-        for (let user of users) {
-			var fileInBase64 = user.account.photo;
-			if(fileInBase64 != null)
-			{
-				var splitted = fileInBase64.split(",", 2);
-				if(splitted[0] != 'data:image/png;base64')
-					user.account.photo = 'data:image/png;base64,' + user.account.photo;
-			}
-        }
-        th.users = users;
-        sessionStorage.setItem("students", JSON.stringify(users));
-        th.users2 = JSON.parse(sessionStorage.students).map(i => ({
+		var students = operationStatus.attachedObject;
+        th.students = students;
+        sessionStorage.setItem("students", JSON.stringify(students));
+        th.students2 = JSON.parse(sessionStorage.students).map(i => ({
           idx: i,
           id: i.id,
-          account: i.account
+          firstName: i.firstName,
+		  lastName: i.lastName,
+		  birthday: i.birthday,
+		  phone: i.phone,
+		  address: i.address,
+		  group: i.group
         }));
       }).catch(function(err) {
         console.log("Error while fetching students");
@@ -106,10 +97,10 @@ export class StudentsComponent implements OnInit {
 
     var message: Message;
     message = new Message();
-    message.senderName = this.getAccessLevel(this.user.accessLevel);
+    message.senderName = this.getAccessLevel(AccessLevel.Teacher);
     message.text = this.notifyForm.controls.messageText.value;
 	
-	this.stub.sendNotifyAllEnteredText(message)
+	this.notifySerivce.sendNotifyAllEnteredText(message)
 	  .then(function (operationStatus: operationStatusInfo) {
 		console.log("Message is sent:" + th.notifyForm.controls.messageText.value);
         th.messageText = "";
@@ -120,15 +111,15 @@ export class StudentsComponent implements OnInit {
       });
   }
   
-  sendNotifyOneText(user, txt) {
+  sendNotifyOneText(student, txt) {
     var th = this;
 
     var message: Message;
     message = new Message();
-    message.senderName = this.getAccessLevel(this.user.accessLevel);
+    message.senderName = this.getAccessLevel(AccessLevel.Teacher);
     message.text = txt;
 	
-	this.stub.sendNotifyOneText(user.id, message)
+	this.notifySerivce.sendNotifyOneText(student.id, message)
 	  .then(function (operationStatus: operationStatusInfo) {
 		console.log("Message is sent:" + txt);
         th.messageText = "";

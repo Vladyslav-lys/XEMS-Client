@@ -1,0 +1,29 @@
+.full-profile {
+  display: flex;
+  flex-direction: row;
+  margin: 0 auto;
+  justify-content: center;
+  flex-wrap: wrap;
+  font-family: Cambria;
+}
+
+.col-full-profile {
+  width: 400px;
+}
+
+.image-full-profile {
+  width: 300px;
+  height: auto;
+  border: 1px solid rgb(211, 211, 211);
+  padding: 5px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.image-block-full-profile {
+}
+
+.another-side {
+  width: 100px;
+}

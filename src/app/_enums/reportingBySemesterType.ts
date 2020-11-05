@@ -1,0 +1,1 @@
+export enum ReportingBySemesterType { Credit = 1, DifferentialCredit = 2, Exam = 3 }

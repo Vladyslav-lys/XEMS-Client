@@ -1,0 +1,1 @@
+export enum CourseTask { None = 0, CourseWork = 1, CoureProject = 2 }

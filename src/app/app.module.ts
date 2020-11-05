@@ -3,6 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
+import { StoreModule } from '@ngrx/store';
 import { ToastrModule } from 'ngx-toastr';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
@@ -12,33 +13,47 @@ import { appRoutingModule } from './app.routing';
 import { AlertComponent } from './alert/alert.component';
 import { HeaderComponent } from './header/header.component';
 import { FooterComponent } from './footer/footer.component';
-import { AuthGuard } from './_services/auth.guard';
 import { LeftmenuComponent } from './leftmenu/leftmenu.component';
-import { ProfileGuard } from './_services/profile.guard';
-import { FullProfileComponent } from './full-profile/full-profile.component';
+import { HomeComponent } from './home/home.component';
+import { MasterDetailModule } from './master-detail/master-detail.module';
+import { DetailComponent } from './master-detail/detail.component';
+
 import { StudentsComponent } from './students/students.component';
 import { NotificationComponent } from './notification/notification.component';
-import { HomeComponent } from './home/home.component';
-import { WorkPlansComponent } from './work-plans/work-plans.component';
-import { StudentModulesComponent } from './student-modules/student-modules.component';
-import { ModulesComponent } from './modules/modules.component';
+//import { WorkingPlansComponent } from './working-plans/working-plans.component';
+//import { ReportingBySubjectsComponent } from './reporting-by-subject/reporting-by-subject.component';
+
 import { StudentsControlComponent } from './students-control/students-control.component';
-import { SubjectsControlComponent } from './subjects-control/subjects-control.component';
-import { TeachersControlComponent } from './teachers-control/teachers-control.component';
-import { WorkPlansControlComponent } from './work-plans-control/work-plans-control.component';
-import { ScheduleControlComponent } from './schedule-control/schedule-control.component';
+//import { SubjectsControlComponent } from './subjects-control/subjects-control.component';
+//import { DisciplinesControlComponent } from './disciplines-control/disciplines-control.component';
+//import { GroupsControlComponent } from './groups-control/groups-control.component';
+//import { TeachersControlComponent } from './teachers-control/teachers-control.component';
+//import { WorkingPlansControlComponent } from './working-plans-control/working-plans-control.component';
+//import { ReportingBySubjectsControlComponent } from './reporting-by-subject-control/reporting-by-subject-control.component';
+
 import { SignUpStudentComponent } from './sign-up-student/sign-up-student.component';
-import { SignUpSubjectComponent } from './sign-up-subject/sign-up-subject.component';
-import { SignUpTeacherComponent } from './sign-up-teacher/sign-up-teacher.component';
-import { SignUpWorkPlansComponent } from './sign-up-work-plans/sign-up-work-plans.component';
-import { SignUpScheduleComponent } from './sign-up-schedule/sign-up-schedule.component';
+//import { SignUpSubjectComponent } from './sign-up-subject/sign-up-subject.component';
+//import { SignUpDisciplineComponent } from './sign-up-discipline/sign-up-discipline.component';
+//import { SignUpGroupComponent } from './sign-up-group/sign-up-group.component';
+//import { SignUpTeacherComponent } from './sign-up-teacher/sign-up-teacher.component';
+//import { SignUpWorkingPlansComponent } from './sign-up-working-plans/sign-up-working-plans.component';
+//import { SignUpReportingBySubjectComponent } from './sign-up-reporting-by-subject/sign-up-reporting-by-subject.component';
+
 import { FullProfileStudentComponent } from './full-profile-student/full-profile-student.component';
-import { FullProfileSubjectComponent } from './full-profile-subject/full-profile-subject.component';
-import { FullProfileTeacherComponent } from './full-profile-teacher/full-profile-teacher.component';
-import { FullProfileWorkPlansComponent } from './full-profile-work-plans/full-profile-work-plans.component';
-import { FullProfileScheduleComponent } from './full-profile-schedule/full-profile-schedule.component';
-import { ScheduleComponent } from './schedule/schedule.component';
-import { WorksAndProjectsComponent } from './works-and-projects/works-and-projects.component';
+//import { FullProfileSubjectComponent } from './full-profile-subject/full-profile-subject.component';
+//import { FullProfileDisciplineComponent } from './full-profile-discipline/full-profile-discipline.component';
+//import { FullProfileGroupComponent } from './full-profile-group/full-profile-group.component';
+//import { FullProfileTeacherComponent } from './full-profile-teacher/full-profile-teacher.component';
+//import { FullProfileWorkingPlansComponent } from './full-profile-working-plans/full-profile-working-plans.component';
+//import { FullProfileReportingBySubjectComponent } from './full-profile-reporting-by-subject/full-profile-reporting-by-subject.component';
+//import { ProfileAdminComponent } from './profile-admin/profile-admin.component';
+//import { ProfileTeacherComponent } from './profile-teacher/profile-teacher.component';
+//import { ProfileStudentComponent } from './profile-student/profile-student.component';
+
+import { AuthGuard } from './_guards/auth.guard';
+import { AdminGuard } from './_guards/admin.guard';
+import { TeacherGuard } from './_guards/teacher.guard';
+import { StudentGuard } from './_guards/student.guard';
 
 @NgModule({
   declarations: [
@@ -48,30 +63,36 @@ import { WorksAndProjectsComponent } from './works-and-projects/works-and-projec
 	HeaderComponent,
     FooterComponent,
     LeftmenuComponent,
-    FullProfileComponent,
     NotificationComponent,
-	StudentsComponent,
 	HomeComponent,
-	WorkPlansComponent,
-	StudentModulesComponent,
-	ModulesComponent,
+	DetailComponent,
+	StudentsComponent,
+	//WorkingPlansComponent,
+	//ReportingBySubjectsComponent,
 	StudentsControlComponent,
-	SubjectsControlComponent,
-	TeachersControlComponent,
-	WorkPlansControlComponent,
-	ScheduleControlComponent,
+	//SubjectsControlComponent,
+	//DisciplinesControlComponent,
+	//GroupsControlComponent,
+	//TeachersControlComponent,
+	//WorkingPlansControlComponent,
+	//ReportingBySubjectsControlComponent,
 	SignUpStudentComponent,
-	SignUpSubjectComponent,
-	SignUpTeacherComponent,
-	SignUpWorkPlansComponent,
-	SignUpScheduleComponent,
+	//SignUpSubjectComponent,
+	//SignUpDisciplineComponent,
+	//SignUpGroupComponent,
+	//SignUpTeacherComponent,
+	//SignUpWorkingPlansComponent,
+	//SignUpReportingBySubjectComponent,
 	FullProfileStudentComponent,
-	FullProfileSubjectComponent,
-	FullProfileTeacherComponent,
-	FullProfileWorkPlansComponent,
-	FullProfileScheduleComponent,
-	ScheduleComponent,
-	WorksAndProjectsComponent
+	//FullProfileSubjectComponent,
+	//FullProfileDisciplineComponent,
+	//FullProfileGroupComponent,
+	//FullProfileTeacherComponent,
+	//FullProfileWorkingPlansComponent,
+	//FullProfileReportingBySubjectComponent,
+	//ProfileAdminComponent,
+	//ProfileTeacherComponent,
+	//ProfileStudentComponent
   ],
   imports: [
     BrowserModule,
@@ -80,7 +101,9 @@ import { WorksAndProjectsComponent } from './works-and-projects/works-and-projec
     appRoutingModule,
 	BrowserAnimationsModule,
 	ToastrModule.forRoot(),
-    FormsModule
+    FormsModule,
+	MasterDetailModule,
+    StoreModule.forRoot({}, {})
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -6,22 +6,41 @@ import {
   LogLevel
 } from '@microsoft/signalr';
 import { BehaviorSubject, Subject } from 'rxjs';
+import {operationStatusInfo, OperationStatus} from '../_helpers/operationStatusInfo';
 
 @Injectable({ providedIn: 'root' })
 export class SignalRService {
   connectionEstablished$ = new BehaviorSubject<boolean>(false);
 
   public hubConnection: HubConnection;
+  authorization = JSON.parse(localStorage.currentAuthorization);
+  private currentToken: string;
 
   constructor() {
+	
+	this.getToken();
     this.createConnection();
     this.startConnection();
+	
+	this.getNewToken();
   }
   
 	//http://46.98.190.16:5001
+	//http://127.0.0.1:4040
   private createConnection() {
+	
+	if(this.currentToken)
+	{
+	   this.hubConnection = new HubConnectionBuilder()
+		.withUrl("'http://2428a83cca2d.ngrok.io/ServerHub'", { accessTokenFactory: () => this.currentToken })
+		.withAutomaticReconnect()
+        .configureLogging(LogLevel.Information)
+        .build();
+		return;
+	}
+	
     this.hubConnection = new HubConnectionBuilder()
-      .withUrl('http://194.107.230.233:5001/ServerHub')
+      .withUrl('http://2428a83cca2d.ngrok.io/ServerHub')
       .withAutomaticReconnect()
       .configureLogging(LogLevel.Information)
       .build();
@@ -40,10 +59,47 @@ export class SignalRService {
       error => console.error(error)
     );
   }
-
-  /*private registerOnServerEvents(): void {
-    this.hubConnection.on('Send', (data: any) => {
-      console.log('data', data);
-    });
-  }*/
+  
+  private getToken() {
+	if(this.authorization != null)
+	{
+	   this.currentToken = this.authorization[2];
+	}
+  }
+  
+  private getNewToken() {
+	var currentDate = new Date();
+	
+	if(this.authorization != null)
+	{
+	  if(this.authorization[4] <= currentDate)
+	  {
+		var th = this;
+		this.changeToken(this.authorization[3])
+		.then(function (operationStatusInfo : operationStatusInfo){
+		  if (operationStatusInfo.operationStatus == OperationStatus.Done) {
+			th.currentToken = th.authorization[3];
+			th.authorization[2] = th.authorization[3];
+			var currentDate = new Date();
+			th.authorization[4] = new Date(currentDate.getFullYear() + 1, currentDate.getMonth(), currentDate.getDay() + 2);
+			localStorage.setItem('currentAuthentication', JSON.stringify(th.authorization));
+		  }
+		}).catch(err => {
+		  console.log(err);
+		});
+	  }
+    }
+  }
+  
+  private changeToken(token)
+  {
+	return new Promise(function (resolve, reject) {
+	  this.hubConnection.invoke("ChangeToken", token)
+            .then(function (operationStatus) {
+              resolve(operationStatus);
+            }).catch(function (err) {
+              reject(err);
+          });
+	});
+  }
 }

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { User } from '../_models/user';
+import { Authorization } from '../_models/authorization';
 
 @Component({
   selector: 'app-leftmenu',
@@ -8,13 +8,13 @@ import { User } from '../_models/user';
 })
 export class LeftmenuComponent implements OnInit {
 
-  public user: User;
+  public authentication: any;
 
   constructor() { }
 
   ngOnInit(): void {
-    if (localStorage.getItem('currentUser')) {
-      this.user = JSON.parse(localStorage.currentUser);
+    if (localStorage.getItem('currentAuthentication')) {
+      this.authentication = JSON.parse(localStorage.currentAuthentication);
     }
   }
 }

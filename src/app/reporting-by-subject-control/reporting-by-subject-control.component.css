@@ -1,0 +1,66 @@
+.designed-home {
+	display:flex;
+	flex-direction:row;
+	margin:0 auto;
+	justify-content:center;
+	flex-wrap:wrap;
+	font-family:Cambria;
+}
+
+.master-detail {
+	margin-top:20px;
+	
+}
+
+li {
+	list-style-type:none;
+	margin-bottom:5px;
+}
+
+.use-elem a {
+	color: rgb(50, 50, 50);
+	width:100%;
+	text-decoration:none;
+}
+
+.use-elem-link {
+	border:1px solid rgb(211, 211, 211);
+	margin-left:-30px;
+	margin-right:10px;
+	padding:10px 15px 10px 15px;
+	text-align:left;
+	max-width:237px;
+	max-height:41px;
+}
+
+.use-elem-button-md {
+	border:1px solid rgb(150, 150, 150);
+	margin-top:20px;
+	margin-right:30%;
+	margin-left:30%;
+	padding:5px 5px 5px 5px;
+}
+
+.menu {
+	margin-left:18px;
+}
+
+.note-text {
+  font-size: 1em;
+  text-align: left;
+}
+
+.note-marging {
+	margin-left:5px;
+}
+
+.note-p p {
+	margin-bottom:-8px;
+}
+
+.no-note-text {
+  padding: 10px 15px 10px 15px;
+  text-align: center;
+  max-width: 237px;
+  font-size: 1.3em;
+}

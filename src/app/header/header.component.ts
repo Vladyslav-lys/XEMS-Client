@@ -1,10 +1,10 @@
 import { Component, OnInit, OnChanges, DoCheck } from '@angular/core';
 import {AuthenticationService} from '../_services/authentication.service';
-import { StubService } from '../_services/stub.service';
+//import { StubService } from '../_services/stub.service';
 import {Router} from '@angular/router';
 import {SignalRService} from '../_services/signalR.service';
-import {User} from '../_models/user';
-import { operationStatusInfo } from '../_models/operationStatusInfo';
+import {Authorization} from '../_models/authorization';
+import { operationStatusInfo } from '../_helpers/operationStatusInfo';
 
 @Component({
   selector: 'app-header',
@@ -13,12 +13,12 @@ import { operationStatusInfo } from '../_models/operationStatusInfo';
 })
 export class HeaderComponent implements OnInit, OnChanges, DoCheck {
   
-  user:User;
+  authorization:any;
   
   constructor(
 	private serviceClient: SignalRService,
     private authenticateService: AuthenticationService,
-	private stub:StubService,
+	//private stub:StubService,
     private router: Router
   ) { }
   
@@ -29,25 +29,25 @@ export class HeaderComponent implements OnInit, OnChanges, DoCheck {
   }
   
   ngDoCheck(): void {
-	if(localStorage.currentUser != null)
+	if(localStorage.currentAuthorization != null)
 	{
-		this.user = JSON.parse(localStorage.currentUser);
+		this.authorization = JSON.parse(localStorage.currentAuthorization);
 		return;
 	}
-	this.user = null;
+	this.authorization = null;
   }
   
   logout() {
 	  var th = this;
-	  if(JSON.parse(localStorage.currentUser)!= null)
+	  if(JSON.parse(localStorage.currentAuthorization)!= null)
 	  {
-		var user = JSON.parse(localStorage.currentUser);
+		var authorization = JSON.parse(localStorage.currentAuthorization);
 		
-		this.stub.logout(user.id)
+		this.authenticateService.logout(authorization[0])
 	    .then(function (operationStatus: operationStatusInfo){
-		  user = null;
+		  authorization = null;
         }).catch(function(err) {
-          console.log("Error loading notes");
+          console.log("Error logging out");
           alert(err);
         }); 
 	  }

@@ -11,13 +11,31 @@
     <table>
       <tr class="border-style">
         <td>№</td>
-        <td>NAME</td>
+		<td>STUDENT</td>
+		<td>DISCIPLINE</td>
+		<td>YEAR</td>
+		<td>SEMESTER</td>
+		<td>LECTURE HOURS</td>
+		<td>PRACTICE HOURS</td>
+		<td>LABORATORY HOURS</td>
+		<td>REPORTING</td>
+		<td>COURSE TASK</td>
+		<td>SEMESTER GRADE</td>
         <td></td>
         <td></td>
       </tr>
       <tr *ngFor="let subject of subjects; let row_no = index" class="border-style">
         <td>{{row_no + 1}}</td>
-        <td>{{subject.name}}</td>
+		<td>{{subject.student.lastName}} + " " + {{subject.student.firstName}}</td>
+		<td>{{subject.discipline.title}}</td>
+		<td>{{subject.year}}</td>
+		<td>{{getSemester(subject.semester)}}</td>
+		<td>{{subject.lectureHours}}</td>
+		<td>{{subject.practiceHours}}</td>
+		<td>{{subject.laboratoryHours}}</td>
+		<td>{{getReportingBySemesterType(subject.reporting)}}</td>
+		<td>{{getCourseTask(subject.courseTask)}}</td>
+		<td>{{subject.semesterGrade}}</td>
         <td><button class="user-btn btn btn-primary" [routerLink]="['/full-profile-subject', subject.id]">Edit</button></td>
         <td><button class="user-btn btn btn-primary" (click)="deleteSubject(subject)">Delete</button></td>
       </tr>

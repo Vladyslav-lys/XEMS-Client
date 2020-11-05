@@ -16,25 +16,29 @@
     <table>
       <tr class="border-style">
         <td>№</td>
+		<td>LAST NAME</td>
         <td>FIRST NAME</td>
-        <td>LAST NAME</td>
-        <td>NICKNAME</td>
-        <td>PHOTO</td>
+		<td>BIRTHDAY</td>
+        <td>PHONE</td>
+		<td>ADDRESS</td>
+		<td>GROUP</td>
         <td></td>
       </tr>
-      <tr *ngFor="let user of users; let row_no = index" class="border-style">
+      <tr *ngFor="let student of students; let row_no = index" class="border-style">
         <td>{{row_no + 1}}</td>
-        <td>{{user.account.firstName}}</td>
-        <td>{{user.account.lastName}}</td>
-        <td>{{user.account.nickname}}</td>
-        <td><img width="50" height="50" src="{{user.account.photo}}" /></td>
+		<td>{{student.lastName}}</td>
+        <td>{{student.firstName}}</td>
+		<td>{{student.birthday}}</td>
+        <td>{{student.phone}}</td>
+		<td>{{student.address}}</td>
+        <td>{{student.group.name}}</td>
         <td>
 			<div class="cell-grid">
 				<div class="use-elem use-elem-input notify-pos">
 					<textarea #txt cols="20" rows="2" class="textarea-notify" placeholder="Type a message here..."></textarea>
 				</div>
 				<div class="use-elem div-send-one-btn ">
-					<button class="send-one-btn btn btn-primary" (click)="sendNotifyOneText(user, txt.value)">Send</button>
+					<button class="send-one-btn btn btn-primary" (click)="sendNotifyOneText(student, txt.value)">Send</button>
 				</div>
 			</div>
 		</td>

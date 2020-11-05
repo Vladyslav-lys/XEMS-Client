@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import {AuthenticationService} from '../_services/authentication.service';
-import {operationStatusInfo} from '../_models/operationStatusInfo';
-import {User} from '../_models/user';
+import {operationStatusInfo} from '../_helpers/operationStatusInfo';
+import { Authorization } from '../_models/authorization';
 import {SignalRService} from '../_services/signalR.service';
+import {AccessLevel} from '../_enums/accessLevel';
 import {HubConnectionState} from '@microsoft/signalr';
 import {Router} from '@angular/router';
 
@@ -21,18 +22,17 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit() {
-	var user = JSON.parse(localStorage.currentUser);
-	switch(user.accessLevel)
+	var authorization = JSON.parse(localStorage.currentAuthorization);
+	
+	switch(authorization[1])
 	{
-		case 1:
+		case AccessLevel.Student:
+			this.router.navigate(['/reporting-by-subject']);
 			break;
-		case 2:
-			this.router.navigate(['/schedule']);
+		case AccessLevel.Teacher:
+			this.router.navigate(['/students']);
 			break;
-		case 3:
-			this.router.navigate(['/modules']);
-			break;
-		case 4:
+		case AccessLevel.Admin:
 			this.router.navigate(['/students-control']);
 			break;
 		default:

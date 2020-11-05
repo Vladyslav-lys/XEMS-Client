@@ -1,0 +1,36 @@
+<div class="users">
+  <div class="">
+    <app-leftmenu></app-leftmenu>
+  </div>
+  <div class="col-users">
+    <div class="row-fit-users">
+      <div class="use-elem add-user-btn btn">
+        <button type="button" class="use-elem btn" (click)="openAdd()">New group</button>
+      </div>
+    </div>
+    <table>
+      <tr class="border-style">
+        <td>№</td>
+        <td>NAME</td>
+		<td>CURATOR</td>
+		<td>LEARNING START DATE</td>
+		<td>LEARNING END DATE</td>
+		<td>DEGREE</td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr *ngFor="let group of groups; let row_no = index" class="border-style">
+        <td>{{row_no + 1}}</td>
+        <td>{{group.name}}</td>
+		<td>{{group.curator.lastName}} + " " + {{group.curator.firstName}}</td>
+		<td>{{group.learningStartDate}}</td>
+		<td>{{group.learningEndDate}}</td>
+		<td>{{getDegree(group.degree)}}</td>
+        <td><button class="user-btn btn btn-primary" [routerLink]="['/full-profile-group', group.id]">Edit</button></td>
+        <td><button class="user-btn btn btn-primary" (click)="deleteGroup(group)">Delete</button></td>
+      </tr>
+    </table>
+  </div>
+  <div class="another-side">
+  </div>
+</div>

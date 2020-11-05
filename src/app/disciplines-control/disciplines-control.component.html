@@ -1,0 +1,28 @@
+<div class="users">
+  <div class="">
+    <app-leftmenu></app-leftmenu>
+  </div>
+  <div class="col-users">
+    <div class="row-fit-users">
+      <div class="use-elem add-user-btn btn">
+        <button type="button" class="use-elem btn" (click)="openAdd()">New discipline</button>
+      </div>
+    </div>
+    <table>
+      <tr class="border-style">
+        <td>№</td>
+        <td>TITLE</td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr *ngFor="let discipline of disciplines; let row_no = index" class="border-style">
+        <td>{{row_no + 1}}</td>
+        <td>{{discipline.title}}</td>
+        <td><button class="user-btn btn btn-primary" [routerLink]="['/full-profile-discipline', discipline.id]">Edit</button></td>
+        <td><button class="user-btn btn btn-primary" (click)="deleteDiscipline(discipline)">Delete</button></td>
+      </tr>
+    </table>
+  </div>
+  <div class="another-side">
+  </div>
+</div>

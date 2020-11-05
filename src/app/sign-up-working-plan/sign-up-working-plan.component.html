@@ -1,0 +1,64 @@
+<div class="register">
+  <div class="">
+    <app-leftmenu></app-leftmenu>
+  </div>
+  <div class="col-register">
+
+    <form [formGroup]="registerForm">
+      <div class="row-another">
+	  <h3 class="h3">Working plan</h3>
+		<div class="input-group">
+          <div class="error-area"></div>
+          <select class="use-elem use-elem-select" formControlName="teacher">
+            <option *ngFor="let teacher of teachers2" [ngValue]="{{teacher.id}}">{{teacher.lastName}} + " " + {{teacher.firstName}}</option>
+          </select>
+        </div>
+		<div class="input-group">
+          <div class="error-area"></div>
+          <select class="use-elem use-elem-select" formControlName="discipline">
+            <option *ngFor="let discipline of disciplines2" [ngValue]="{{discipline.id}}">{{discipline.title}}</option>
+          </select>
+        </div>
+		<div class="form-group">
+          <div class="error-area">
+            <div class="error-text" *ngIf="(submitted || this.registerForm.controls.hours.touched) && this.registerForm.controls.hours.errors">Hours is required</div>
+          </div>
+          <div [class.error-block]="(submitted || this.registerForm.controls.hours.touched) && this.registerForm.controls.hours.errors" class="use-elem use-elem-input">
+            <input type="number" formControlName="hours" class="form-control" [ngClass]="{ 'is-invalid': submitted && this.registerForm.controls.hours.errors }" placeholder="Hours"/>
+          </div>
+        </div>
+		<div class="input-group">
+            <div class="error-area"></div>
+            <select class="use-elem use-elem-select" formControlName="role">
+              <option value="1">Lection</option>
+              <option value="2">Practice</option>
+			  <option value="3">Laboratory</option>
+            </select>
+        </div>
+		<div class="form-group">
+          <div class="error-area">
+            <div class="error-text" *ngIf="(submitted || this.registerForm.controls.year.touched) && this.registerForm.controls.year.errors">Year is required</div>
+          </div>
+          <div [class.error-block]="(submitted || this.registerForm.controls.year.touched) && this.registerForm.controls.year.errors" class="use-elem use-elem-input">
+            <input type="number" formControlName="year" class="form-control" [ngClass]="{ 'is-invalid': submitted && this.registerForm.controls.year.errors }" placeholder="Year"/>
+          </div>
+        </div>
+		<div class="input-group">
+            <div class="error-area"></div>
+            <select class="use-elem use-elem-select" formControlName="semester">
+              <option value="1">First with winter session</option>
+              <option value="2">Second with summer session</option>
+            </select>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <div [class.btn]="enableBtn()" class="use-elem use-elem-button">
+          <button type="submit" [class.btn]="enableBtn()" [disabled]="loading" class="btn-primary" (click)="AddWorkingPlan()">Add</button>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="another-side">
+  </div>
+</div>

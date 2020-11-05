@@ -2,7 +2,7 @@ import { OnInit, Component, ViewChild, TemplateRef } from "@angular/core";
 import { ToastrService } from 'ngx-toastr';
 import { NotifyService } from "../_services/notify.service";
 import { Message } from "../_models/message";
-import { StubService } from '../_services/stub.service';
+//import { StubService } from '../_services/stub.service';
 
 @Component({
   selector: 'app-notification',
@@ -13,7 +13,7 @@ export class NotificationComponent implements OnInit {
 
   constructor(private toastrService: ToastrService,
     private notifySerivce: NotifyService,
-	private stub:StubService,
+	//private stub:StubService,
   ) {
   }
 
@@ -22,14 +22,14 @@ export class NotificationComponent implements OnInit {
   }
 
   callNotificationEnteredText() {
-    this.stub.getNotifyEnteredText(this.toastrService);
+    this.notifySerivce.getNotifyEnteredText(this.toastrService);
   }
   
   callNotificationConnectedText() {
-    this.stub.getNotifyConnectedText(this.toastrService);
+    this.notifySerivce.getNotifyConnectedText(this.toastrService);
   }
   
   callNotificationUnicastText() {
-    this.stub.getNotifyUnicastText(this.toastrService);
+    this.notifySerivce.getNotifyUnicastText(this.toastrService);
   }
 }
