@@ -64,10 +64,11 @@ export class LoginComponent implements OnInit {
 		  auth[4] = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDay() + 8);
         localStorage.setItem('currentAuthentication', JSON.stringify(auth));
 		var authentication = JSON.parse(localStorage.currentAuthentication);
+		th.serviceConnectionClient.makeFullConnection(authentication);
         th.authenticationService.setAuth(true);
-		th.getAccessAdmin(authentication[1]);
-		th.getAccessTeacher(authentication[1]);
-		th.getAccessStudent(authentication[1]);
+		th.getAccessAdmin(authentication);
+		th.getAccessTeacher(authentication);
+		th.getAccessStudent(authentication);
         th.router.navigate(['/']);
       }
       else {

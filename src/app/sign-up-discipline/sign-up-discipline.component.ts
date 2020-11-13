@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DisciplineService } from '../_services/discipline.service';
-import { StubService } from '../_services/stub.service';
+//import { StubService } from '../_services/stub.service';
 import { Router } from '@angular/router';
 import { Authorization } from '../_models/authorization';
 import { Discipline } from '../_models/discipline';
@@ -21,7 +21,7 @@ export class SignUpDisciplineComponent implements OnInit {
   constructor(
     private router: Router,
     private disciplineService: DisciplineService,
-	private stub:StubService,
+	//private stub:StubService,
     private formBuilder: FormBuilder
   ) {
   }
@@ -57,7 +57,6 @@ export class SignUpDisciplineComponent implements OnInit {
         th.router.navigate(['/disciplines-control']);
       }).catch(function(err) {
         console.log("Error while adding new discipline");
-        alert(err);
 	    th.loading = false;
       });
   }

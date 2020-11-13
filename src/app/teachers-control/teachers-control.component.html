@@ -28,9 +28,8 @@
         <td>MODIFY TIME</td>
         <td>ACTIVE</td>
         <td></td>
-        <td></td>
       </tr>
-      <tr *ngFor="let teacher of teachers; let row_no = index; let active of isActives" class="border-style">
+      <tr *ngFor="let teacher of teachers; let row_no = index" class="border-style">
         <td>{{row_no + 1}}</td>
 		<td>{{teacher.lastName}}</td>
         <td>{{teacher.firstName}}</td>
@@ -39,9 +38,8 @@
 		<td>{{teacher.address}}</td>
         <td>{{teacher.createTime | date : "dd.MM.y h:mm"}}</td>
         <td>{{teacher.modifyTime | date : "dd.MM.y h:mm"}}</td>
-        <td>{{getActive(active)}}</td>
+        <td>{{getActive(teacher.authorization.isActive)}}</td>
         <td><button class="user-btn btn btn-primary" [routerLink]="['/full-profile-teacher', teacher.id]">Edit</button></td>
-        <td><button class="user-btn btn btn-primary" (click)="deleteTeacher(teacher)">Delete</button></td>
       </tr>
     </table>
   </div>

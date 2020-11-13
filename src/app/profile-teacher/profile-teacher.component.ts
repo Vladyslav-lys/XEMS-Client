@@ -6,7 +6,7 @@ import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { Authorization } from '../_models/authorization';
 import { Teacher } from '../_models/teacher';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { operationStatusInfo } from '../_helpers/operationStatusInfo';
+import { operationStatusInfo, OperationStatus } from '../_helpers/operationStatusInfo';
 
 @Component({
   selector: 'app-profile-teacher',
@@ -35,27 +35,21 @@ export class FullProfileTeacherComponent implements OnInit {
     var currentAuth = JSON.parse(localStorage.currentAuthentication);
 	
 	var th = this;
-	this.authenticationService.getAuthorizationById(currentAuth[0])
-	  .then(function (operationStatus : operationStatusInfo){
-		if (operationStatus.operationStatus == operationStatus.Done) {
-			th.currentAuth = operationStatus.attachedObject;
-			
-			var th1 = th;
-			th.teacherService.getTeacherByAuthId(th.currentAuth.id])
+	this.teacherService.getTeacherByAuthId(currentAuth[0])
 				.then(function (operationStatus : operationStatusInfo){
-					if (operationStatus.operationStatus == operationStatus.Done) {
-						th1.currentTeacher = operationStatus.attachedObject;
+					if (operationStatus.operationStatus == OperationStatus.Done) {
+						th.currentTeacher = operationStatus.attachedObject;
 		
-						th1.currentTeacher.birthday = new Date(th1.currentTeacher.birthday);
+						th.currentTeacher.birthday = new Date(th1.currentTeacher.birthday);
 	
-						th1.profileForm = th1.formBuilder.group({
-							login: [th1.currentAuth.login, Validators.required],
-							password: [th1.currentAuth.password, Validators.required],
-							lastName: [th1.currentTeacher.lastName, Validators.required],
-							firstName: [th1.currentTeacher.firstName, Validators.required],
-							birthday: [th1.currentTeacher.birthday, Validators.required],
-							phone: [th1.currentTeacher.phone, Validators.required],
-							address: [th1.currentTeacher.address, Validators.required]
+						th.profileForm = th.formBuilder.group({
+							login: [th.currentAuth.login, Validators.required],
+							password: [th.currentAuth.password, Validators.required],
+							lastName: [th.currentTeacher.lastName, Validators.required],
+							firstName: [th.currentTeacher.firstName, Validators.required],
+							birthday: [th.currentTeacher.birthday, Validators.required],
+							phone: [th.currentTeacher.phone, Validators.required],
+							address: [th.currentTeacher.address, Validators.required]
 						});
 					}
 				}).catch(err => {
@@ -63,12 +57,6 @@ export class FullProfileTeacherComponent implements OnInit {
 					th.alertService.error(err.toString());
 					th.loading = false;
 				}); 
-		}
-    }).catch(err => {
-      console.log(err);
-      this.alertService.error(err.toString());
-      this.loading = false;
-    });
   }
 
   EditProfile() {
@@ -91,6 +79,7 @@ export class FullProfileTeacherComponent implements OnInit {
     if (this.profileForm.controls.password.value != null)
       newAuthorization.password = this.profileForm.controls.password.value;
     
+	newTeacher.authorization = newAuthorization;
     if (this.profileForm.controls.lastName.value != null)
       newTeacher.lastName = this.profileForm.controls.lastName.value;
     if (this.profileForm.controls.firstName.value != null)
@@ -104,17 +93,6 @@ export class FullProfileTeacherComponent implements OnInit {
     newTeacher.modifyTime = new Date();
 
     var th = this;
-	this.authenticationService.invokeUpdateAuthorizationInfo(newAuthorization)
-      .then(function (operationStatus: operationStatusInfo) {
-        if (operationStatus.operationStatus == operationStatus.Done) {
-          var message = "Admin info updated successfully";
-          console.log(message);
-          alert(message);
-        }
-      }).catch(function (err) {
-        console.log("Error while updating admin info");
-        alert(err);
-      });
     this.teacherService.invokeUpdateTeacherInfo(newTeacher)
       .then(function (operationStatus: operationStatusInfo) {
         if (operationStatus.operationStatus == operationStatus.Done) {

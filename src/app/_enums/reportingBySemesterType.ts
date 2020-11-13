@@ -1,1 +1,1 @@
-export enum ReportingBySemesterType { Credit = 1, DifferentialCredit = 2, Exam = 3 }
+export enum ReportingBySemesterType { None = 0, Credit = 1, DifferentialCredit = 2, Exam = 3 }

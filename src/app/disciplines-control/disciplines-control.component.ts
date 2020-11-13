@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DisciplineService } from '../_services/discipline.service';
-import { StubService } from '../_services/stub.service';
+//import { StubService } from '../_services/stub.service';
 import { Router } from '@angular/router';
 import { Authorization } from '../_models/authorization';
 import { Discipline } from '../_models/discipline';
@@ -18,16 +18,13 @@ import {SignalRService} from '../_services/signalR.service';
 })
 export class DisciplinesControlComponent implements OnInit {
 
-  authorization: Authorization;
-
   disciplines: Discipline[];
-
   disciplines2: Discipline[];
 
   constructor(
     private router: Router,
     private disciplineService: DisciplineService,
-	private stub:StubService,
+	//private stub:StubService,
 	private serviceClient: SignalRService,
     private notifySerivce: NotifyService,
     private formBuilder: FormBuilder
@@ -35,14 +32,16 @@ export class DisciplinesControlComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void>{
-    this.authorization = JSON.parse(localStorage.currentAuthorization);
-	
+	  
 	if(this.serviceClient.hubConnection.state == HubConnectionState.Connected){
 	  await this.getAllDisciplines()
     }
     else {
-      setTimeout(async () => {
-		  await this.getAllDisciplines()
+      var interval = setInterval(async () => {
+		  if(this.serviceClient.hubConnection.state == HubConnectionState.Connected){
+			  clearInterval(interval);
+		    await this.getAllDisciplines();
+		  }
 		}, 500);
     }
   }
@@ -53,8 +52,8 @@ export class DisciplinesControlComponent implements OnInit {
 	await this.disciplineService.getAllDisciplines()
 	  .then(function (operationStatus: operationStatusInfo) {
 		var disciplines = operationStatus.attachedObject;
-        th.disciplines = disciplines;
-        sessionStorage.setItem("disciplines", JSON.stringify(disciplines));
+        th.disciplines = disciplines[0];
+        sessionStorage.setItem("disciplines", JSON.stringify(th.disciplines));
         th.disciplines2 = JSON.parse(sessionStorage.disciplines).map(i => ({
           idx: i,
           id: i.id,
@@ -62,12 +61,7 @@ export class DisciplinesControlComponent implements OnInit {
         }));
       }).catch(function(err) {
         console.log("Error while fetching disciplines");
-        alert(err);
       });
-  }
-
-  openEdit(discipline) {
-    this.router.navigate(['/full-profile-discipline/:id']);
   }
 
   deleteDiscipline(discipline) {
@@ -79,7 +73,6 @@ export class DisciplinesControlComponent implements OnInit {
           window.location.reload();
       }).catch(function(err) {
         console.log("Error while deleting the discipline");
-        alert(err);
       });
   }
 

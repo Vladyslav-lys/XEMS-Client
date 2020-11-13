@@ -26,8 +26,6 @@ export class FullProfileStudentComponent implements OnInit {
   
   groups: Group[];
   groups2: Group[];
-  
-  isActive = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -54,16 +52,17 @@ export class FullProfileStudentComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
-    this.currentStudent.birthday = new Date(this.currentStudent.birthday);
+    //this.currentStudent.birthday = new Date(this.currentStudent.birthday);
 	
 	if(this.serviceClient.hubConnection.state == HubConnectionState.Connected){
 	  await this.getAllGroups();
-	  await this.getActive()
     }
     else {
-      setTimeout(async () => {
-		  await this.getAllGroups();
-		  await this.getActive()
+      var interval = setInterval(async () => {
+		  if(this.serviceClient.hubConnection.state == HubConnectionState.Connected){
+			  clearInterval(interval);
+		    await this.getAllGroups();
+		  }
 		}, 500);
     }
 	
@@ -73,20 +72,9 @@ export class FullProfileStudentComponent implements OnInit {
       birthday: [this.currentStudent.birthday, Validators.required],
 	  phone: [this.currentStudent.phone, Validators.required],
 	  address: [this.currentStudent.address, Validators.required],
-	  group: [this.currentStudent.group]
+	  group: [this.currentStudent.group.id],
+	  active: [this.currentStudent.authorization.isActive]
     });
-  }
-  
-  async getActive() {
-    var th = this;
-    
-	await this.studentService.getActiveStudentById(this.currentStudentId)
-	  .then(function (operationStatus: operationStatusInfo) {
-		th.isActive = operationStatus.attachedObject;
-      }).catch(function(err) {
-        console.log("Error while fetching teachers");
-        alert(err);
-      });
   }
   
   async getAllGroups() {
@@ -95,8 +83,8 @@ export class FullProfileStudentComponent implements OnInit {
 	await this.groupService.getAllGroups()
 	  .then(function (operationStatusInfo: operationStatusInfo) {
 		var groups = operationStatusInfo.attachedObject;
-        th.groups = groups;
-        sessionStorage.setItem("groups", JSON.stringify(groups));
+        th.groups = groups[0];
+        sessionStorage.setItem("groups", JSON.stringify(th.groups));
         th.groups2 = JSON.parse(sessionStorage.groups).map(i => ({
           idx: i,
           id: i.id,
@@ -108,7 +96,6 @@ export class FullProfileStudentComponent implements OnInit {
         }));
       }).catch(function(err) {
         console.log("Error while fetching groups");
-        alert(err);
       });
   }
 
@@ -132,46 +119,44 @@ export class FullProfileStudentComponent implements OnInit {
 
     this.loading = true;
 
-    var newStudent: Student;
-    newStudent = this.currentStudent;
-
-	if (this.profileForm.controls.active.value != null)
-      this.isActive = this.profileForm.controls.active.value;
-
-    if (this.profileForm.controls.lastName.value != null)
+    //var newStudent: Student;
+    //newStudent = this.currentStudent;
+	var newStudent: any;
+	newStudent = {};
+	
+	/*if (this.profileForm.controls.active.value != null)
+      newStudent.authorization.isActive = this.profileForm.controls.active.value;*/
+	
+	newStudent.id = this.currentStudent.id;
+    if (this.profileForm.controls.lastName.value != null && this.profileForm.controls.lastName.value != this.currentStudent.lastName)
       newStudent.lastName = this.profileForm.controls.lastName.value;
-    if (this.profileForm.controls.firstName.value != null)
+    if (this.profileForm.controls.firstName.value != null && this.profileForm.controls.firstName.value != this.currentStudent.firstName)
       newStudent.firstName = this.profileForm.controls.firstName.value;
-    if (this.profileForm.controls.birthday.value != null)
+    if (this.profileForm.controls.birthday.value != null && this.profileForm.controls.birthday.value != this.currentStudent.birthday.split('T')[0])
       newStudent.birthday = this.profileForm.controls.birthday.value;
-    if (this.profileForm.controls.phone.value != null)
+    if (this.profileForm.controls.phone.value != null && this.profileForm.controls.phone.value != this.currentStudent.phone)
       newStudent.phone = this.profileForm.controls.phone.value;
-    if (this.profileForm.controls.address.value != null)
+    if (this.profileForm.controls.address.value != null && this.profileForm.controls.address.value != this.currentStudent.address)
       newStudent.address = this.profileForm.controls.address.value;
-    if (this.profileForm.controls.group.value != null)
+    if (this.profileForm.controls.group.value != null && this.profileForm.controls.group.value != this.currentStudent.group.id)
 	{
 	  var id = this.profileForm.controls.group.value;
-	  newStudent.group = this.getGroupById(id);
+	  //newStudent.group = this.getGroupById(id);
+	  newStudent.groupId = +id;
 	}
-    newStudent.modifyTime = new Date();
 
     var th = this;
-	this.studentService.invokeUpdateAcitveStudentInfo(newStudent.id, this.isActive)
-      .then(function (operationStatusInfo: operationStatusInfo) {
-        if (operationStatusInfo.operationStatus == OperationStatus.Done) {
-          var message = "Student info updated successfully";
-          console.log(message);
-          alert(message);
-        }
-        else {
-          alert(operationStatusInfo.attachedInfo);
-        }
-      }).catch(function (err) {
-        console.log("Error while updating student info");
-        alert(err);
-      });
-    
-    this.studentService.invokeUpdateStudentInfo(newStudent)
+	console.log(newStudent);
+	
+	if(Object.keys(newStudent).length < 2 && this.profileForm.controls.active.value == this.currentStudent.authorization.isActive)
+	{
+		alert("Please, change any field");
+        th.loading = false;
+		return;
+	}
+	
+	if(Object.keys(newStudent).length >= 2)
+    this.studentService.invokeUpdateStudentInfo(newStudent, Object.keys(newStudent))
       .then(function (operationStatusInfo: operationStatusInfo) {
         if (operationStatusInfo.operationStatus == OperationStatus.Done) {
           var message = "Student info updated successfully";
@@ -184,8 +169,52 @@ export class FullProfileStudentComponent implements OnInit {
         }
       }).catch(function (err) {
         console.log("Error while updating student info");
-        alert(err);
+        th.loading = false;
       });
+	
+	if(this.profileForm.controls.active.value == this.currentStudent.authorization.isActive)
+	{
+		th.loading = false;
+		return;
+	}
+	
+	if(!this.profileForm.controls.active.value)
+	{
+	  this.authenticationService.blockAuthorization(this.currentStudent.authorization.id)
+	   .then(function (operationStatusInfo: operationStatusInfo) {
+        if (operationStatusInfo.operationStatus == OperationStatus.Done) {
+          var message = "Student blocked successfully";
+          console.log(message);
+          alert(message);
+          th.router.navigate(['/students-control']);
+        }
+        else {
+          alert(operationStatusInfo.attachedInfo);
+        }
+      }).catch(function (err) {
+        console.log("Error while blocking student");
+        th.loading = false;
+      });
+	}
+	else
+	{
+	 this.authenticationService.unblockAuthorization(this.currentStudent.authorization.id)
+	  .then(function (operationStatusInfo: operationStatusInfo) {
+        if (operationStatusInfo.operationStatus == OperationStatus.Done) {
+          var message = "Student unblocked successfully";
+          console.log(message);
+          alert(message);
+          th.router.navigate(['/students-control']);
+        }
+        else {
+          alert(operationStatusInfo.attachedInfo);
+        }
+      }).catch(function (err) {
+        console.log("Error while unblocking student");
+		alert(err);
+        th.loading = false;
+      });
+	}
   }
   
   getGroupById(id)
@@ -198,9 +227,13 @@ export class FullProfileStudentComponent implements OnInit {
   }
 
   enableBtn(): boolean {
-    if (this.profileForm.controls.lastName.value.length > 0 && this.profileForm.controls.firstName.value.length > 0
-	  && this.profileForm.controls.phone.value.length > 0 && this.profileForm.controls.birthday.value != null 
-	  && this.profileForm.controls.address.value.length > 0 && this.profileForm.controls.group.value.length > 0)
+    if (!this.profileForm.invalid && (this.profileForm.controls.lastName.value != this.currentStudent.lastName
+	|| this.profileForm.controls.firstName.value != this.currentStudent.firstName
+	|| this.profileForm.controls.birthday.value != this.currentStudent.birthday
+	|| this.profileForm.controls.phone.value != this.currentStudent.phone
+	|| this.profileForm.controls.address.value != this.currentStudent.address
+	|| this.profileForm.controls.group.value != this.currentStudent.group.id
+	|| this.profileForm.controls.active.value != this.currentStudent.authorization.isActive))
       return true;
     return false;
   }

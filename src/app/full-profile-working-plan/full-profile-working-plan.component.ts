@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { UserService } from '../_services/user.service';
-import { StubService } from '../_services/stub.service';
+import { TeacherService } from '../_services/teacher.service';
+import { DisciplineService } from '../_services/discipline.service';
+import { AuthenticationService } from '../_services/authentication.service';
+import {WorkingPlanService} from '../_services/workingPlan.service';
+//import { StubService } from '../_services/stub.service';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import {Teacher} from '../_models/teacher';
 import {Discipline} from '../_models/discipline';
@@ -8,12 +11,14 @@ import { Semester } from "../_enums/semester";
 import { TeachersRole } from "../_enums/teachersRole";
 import {WorkingPlan} from '../_models/workingPlan';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { operationStatusInfo } from '../_helpers/operationStatusInfo';
+import { operationStatusInfo, OperationStatus } from '../_helpers/operationStatusInfo';
+import {HubConnectionState} from '@microsoft/signalr';
+import {SignalRService} from '../_services/signalR.service';
 
 @Component({
-  selector: 'app-full-profile-working-plans',
-  templateUrl: './full-profile-working-plans.component.html',
-  styleUrls: ['./full-profile-working-plans.component.css']
+  selector: 'app-full-profile-working-plan',
+  templateUrl: './full-profile-working-plan.component.html',
+  styleUrls: ['./full-profile-working-plan.component.css']
 })
 export class FullProfileWorkingPlansComponent implements OnInit {
   profileForm: FormGroup;
@@ -31,8 +36,12 @@ export class FullProfileWorkingPlansComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-	private stub:StubService,
-    private userService: UserService,
+	//private stub:StubService,
+    private authenticationService: AuthenticationService,
+	private teacherService: TeacherService,
+	private workingPlanService: WorkingPlanService,
+	private disciplineService: DisciplineService,
+	private serviceClient: SignalRService,
     private formBuilder: FormBuilder
   ) {
     this.router.events.subscribe(
@@ -55,15 +64,18 @@ export class FullProfileWorkingPlansComponent implements OnInit {
 	  await this.getAllDisciplines();
     }
     else {
-      setTimeout(async () => {
-		  await this.getAllTeachers();
-		  await this.getAllDisciplines()
+		var interval = setInterval(async () => {
+		  if(this.serviceClient.hubConnection.state == HubConnectionState.Connected){
+			  clearInterval(interval);
+		    await this.getAllTeachers();
+			await this.getAllDisciplines();
+		  }
 		}, 500);
     }
 	
     this.profileForm = this.formBuilder.group({
-      teacher: [this.currentWorkingPlan.teacher],
-	  discipline: [this.currentWorkingPlan.discipline],
+      teacher: [this.currentWorkingPlan.teacher.id, Validators.required],
+	  discipline: [this.currentWorkingPlan.discipline.id, Validators.required],
 	  hours: [this.currentWorkingPlan.hours, Validators.required],
 	  role: [this.currentWorkingPlan.role],
 	  year: [this.currentWorkingPlan.year, Validators.required],
@@ -84,11 +96,11 @@ export class FullProfileWorkingPlansComponent implements OnInit {
   async getAllDisciplines() {
     var th = this;
     
-	await this.stub.getAllDisciplines()
+	await this.disciplineService.getAllDisciplines()
 	  .then(function (operationStatus: operationStatusInfo) {
 		var disciplines = operationStatus.attachedObject;
-        th.disciplines = disciplines;
-        sessionStorage.setItem("disciplines", JSON.stringify(disciplines));
+        th.disciplines = disciplines[0];
+        sessionStorage.setItem("disciplines", JSON.stringify(th.disciplines));
         th.disciplines2 = JSON.parse(sessionStorage.disciplines).map(i => ({
           idx: i,
           id: i.id,
@@ -103,11 +115,11 @@ export class FullProfileWorkingPlansComponent implements OnInit {
   async getAllTeachers() {
     var th = this;
     
-	await this.stub.getAllTeachers()
+	await this.teacherService.getAllTeachers()
 	  .then(function (operationStatus: operationStatusInfo) {
 		var teachers = operationStatus.attachedObject;
-        th.teachers = teachers;
-        sessionStorage.setItem("teachers", JSON.stringify(teachers));
+        th.teachers = teachers[0];
+        sessionStorage.setItem("teachers", JSON.stringify(th.teachers));
         th.teachers2 = JSON.parse(sessionStorage.teachers).map(i => ({
           idx: i,
           id: i.id,
@@ -135,50 +147,61 @@ export class FullProfileWorkingPlansComponent implements OnInit {
 
     this.loading = true;
 	
-	var newWorkingPlan: WorkingPlan;
-    newWorkingPlan = this.currentWorkingPlan;
+	//var newWorkingPlan: WorkingPlan;
+    //newWorkingPlan = this.currentWorkingPlan;
+	var newWorkingPlan: any;
+    newWorkingPlan = {};
 	
-	if (this.profileForm.controls.teacher.value != null)
-	{
-	  var id = this.profileForm.controls.teacher.value;
-	  newWorkingPlan.teacher = this.stub.getTeacherById(id);
-	}
-	if (this.profileForm.controls.discipline.value != null)
+	newWorkingPlan.id = this.currentWorkingPlan.id;
+	if (this.profileForm.controls.discipline.value != null && this.profileForm.controls.discipline.value != this.currentWorkingPlan.discipline.id)
 	{
 	  var id = this.profileForm.controls.discipline.value;
-	  newWorkingPlan.discipline = this.stub.getDisciplineById(id);
+	  //newWorkingPlan.discipline = this.stub.getDisciplineById(id);
+	  newWorkingPlan.disciplineId = +id;
 	}
-	if (this.profileForm.controls.hours.value != null && this.profileForm.controls.hours.value > 0)
-      newWorkingPlan.hours = this.profileForm.controls.hours.value;
-    if (this.profileForm.controls.role.value != null && this.profileForm.controls.semester.role.length > 0)
-      newWorkingPlan.role = this.profileForm.controls.role.value;
-    if (this.profileForm.controls.year.value != null && this.profileForm.controls.year.value > 0)
-      newWorkingPlan.year = this.profileForm.controls.year.value;
-	if (this.profileForm.controls.semester.value != null && this.profileForm.controls.semester.value.length > 0)
-      newWorkingPlan.semester = this.profileForm.controls.semester.value;
-  
-	this.stub.invokeUpdateWorkingPlanInfo(newWorkingPlan)
+	if (this.profileForm.controls.hours.value != null && this.profileForm.controls.hours.value > 0 && this.profileForm.controls.hours.value != this.currentWorkingPlan.hours)
+      newWorkingPlan.hours = +this.profileForm.controls.hours.value;
+    if (this.profileForm.controls.role.value != null && this.profileForm.controls.role.value.length > 0 && this.profileForm.controls.role.value != this.currentWorkingPlan.role)
+      newWorkingPlan.role = +this.profileForm.controls.role.value;
+    if (this.profileForm.controls.year.value != null && this.profileForm.controls.year.value > 0 && this.profileForm.controls.year.value != this.currentWorkingPlan.year)
+      newWorkingPlan.year = +this.profileForm.controls.year.value;
+	if (this.profileForm.controls.semester.value != null && this.profileForm.controls.semester.value.length > 0 && this.profileForm.controls.semester.value != this.currentWorkingPlan.semester)
+      newWorkingPlan.semester = +this.profileForm.controls.semester.value;
+	
+	var th = this;
+	if(Object.keys(newWorkingPlan).length < 2)
+	{
+		alert("Please, change any field");
+        th.loading = false;
+		return;
+	}
+	
+	this.workingPlanService.invokeUpdateWorkingPlanInfo(newWorkingPlan, Object.keys(newWorkingPlan))
       .then(function (operationStatusInfo: operationStatusInfo) {
-        if (operationStatusInfo.operationStatus == operationStatus.Done) {
+        if (operationStatusInfo.operationStatus == OperationStatus.Done) {
           var message = "Working plan info updated successfully";
           console.log(message);
           alert(message);
           th.router.navigate(['/working-plans-control']);
         }
         else {
+		  console.log(operationStatusInfo.attachedInfo);
           alert(operationStatusInfo.attachedInfo);
+		  th.loading = false;
         }
       }).catch(function (err) {
         console.log("Error while updating working plan info");
         alert(err);
+		th.loading = false;
       });
   }
 
   enableBtn(): boolean {
-	if (this.profileForm.controls.teacher.value.length > 0 && this.profileForm.controls.discipline.value.length > 0  
-		&& this.profileForm.controls.year.value.length > 0 && this.profileForm.controls.year.value > 0
-		&& this.profileForm.controls.hours.value.length > 0 && this.profileForm.controls.hours.value > 0
-		&& this.profileForm.controls.role.value.length > 0 && this.profileForm.controls.semester.value.length > 0)
+	if (!this.profileForm.invalid && (this.profileForm.controls.discipline.value != this.currentWorkingPlan.discipline.id
+	|| this.profileForm.controls.year.value != this.currentWorkingPlan.year
+	|| this.profileForm.controls.hours.value != this.currentWorkingPlan.hours
+	|| this.profileForm.controls.role.value != this.currentWorkingPlan.role
+	|| this.profileForm.controls.semester.value != this.currentWorkingPlan.semester))
       return true;
     return false;
   }

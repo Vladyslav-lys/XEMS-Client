@@ -11,9 +11,9 @@ export class SubjectService {
     ) {
     }
 
-  invokeUpdateSubjectInfo(subject, serviceClient = this.serviceClient) {
+  invokeUpdateSubjectInfo(subject, changedFields, serviceClient = this.serviceClient) {
     return new Promise(function (resolve, reject) {
-      serviceClient.hubConnection.invoke("UpdateSubject", subject)
+      serviceClient.hubConnection.invoke("UpdateSubject", subject, changedFields)
         .then(function (operationStatus) {
           resolve(operationStatus);
         }).catch(function (err) {
@@ -24,7 +24,7 @@ export class SubjectService {
   
   getAllSubjects(serviceClient = this.serviceClient) {
     return new Promise(function (resolve, reject) {
-      serviceClient.hubConnection.invoke("GetAllSubjects")
+      serviceClient.hubConnection.invoke("GetSubjectsCatalogue")
         .then(function (operationStatus) {
           resolve(operationStatus);
         }).catch(function (err) {
@@ -46,7 +46,7 @@ export class SubjectService {
 
   addSubject(subject, serviceClient = this.serviceClient) {
     return new Promise(function (resolve, reject) {
-      serviceClient.hubConnection.invoke("RegistrationSubject",subject)
+      serviceClient.hubConnection.invoke("CreateSubject",subject)
         .then(function (operationStatus) {
           resolve(operationStatus);
         }).catch(function (err) {

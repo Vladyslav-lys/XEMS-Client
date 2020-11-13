@@ -3,20 +3,26 @@
     <app-leftmenu></app-leftmenu>
   </div>
   <div class="col-register">
-
+	<alert class="error-text"></alert>
     <form [formGroup]="registerForm">
       <div class="row-another">
         <h3 class="h3">Subject</h3>
 		<div class="input-group">
-          <div class="error-area"></div>
-          <select class="use-elem use-elem-select" formControlName="student">
-            <option *ngFor="let student of students2" [ngValue]="{{student.id}}">{{student.lastName}} + " " + {{student.firstName}}</option>
+          <div class="error-area">
+            <div class="error-text" *ngIf="(submitted || this.registerForm.controls.student.touched) && this.registerForm.controls.student.errors">Student is required</div>
+          </div>
+          <select [class.error-block]="(submitted || this.registerForm.controls.student.touched) && this.registerForm.controls.student.errors" class="use-elem use-elem-select" formControlName="student">
+			<option value="">No student</option>
+            <option *ngFor="let student of students2" value="{{student.id}}">{{student.lastName}} {{student.firstName}}</option>
           </select>
         </div>
 		<div class="input-group">
-          <div class="error-area"></div>
-          <select class="use-elem use-elem-select" formControlName="discipline">
-            <option *ngFor="let discipline of disciplines2" [ngValue]="{{discipline.id}}">{{discipline.title}}</option>
+          <div class="error-area">
+            <div class="error-text" *ngIf="(submitted || this.registerForm.controls.discipline.touched) && this.registerForm.controls.discipline.errors">Discipline is required</div>
+          </div>
+          <select [class.error-block]="(submitted || this.registerForm.controls.discipline.touched) && this.registerForm.controls.discipline.errors" class="use-elem use-elem-select" formControlName="discipline">
+			<option value="">No discipline</option>
+            <option *ngFor="let discipline of disciplines2" value="{{discipline.id}}">{{discipline.title}}</option>
           </select>
         </div>
         <div class="form-group">
@@ -28,8 +34,11 @@
           </div>
         </div>
 		<div class="input-group">
-            <div class="error-area"></div>
-            <select class="use-elem use-elem-select" formControlName="semester" [ngValue]="1">
+            <div class="error-area">
+            <div class="error-text" *ngIf="(submitted || this.registerForm.controls.semester.touched) && this.registerForm.controls.semester.errors">Semester is required</div>
+          </div>
+            <select [class.error-block]="(submitted || this.registerForm.controls.semester.touched) && this.registerForm.controls.semester.errors" class="use-elem use-elem-select" formControlName="semester" value="0">
+			  <option value="">No semester</option>
               <option value="1">First with winter session</option>
               <option value="2">Second with summer session</option>
             </select>
@@ -59,8 +68,11 @@
           </div>
         </div>
 		<div class="input-group">
-            <div class="error-area"></div>
-            <select class="use-elem use-elem-select" formControlName="reporting" [ngValue]="1">
+            <div class="error-area">
+            <div class="error-text" *ngIf="(submitted || this.registerForm.controls.reporting.touched) && this.registerForm.controls.reporting.errors">Reporting is required</div>
+          </div>
+            <select [class.error-block]="(submitted || this.registerForm.controls.reporting.touched) && this.registerForm.controls.reporting.errors" class="use-elem use-elem-select" formControlName="reporting" value="0">
+			  <option value="">No reporting</option>
               <option value="1">Credit</option>
               <option value="2">Differential credit</option>
 			  <option value="3">Exam</option>
@@ -68,19 +80,11 @@
         </div>
 		<div class="input-group">
             <div class="error-area"></div>
-            <select class="use-elem use-elem-select" formControlName="courseTask" [ngValue]="0">
-			  <option value="0">None</option>
+            <select class="use-elem use-elem-select" formControlName="courseTask" value="0">
+			  <option value="0">No course task</option>
               <option value="1">Course work</option>
               <option value="2">Course project</option>
             </select>
-        </div>
-		<div class="form-group">
-          <div class="error-area">
-            <div class="error-text" *ngIf="(submitted || this.registerForm.controls.semesterGrade.touched) && this.registerForm.controls.semesterGrade.errors">Semester grade is required</div>
-          </div>
-          <div [class.error-block]="(submitted || this.registerForm.controls.semesterGrade.touched) && this.registerForm.controls.semesterGrade.errors" class="use-elem use-elem-input">
-            <input type="number" formControlName="semesterGrade" class="form-control" [ngClass]="{ 'is-invalid': submitted && this.registerForm.controls.semesterGrade.errors }" placeholder="Semester grade"/>
-          </div>
         </div>
       </div>
 

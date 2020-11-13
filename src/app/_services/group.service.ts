@@ -24,7 +24,7 @@ export class GroupService {
   
   getAllGroups(serviceClient = this.serviceClient) {
     return new Promise(function (resolve, reject) {
-      serviceClient.hubConnection.invoke("GetAllGroups")
+      serviceClient.hubConnection.invoke("GetGroupsCatalogue")
         .then(function (operationStatus) {
           resolve(operationStatus);
         }).catch(function (err) {
@@ -46,7 +46,7 @@ export class GroupService {
 
   addGroup(group, serviceClient = this.serviceClient) {
     return new Promise(function (resolve, reject) {
-      serviceClient.hubConnection.invoke("RegistrationGroup",group)
+      serviceClient.hubConnection.invoke("CreateGroup",group)
         .then(function (operationStatus) {
           resolve(operationStatus);
         }).catch(function (err) {

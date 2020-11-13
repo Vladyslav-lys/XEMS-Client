@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { TeacherService } from '../_services/teacher.service';
 import { AuthenticationService } from '../_services/authentication.service';
-import { StubService } from '../_services/stub.service';
+//import { StubService } from '../_services/stub.service';
 import { Router } from '@angular/router';
 import { Authorization } from '../_models/authorization';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { operationStatusInfo } from '../_helpers/operationStatusInfo';
+import { operationStatusInfo, OperationStatus } from '../_helpers/operationStatusInfo';
 import { Teacher } from '../_models/teacher';
 import { Group } from '../_models/group';
+import { AccessLevel } from '../_enums/accessLevel';
 
 @Component({
   selector: 'app-sign-up-teacher',
@@ -23,8 +24,8 @@ export class SignUpTeacherComponent implements OnInit {
   constructor(
     private router: Router,
     private teacherService: TeacherService,
-	private authenticationService: AuthorizationService,
-	private stub:StubService,
+	private authenticationService: AuthenticationService,
+	//private stub:StubService,
     private formBuilder: FormBuilder
   ) {
   }
@@ -40,7 +41,6 @@ export class SignUpTeacherComponent implements OnInit {
       birthday: ["", Validators.required],
 	  phone: ["", Validators.required],
 	  address: ["", Validators.required],
-      accessLevel: [2],
       active: [true]
     });
   }
@@ -57,18 +57,22 @@ export class SignUpTeacherComponent implements OnInit {
 	
 	var newAuthorization: Authorization;
 	newAuthorization = new Authorization();
-    var newTeacher: Teacher;
-    newTeacher = new Teacher();
+    //var newTeacher: Teacher;
+    //newTeacher = new Teacher();
+	var newTeacher: any;
+    newTeacher = {};
 	
     if (this.registerForm.controls.login.value != null)
-      newAuthorization.login = this.registerForm.controls.login.value;
+      //newAuthorization.login = this.registerForm.controls.login.value;
+		newTeacher.login = this.registerForm.controls.login.value;
     if (this.registerForm.controls.password.value != null)
-      newAuthorization.password = this.registerForm.controls.password.value;
-	if (this.registerForm.controls.active.value != null)
-      newAuthorization.isActive = this.registerForm.controls.active.value;
-	if (this.registerForm.controls.accessLevel.value != null)
-      newAuthorization.accessLevel = this.registerForm.controls.accessLevel.value;
-  
+      //newAuthorization.password = this.registerForm.controls.password.value;
+		newTeacher.password = this.registerForm.controls.password.value;
+	//if (this.registerForm.controls.active.value != null)
+      //newAuthorization.isActive = this.registerForm.controls.active.value;
+    //newAuthorization.accessLevel = AccessLevel.Teacher;
+	
+	//newTeacher.authorization = newAuthorization;
     if (this.registerForm.controls.lastName.value != null)
       newTeacher.lastName = this.registerForm.controls.lastName.value;
     if (this.registerForm.controls.firstName.value != null)
@@ -79,29 +83,28 @@ export class SignUpTeacherComponent implements OnInit {
       newTeacher.phone = this.registerForm.controls.phone.value;
     if (this.registerForm.controls.address.value != null)
       newTeacher.address = this.registerForm.controls.address.value;
-	newTeacher.createTime = new Date();
-    newTeacher.modifyTime = new Date();
+	//newTeacher.createTime = new Date();
+    //newTeacher.modifyTime = new Date();
 
     var th = this;
-	this.authenticationService.addAuthorization(newAuthorization)
-	  .then(function (operationStatus: operationStatusInfo) {
-		var message = "Authorization added successfully";
-        console.log(message);
-        alert(message);
-      }).catch(function(err) {
-        console.log("Error while adding new authorization");
-        alert(err);
-	    th.loading = false;
-      });
 	this.teacherService.addTeacher(newTeacher)
 	  .then(function (operationStatus: operationStatusInfo) {
-		var message = "Teacher added successfully";
-        console.log(message);
-        alert(message);
-        th.router.navigate(['/teacher-control']);
+		if(operationStatus.operationStatus == OperationStatus.Done)
+		{
+			var message = "Teacher added successfully";
+			console.log(message);
+			alert(message);
+			th.router.navigate(['/teachers-control']);
+		}
+		else
+		{
+			console.log(operationStatus.attachedInfo);
+			alert(operationStatus.attachedInfo);
+			th.loading = false;
+		}
       }).catch(function(err) {
         console.log("Error while adding new teacher");
-        alert(err);
+		alert(err);
 	    th.loading = false;
       });
   }

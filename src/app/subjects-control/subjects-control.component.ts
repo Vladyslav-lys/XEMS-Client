@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { UserService } from '../_services/user.service';
-import { StubService } from '../_services/stub.service';
+import { StudentService } from '../_services/student.service';
+import { DisciplineService } from '../_services/discipline.service';
+import { SubjectService } from '../_services/subject.service';
+//import { StubService } from '../_services/stub.service';
 import { Router } from '@angular/router';
 import { Subject } from '../_models/subject';
-import {Student} from './student';
-import {Discipline} from './discipline';
+import {Student} from '../_models/student';
+import {Discipline} from '../_models/discipline';
 import { CourseTask } from "../_enums/courseTask";
 import { ReportingBySemesterType } from "../_enums/reportingBySemesterType";
 import { Semester } from "../_enums/semester";
@@ -27,8 +29,10 @@ export class SubjectsControlComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private userService: UserService,
-	private stub:StubService,
+    private studentService: StudentService,
+	private disciplineService: DisciplineService,
+	private subjectService: SubjectService,
+	//private stub:StubService,
 	private serviceClient: SignalRService,
     private notifySerivce: NotifyService,
     private formBuilder: FormBuilder
@@ -41,8 +45,11 @@ export class SubjectsControlComponent implements OnInit {
 	  await this.getAllSubjects()
     }
     else {
-      setTimeout(async () => {
-		  await this.getAllSubjects()
+      var interval = setInterval(async () => {
+		  if(this.serviceClient.hubConnection.state == HubConnectionState.Connected){
+			  clearInterval(interval);
+		    await this.getAllSubjects();
+		  }
 		}, 500);
     }
   }
@@ -50,28 +57,28 @@ export class SubjectsControlComponent implements OnInit {
   async getAllSubjects() {
     var th = this;
     
-	await this.stub.getAllSubjects()
+	await this.subjectService.getAllSubjects()
 	  .then(function (operationStatus: operationStatusInfo) {
 		var subjects = operationStatus.attachedObject;
-        th.subjects = subjects;
-        sessionStorage.setItem("subjects", JSON.stringify(subjects));
+        th.subjects = subjects[0];
+        sessionStorage.setItem("subjects", JSON.stringify(th.subjects));
         th.subjects2 = JSON.parse(sessionStorage.subjects).map(i => ({
           idx: i,
           id: i.id,
-		  student: i.student;
-		  discipline: i.discipline;
-		  year: i.year;
-		  semester: i.semester;
-		  lectureHours: i.lectureHours;
-		  practiceHours: i.practiceHours;
-		  laboratoryHours: i.laboratoryHours;
-		  reporting: i.reportingBySemesterType;
-		  courseTask: i.courseTask;
-		  semesterGrade: i.semesterGrade;
+		  student: i.student,
+		  discipline: i.discipline,
+		  year: i.year,
+		  semester: i.semester,
+		  lectureHours: i.lectureHours,
+		  practiceHours: i.practiceHours,
+		  laboratoryHours: i.laboratoryHours,
+		  reporting: i.reportingBySemesterType,
+		  courseTask: i.courseTask,
+		  semesterGrade: i.semesterGrade
         }));
       }).catch(function(err) {
+		  alert(err);
         console.log("Error while fetching subjects");
-        alert(err);
       });
   }
   
@@ -112,6 +119,9 @@ export class SubjectsControlComponent implements OnInit {
     var s = "";
 
     switch (reportingBySemesterType) {
+	  case ReportingBySemesterType.None:
+        s = "None";
+        break;
       case ReportingBySemesterType.Credit:
         s = "Credit";
         break;
@@ -132,14 +142,13 @@ export class SubjectsControlComponent implements OnInit {
 
   deleteSubject(subject) {
     var th = this;
-	this.stub.deleteSubject(subject.id)
+	this.subjectService.deleteSubject(subject.id)
 	  .then(function (operationStatus: operationStatusInfo) {
 		console.log(operationStatus.attachedObject);
         if (!JSON.stringify(operationStatus.operationStatus))
           window.location.reload();
       }).catch(function(err) {
         console.log("Error while deleting the subject");
-        alert(err);
       });
   }
 

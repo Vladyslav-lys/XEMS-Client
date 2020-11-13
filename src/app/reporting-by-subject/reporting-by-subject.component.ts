@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import {AuthenticationService} from '../_services/authentication.service';
-import {operationStatusInfo} from '../_models/operationStatusInfo';
+import {ReportingBySubjectService} from '../_services/reportingBySubject.service';
+import {StudentService} from '../_services/student.service';
+import {operationStatusInfo, OperationStatus} from '../_helpers/operationStatusInfo';
 import {ReportingBySubject} from '../_models/reportingBySubject';
 import {ReportingBySubjectAdditionalMaterials} from '../_models/reportingBySubjectAdditionalMaterials';
 import {SignalRService} from '../_services/signalR.service';
-import { StubService } from '../_services/stub.service';
+//import { StubService } from '../_services/stub.service';
 import {HubConnectionState} from '@microsoft/signalr';
 import {Router} from '@angular/router';
 
@@ -15,13 +17,17 @@ import {Router} from '@angular/router';
 })
 export class ReportingBySubjectComponent implements OnInit {
 
-  items:ReportingBySubjectAdditionalMaterials[];
-  items2:ReportingBySubjectAdditionalMaterials[];
+  //items:ReportingBySubjectAdditionalMaterials[];
+  //items2:ReportingBySubjectAdditionalMaterials[];
+  items:ReportingBySubject[];
+  items2:ReportingBySubject[];
   
 	constructor(
     private serviceClient: SignalRService,
     private authenticateService: AuthenticationService,
-	private stub:StubService,
+	private reportingBySubjectService: ReportingBySubjectService,
+	private studentService: StudentService,
+	//private stub:StubService,
     private router: Router
 	) {
   }
@@ -31,8 +37,11 @@ export class ReportingBySubjectComponent implements OnInit {
 	  await this.getReporting();
     }
     else {
-      setTimeout(async () => {
-		  await this.getReporting()
+      var interval = setInterval(async () => {
+		  if(this.serviceClient.hubConnection.state == HubConnectionState.Connected){
+			  clearInterval(interval);
+		    await this.getReporting();
+		  }
 		}, 500);
     }
   }
@@ -56,6 +65,9 @@ export class ReportingBySubjectComponent implements OnInit {
 		case reportingBySubjectType.DifferentialCredit:
 			return "Differential Credit";
 			break;
+		default:
+			return "None";
+			break;
 	}		
   }
   
@@ -74,31 +86,41 @@ export class ReportingBySubjectComponent implements OnInit {
 
   async getReporting() {
     var th = this;
-    
-    await this.stub.getAllReportingBySubjectAdditionalMaterialss()
+	var auth = JSON.parse(localStorage.currentAuthentication);
+	var student;
+    await this.studentService.getStudentByAuthId(auth[0])
+	  .then(function (operationStatus: operationStatusInfo) {
+		var student1 = operationStatus.attachedObject;
+		student = student1[0];
+      }).catch(function(err) {
+        console.log("Error while fetching student");
+        alert(err);
+      });
+	  
+    await this.reportingBySubjectService.getReportingBySubjectsByStudentId(student.id)
 	 .then(function (operationStatus: operationStatusInfo){
-      if (operationStatus.operationStatus == operationStatus.Done) {
-        var reportings = operationStatus.attachedObject;
-        th.items = reportings;
-        sessionStorage.setItem("reportingBySubjectAdditionalMaterials", JSON.stringify(reportings));
-		th.items2 = JSON.parse(sessionStorage.reportingBySubjectAdditionalMaterials).map(i => ({ 
+      if (operationStatus.operationStatus == OperationStatus.Done) {
+          var reportings = operationStatus.attachedObject;
+          th.items = reportings[0];
+          sessionStorage.setItem("reportingBySubject", JSON.stringify(th.items));
+		  th.items2 = JSON.parse(sessionStorage.reportingBySubject).map(i => ({ 
 			idx: i, 
 			id: i.id, 
 			teacher: i.teacher, 
-			student: i.student, 
+			//student: i.student, 
 			discipline: i.discipline, 
 			title: i.title,
 			description: i.description, 
 			reporting: i.reporting, 
 			dueDate: i.dueDate, 
-			realDueDate: i.realDueDate, 
-			isCompleted: i.isCompleted, 
-			grade: i.grade, 
-			material: i.material}));
+			//realDueDate: i.realDueDate, 
+			//isCompleted: i.isCompleted, 
+			//grade: i.grade, 
+			/*material: i.material*/}));
         }
         else {
           console.log(operationStatus.attachedInfo);
-          sessionStorage.setItem("reportingBySubjectAdditionalMaterials", JSON.stringify(""));
+          sessionStorage.setItem("reportingBySubject", JSON.stringify(""));
           alert(operationStatus.attachedInfo);
         }
       }).catch(function(err) {

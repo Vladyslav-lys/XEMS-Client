@@ -24,6 +24,10 @@ export class AuthenticationService {
       localStorage.setItem('isLoggedIn', JSON.stringify(value));
     }
 	
+	public removeAuth(){
+	  localStorage.removeItem('isLoggedIn');
+	}
+	
 	public getAccessAdmin(): boolean {
       var result: boolean;
       if(localStorage.getItem('isAllowedAdmin') != null)
@@ -36,6 +40,10 @@ export class AuthenticationService {
     public setAccessAdmin(value: boolean){
       localStorage.setItem('isAllowedAdmin', JSON.stringify(value));
     }
+	
+	public removeAccessAdmin(){
+	  localStorage.removeItem('isAllowedAdmin');
+	}
 	
 	public getAccessTeacher(): boolean {
       var result: boolean;
@@ -50,6 +58,10 @@ export class AuthenticationService {
       localStorage.setItem('isAllowedTeacher', JSON.stringify(value));
     }
 	
+	public removeAccessTeacher(){
+	  localStorage.removeItem('isAllowedTeacher');
+	}
+	
 	public getAccessStudent(): boolean {
       var result: boolean;
       if(localStorage.getItem('isAllowedStudent') != null)
@@ -62,6 +74,10 @@ export class AuthenticationService {
     public setAccessStudent(value: boolean){
       localStorage.setItem('isAllowedStudent', JSON.stringify(value));
     }
+	
+	public removeAccessStudent(){
+	  localStorage.removeItem('isAllowedStudent');
+	}
 
     login(username, password, serviceClient = this.serviceClient) {
       var th = this;
@@ -75,16 +91,9 @@ export class AuthenticationService {
       });
     }
 
-    logout(id, serviceClient = this.serviceClient) {
-	  this.setAuth(null);
-	  this.setAccessAdmin(null);
-	  this.setAccessTeacher(null);
-	  this.setAccessStudent(null);
-	  localStorage.setItem('currentAuthentication', JSON.stringify(null));
-	  this.router.navigate(['/login']);
-	
+    logout(serviceClient = this.serviceClient) {
 	  return new Promise(function (resolve, reject) {
-        serviceClient.hubConnection.invoke("Logout", id)
+        serviceClient.hubConnection.invoke("Logout")
           .then(function (operationStatus) {
             resolve(operationStatus);
           }).catch(function (err) {
@@ -103,17 +112,6 @@ export class AuthenticationService {
       });
     });
   }
-  
-  getAllActives(accessLevel, serviceClient = this.serviceClient) {
-	return new Promise(function (resolve, reject) {
-      serviceClient.hubConnection.invoke("GetAllActives", accessLevel)
-        .then(function (operationStatus) {
-          resolve(operationStatus);
-        }).catch(function (err) {
-        reject(err);
-      });
-    });  
-  }
 	
 	getAuthorizationById(id, serviceClient = this.serviceClient) {
 		var th = this;
@@ -126,8 +124,30 @@ export class AuthenticationService {
           });
       });
 	}
+	
+  blockAuthorization(authorizationId, serviceClient = this.serviceClient) {
+    return new Promise(function (resolve, reject) {
+      serviceClient.hubConnection.invoke("BlockAuthorization", authorizationId)
+        .then(function (operationStatus) {
+          resolve(operationStatus);
+        }).catch(function (err) {
+        reject(err);
+      });
+    });
+  }
+  
+  unblockAuthorization(authorizationId, serviceClient = this.serviceClient) {
+    return new Promise(function (resolve, reject) {
+      serviceClient.hubConnection.invoke("UnblockAuthorization", authorizationId)
+        .then(function (operationStatus) {
+          resolve(operationStatus);
+        }).catch(function (err) {
+        reject(err);
+      });
+    });
+  }
 
-  addAuthorization(authorization, serviceClient = this.serviceClient) {
+  /*addAuthorization(authorization, serviceClient = this.serviceClient) {
     return new Promise(function (resolve, reject) {
       serviceClient.hubConnection.invoke("RegistrationAuthorization", authorization)
         .then(function (operationStatus) {
@@ -147,5 +167,5 @@ export class AuthenticationService {
         reject(err);
       });
     });
-  }
+  }*/
 }

@@ -7,5 +7,5 @@ export class Group {
   curator: Teacher;
   learningStartDate: any;
   learningEndDate: any;
-  degree: Degree;
+  qualificationLevel: Degree;
 }

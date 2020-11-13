@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { TeacherService } from '../_services/teacher.service';
 import { AuthenticationService } from '../_services/authentication.service';
-import { StubService } from '../_services/stub.service';
+//import { StubService } from '../_services/stub.service';
 import { Router } from '@angular/router';
 import { Authorization } from '../_models/authorization';
 import { Teacher } from '../_models/teacher';
@@ -27,13 +27,12 @@ export class TeachersControlComponent implements OnInit {
 
   teachers: Teacher[];
   teachers2: Teacher[];
-  isActives: boolean[];
 
   constructor(
     private router: Router,
     private teacherService: TeacherService,
-	private authenticationService: AuthorizationService,
-	private stub:StubService,
+	private authenticationService: AuthenticationService,
+	//private stub:StubService,
 	private serviceClient: SignalRService,
     private notifySerivce: NotifyService,
     private formBuilder: FormBuilder
@@ -43,13 +42,14 @@ export class TeachersControlComponent implements OnInit {
   async ngOnInit(): Promise<void>{
 	
 	if(this.serviceClient.hubConnection.state == HubConnectionState.Connected){
-	  await this.getActive();
 	  await this.getAllTeachers();
     }
     else {
-      setTimeout(async () => {
-		  await this.getActive();
-		  await this.getAllTeachers();
+       var interval = setInterval(async () => {
+		  if(this.serviceClient.hubConnection.state == HubConnectionState.Connected){
+			  clearInterval(interval);
+		    await this.getAllTeachers();
+		  }
 		}, 500);
     }
 
@@ -63,11 +63,12 @@ export class TeachersControlComponent implements OnInit {
 	await this.teacherService.getAllTeachers()
 	  .then(function (operationStatus: operationStatusInfo) {
 		var teachers = operationStatus.attachedObject;
-        th.teachers = teachers;
-        sessionStorage.setItem("teachers", JSON.stringify(teachers));
+        th.teachers = teachers[0];
+        sessionStorage.setItem("teachers", JSON.stringify(th.teachers));
         th.teachers2 = JSON.parse(sessionStorage.teachers).map(i => ({
           idx: i,
           id: i.id,
+		  authorization: i.authorization,
           firstName: i.firstName,
 		  lastName: i.lastName,
 		  birthday: i.birthday,
@@ -78,19 +79,6 @@ export class TeachersControlComponent implements OnInit {
         }));
       }).catch(function(err) {
         console.log("Error while fetching teachers");
-        alert(err);
-      });
-  }
-  
-  async getActive() {
-    var th = this;
-    
-	await this.authenticationService.getAllActives(AccessLevel.Teacher)
-	  .then(function (operationStatus: operationStatusInfo) {
-		th.isActives = operationStatus.attachedObject;
-      }).catch(function(err) {
-        console.log("Error while fetching teachers");
-        alert(err);
       });
   }
 
@@ -133,15 +121,6 @@ export class TeachersControlComponent implements OnInit {
 
   deleteTeacher(teacher) {
     var th = this;
-	this.authenticationService.deleteTeacherAuthorization(teacher.id)
-	  .then(function (operationStatus: operationStatusInfo) {
-		console.log(operationStatus.attachedObject);
-        if (!JSON.stringify(operationStatus.operationStatus))
-          window.location.reload();
-      }).catch(function(err) {
-        console.log("Error while deleting the teacher");
-        alert(err);
-      });
 	this.teacherService.deleteTeacher(teacher.id)
 	  .then(function (operationStatus: operationStatusInfo) {
 		console.log(operationStatus.attachedObject);

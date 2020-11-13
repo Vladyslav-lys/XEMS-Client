@@ -64,3 +64,18 @@ li {
   max-width: 237px;
   font-size: 1.3em;
 }
+
+.user-btn {
+  background-color: transparent;
+  width: 90%;
+  border: 1px solid rgb(150, 150, 150);
+  padding-top: 7px;
+  padding-bottom: 7px;
+}
+
+.add-user-btn {
+  border: 1px solid rgb(150, 150, 150);
+  width:110px;
+  margin-bottom: 20px;
+  padding: 10px 10px 10px 10px;
+}

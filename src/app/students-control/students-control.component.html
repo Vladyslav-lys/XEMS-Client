@@ -29,9 +29,8 @@
         <td>MODIFY TIME</td>
         <td>ACTIVE</td>
         <td></td>
-        <td></td>
       </tr>
-      <tr *ngFor="let student of students; let row_no = index; let active of isActives" class="border-style">
+      <tr *ngFor="let student of students2; let row_no = index" class="border-style">
         <td>{{row_no + 1}}</td>
         <td>{{student.lastName}}</td>
         <td>{{student.firstName}}</td>
@@ -41,9 +40,8 @@
 		<td>{{student.group.name}}</td>
         <td>{{student.createTime | date : "dd.MM.y h:mm"}}</td>
         <td>{{student.modifyTime | date : "dd.MM.y h:mm"}}</td>
-        <td>{{getActive(active)}}</td>
+        <td>{{getActive(student.authorization.isActive)}}</td>
         <td><button class="user-btn btn btn-primary" [routerLink]="['/full-profile-student', student.id]">Edit</button></td>
-        <td><button class="user-btn btn btn-primary" (click)="deleteStudent(student)">Delete</button></td>
       </tr>
     </table>
   </div>

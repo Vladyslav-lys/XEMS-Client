@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { DisciplineService } from '../_services/discipline.service';
-import { StubService } from '../_services/stub.service';
+//import { StubService } from '../_services/stub.service';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { Authorization } from '../_models/authorization';
 import { Discipline } from '../_models/discipline';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { operationStatusInfo } from '../_helpers/operationStatusInfo';
+import { operationStatusInfo, OperationStatus } from '../_helpers/operationStatusInfo';
 
 @Component({
   selector: 'app-full-profile-discipline',
@@ -22,7 +22,7 @@ export class FullProfileDisciplineComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-	private stub:StubService,
+	//private stub:StubService,
     private disciplineService: DisciplineService,
     private formBuilder: FormBuilder
   ) {
@@ -75,7 +75,7 @@ export class FullProfileDisciplineComponent implements OnInit {
     var th = this;
     this.disciplineService.invokeUpdateDisciplineInfo(newDiscipline)
       .then(function (operationStatusInfo: operationStatusInfo) {
-        if (operationStatusInfo.operationStatus == operationStatus.Done) {
+        if (operationStatusInfo.operationStatus == OperationStatus.Done) {
           var message = "Discipline info updated successfully";
           console.log(message);
           alert(message);
@@ -86,7 +86,7 @@ export class FullProfileDisciplineComponent implements OnInit {
         }
       }).catch(function (err) {
         console.log("Error while updating discipline info");
-        alert(err);
+		th.loading = false;
       });
   }
 

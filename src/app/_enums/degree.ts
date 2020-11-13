@@ -1,1 +1,1 @@
-export enum Degree { Specialist = 1, Bachelor = 2, Master = 3, DoctorOfPhilosophy = 4, DoctorOfScience = 5 }
+export enum Degree { Bachelor = 1, Master = 2, DoctorOfPhilosophy = 3, DoctorOfScience = 4 }

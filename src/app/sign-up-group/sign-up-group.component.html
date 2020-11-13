@@ -3,7 +3,7 @@
     <app-leftmenu></app-leftmenu>
   </div>
   <div class="col-register">
-
+	<alert class="error-text"></alert>
     <form [formGroup]="registerForm">
       <div class="row-another">
 	  <h3 class="h3">Group</h3>
@@ -17,9 +17,12 @@
             </div>
           </div>
 		  <div class="input-group">
-            <div class="error-area"></div>
-            <select class="use-elem use-elem-select" formControlName="curator">>
-			  <option *ngFor="let teacher of teachers2" [ngValue]="{{teacher.id}}">{{teacher.lastName}} + " " + {{teacher.firstName}}</option>
+            <div class="error-area">
+              <div class="error-text" *ngIf="(submitted || this.registerForm.controls.curator.touched) && this.registerForm.controls.curator.errors">Curator is required</div>
+            </div>
+            <select [class.error-block]="(submitted || this.registerForm.controls.curator.touched) && this.registerForm.controls.curator.errors" class="use-elem use-elem-select" formControlName="curator">>
+			  <option value="">No curator</option>
+			  <option *ngFor="let teacher of teachers2" value="{{teacher.id}}">{{teacher.lastName}} {{teacher.firstName}}</option>
             </select>
           </div>
           <div class="input-group">
@@ -34,23 +37,24 @@
             <div class="error-area">
               <div class="error-text" *ngIf="(submitted || this.registerForm.controls.learningEndDate.touched) && this.registerForm.controls.learningEndDate.errors">Learning End Date is required</div>
             </div>
-            <div [class.error-block]="(submitted || this.registerForm.controls.blearningEndDate.touched) && this.registerForm.controls.learningEndDate.errors" class="use-elem use-elem-input">
+            <div [class.error-block]="(submitted || this.registerForm.controls.learningEndDate.touched) && this.registerForm.controls.learningEndDate.errors" class="use-elem use-elem-input">
               <input type="date" class="form-control" formControlName="learningEndDate" [valueAsDate]="" />
             </div>
           </div>
           <div class="input-group">
-            <div class="error-area"></div>
-            <select class="use-elem use-elem-select" formControlName="degree">
-              <option value="1">Specialist</option>
-              <option value="2">Bachelor</option>
-              <option value="3">Master</option>
-              <option value="4">DoctorOfPhilosophy</option>
-			  <option value="5">DoctorOfScience</option>
+            <div class="error-area">
+              <div class="error-text" *ngIf="(submitted || this.registerForm.controls.degree.touched) && this.registerForm.controls.degree.errors">Degree is required</div>
+            </div>
+            <select [class.error-block]="(submitted || this.registerForm.controls.degree.touched) && this.registerForm.controls.degree.errors" class="use-elem use-elem-select" formControlName="degree">
+              <option value="1">Bachelor</option>
+              <option value="2">Master</option>
+              <option value="3">DoctorOfPhilosophy</option>
+			  <option value="4">DoctorOfScience</option>
             </select>
           </div>
       <div class="input-group">
-        <div [class.btn]="enableBtn()" class="use-elem use-elem-button">
-          <button type="submit" [class.btn]="enableBtn()" [disabled]="loading" class="btn-primary" (click)="AddGroup()">Add</button>
+        <div [class.btn]="enableBtn()" class="use-elem btn use-elem-button">
+          <button type="submit" [class.btn]="enableBtn()" [disabled]="loading" class="btn-primary btn" (click)="AddGroup()">Add</button>
         </div>
       </div>
     </form>

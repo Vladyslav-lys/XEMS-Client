@@ -8,7 +8,7 @@ import { Authorization } from '../_models/authorization';
 import { Student } from '../_models/student';
 import { Group } from '../_models/group';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { operationStatusInfo } from '../_helpers/operationStatusInfo';
+import { operationStatusInfo, OperationStatus } from '../_helpers/operationStatusInfo';
 
 @Component({
   selector: 'app-profile-student',
@@ -43,47 +43,37 @@ export class FullProfileStudentComponent implements OnInit {
 	  await this.getAllGroups();
     }
     else {
-      setTimeout(async () => {
-		  await this.getAllGroups();
+      var interval = setInterval(async () => {
+		  if(this.serviceClient.hubConnection.state == HubConnectionState.Connected){
+		    await this.getAllGroups();
+			clearInterval(interval);
+		  }
 		}, 500);
     }
 	
-	var th = this;
-	this.authenticationService.getAuthorizationById(currentAuth[0])
-	  .then(function (operationStatus : operationStatusInfo){
-		if (operationStatus.operationStatus == operationStatus.Done) {
-			th.currentAuth = operationStatus.attachedObject;
-			
-			var th1 = th;
-			th.studentService.getStudentByAuthId(th.currentAuth.id])
+			this.studentService.getStudentByAuthId(currentAuth[0])
 				.then(function (operationStatus : operationStatusInfo){
-					if (operationStatus.operationStatus == operationStatus.Done) {
-						th1.currentStudent = operationStatus.attachedObject;
+					if (operationStatus.operationStatus == OperationStatus.Done) {
+						th.currentStudent = operationStatus.attachedObject;
 		
-						th1.currentStudent.birthday = new Date(th1.currentStudent.birthday);
+						th.currentStudent.birthday = new Date(th.currentStudent.birthday);
 	
-						th1.profileForm = th1.formBuilder.group({
-							login: [th1.currentAuth.login, Validators.required],
-							password: [th1.currentAuth.password, Validators.required],
-							lastName: [th1.currentStudent.lastName, Validators.required],
-							firstName: [th1.currentStudent.firstName, Validators.required],
-							birthday: [th1.currentStudent.birthday, Validators.required],
-							phone: [th1.currentStudent.phone, Validators.required],
-							address: [th1.currentStudent.address, Validators.required],
-							group: [th1.currentStudent.group.id]
+						th.profileForm = th.formBuilder.group({
+							login: [th.currentAuth.login, Validators.required],
+							password: [th.currentAuth.password, Validators.required],
+							lastName: [th.currentStudent.lastName, Validators.required],
+							firstName: [th.currentStudent.firstName, Validators.required],
+							birthday: [th.currentStudent.birthday, Validators.required],
+							phone: [th.currentStudent.phone, Validators.required],
+							address: [th.currentStudent.address, Validators.required],
+							group: [th.currentStudent.group.id]
 						});
 					}
 				}).catch(err => {
 					console.log(err);
 					th.alertService.error(err.toString());
 					th.loading = false;
-				}); 
-		}
-    }).catch(err => {
-      console.log(err);
-      this.alertService.error(err.toString());
-      this.loading = false;
-    });
+				});
   }
   
   async getAllGroups() {
@@ -92,8 +82,8 @@ export class FullProfileStudentComponent implements OnInit {
 	await this.groupService.getAllGroups()
 	  .then(function (operationStatus: operationStatusInfo) {
 		var groups = operationStatus.attachedObject;
-        th.groups = groups;
-        sessionStorage.setItem("groups", JSON.stringify(groups));
+        th.groups = groups[0];
+        sessionStorage.setItem("groups", JSON.stringify(th.groups));
         th.groups2 = JSON.parse(sessionStorage.groups).map(i => ({
           idx: i,
           id: i.id,
@@ -105,7 +95,6 @@ export class FullProfileStudentComponent implements OnInit {
         }));
       }).catch(function(err) {
         console.log("Error while fetching groups");
-        alert(err);
       });
   }
 
@@ -128,7 +117,8 @@ export class FullProfileStudentComponent implements OnInit {
       newAuthorization.login = this.profileForm.controls.login.value;
     if (this.profileForm.controls.password.value != null)
       newAuthorization.password = this.profileForm.controls.password.value;
-
+	
+	newStudent.authorization = newAuthorization;
     if (this.profileForm.controls.lastName.value != null)
       newStudent.lastName = this.profileForm.controls.lastName.value;
     if (this.profileForm.controls.firstName.value != null)
@@ -147,17 +137,6 @@ export class FullProfileStudentComponent implements OnInit {
     newStudent.modifyTime = new Date();
 
     var th = this;
-    this.authenticationService.invokeUpdateAuthorizationInfo(newAuthorization)
-      .then(function (operationStatus: operationStatusInfo) {
-        if (operationStatus.operationStatus == operationStatus.Done) {
-          var message = "Admin info updated successfully";
-          console.log(message);
-          alert(message);
-        }
-      }).catch(function (err) {
-        console.log("Error while updating admin info");
-        alert(err);
-      });
     this.studentService.invokeUpdateStudentInfo(newStudent)
       .then(function (operationStatus: operationStatusInfo) {
         if (operationStatus.operationStatus == operationStatus.Done) {
@@ -171,7 +150,6 @@ export class FullProfileStudentComponent implements OnInit {
         }
       }).catch(function (err) {
         console.log("Error while updating student info");
-        alert(err);
       });
   }
 

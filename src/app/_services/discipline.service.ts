@@ -24,7 +24,7 @@ export class DisciplineService {
   
   getAllDisciplines(serviceClient = this.serviceClient) {
     return new Promise(function (resolve, reject) {
-      serviceClient.hubConnection.invoke("GetAllDisciplines")
+      serviceClient.hubConnection.invoke("GetDisciplinesCatalogue")
         .then(function (operationStatus) {
           resolve(operationStatus);
         }).catch(function (err) {
@@ -46,7 +46,7 @@ export class DisciplineService {
 
   addDiscipline(discipline, serviceClient = this.serviceClient) {
     return new Promise(function (resolve, reject) {
-      serviceClient.hubConnection.invoke("RegistrationDiscipline",discipline)
+      serviceClient.hubConnection.invoke("CreateDiscipline",discipline.title)
         .then(function (operationStatus) {
           resolve(operationStatus);
         }).catch(function (err) {

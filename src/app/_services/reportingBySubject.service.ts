@@ -22,6 +22,28 @@ export class ReportingBySubjectService {
     });
   }
   
+  getReportingBySubjectsByTeacherId(teacherId, serviceClient = this.serviceClient) {
+    return new Promise(function (resolve, reject) {
+      serviceClient.hubConnection.invoke("GetReportsByTeacherId", teacherId)
+        .then(function (operationStatus) {
+          resolve(operationStatus);
+        }).catch(function (err) {
+        reject(err);
+      });
+    });
+  }
+  
+  getReportingBySubjectsByStudentId(studentId, serviceClient = this.serviceClient) {
+    return new Promise(function (resolve, reject) {
+      serviceClient.hubConnection.invoke("GetReportsByStudentId", studentId)
+        .then(function (operationStatus) {
+          resolve(operationStatus);
+        }).catch(function (err) {
+        reject(err);
+      });
+    });
+  }
+  
   getAllReportingBySubjects(serviceClient = this.serviceClient) {
     return new Promise(function (resolve, reject) {
       serviceClient.hubConnection.invoke("GetAllReportingBySubjects")
@@ -46,7 +68,18 @@ export class ReportingBySubjectService {
 
   addReportingBySubject(reportingBySubject, serviceClient = this.serviceClient) {
     return new Promise(function (resolve, reject) {
-      serviceClient.hubConnection.invoke("RegistrationReportingBySubject",reportingBySubject)
+      serviceClient.hubConnection.invoke("CreateReport",reportingBySubject)
+        .then(function (operationStatus) {
+          resolve(operationStatus);
+        }).catch(function (err) {
+        reject(err);
+      });
+    });
+  }
+  
+  addReportingBySubjectAdditionalMaterials(reportingBySubject, serviceClient = this.serviceClient) {
+    return new Promise(function (resolve, reject) {
+      serviceClient.hubConnection.invoke("CreateReporting",reportingBySubject)
         .then(function (operationStatus) {
           resolve(operationStatus);
         }).catch(function (err) {

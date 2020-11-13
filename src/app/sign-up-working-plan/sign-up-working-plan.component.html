@@ -3,20 +3,26 @@
     <app-leftmenu></app-leftmenu>
   </div>
   <div class="col-register">
-
+	<alert class="error-text"></alert>
     <form [formGroup]="registerForm">
       <div class="row-another">
 	  <h3 class="h3">Working plan</h3>
 		<div class="input-group">
-          <div class="error-area"></div>
-          <select class="use-elem use-elem-select" formControlName="teacher">
-            <option *ngFor="let teacher of teachers2" [ngValue]="{{teacher.id}}">{{teacher.lastName}} + " " + {{teacher.firstName}}</option>
+          <div class="error-area">
+            <div class="error-text" *ngIf="(submitted || this.registerForm.controls.teacher.touched) && this.registerForm.controls.teacher.errors">Teacher is required</div>
+          </div>
+          <select [class.error-block]="(submitted || this.registerForm.controls.teacher.touched) && this.registerForm.controls.teacher.errors" class="use-elem use-elem-select" formControlName="teacher">
+			<option value="">No teacher</option>
+            <option *ngFor="let teacher of teachers2" value="{{teacher.id}}">{{teacher.lastName}} {{teacher.firstName}}</option>
           </select>
         </div>
 		<div class="input-group">
-          <div class="error-area"></div>
-          <select class="use-elem use-elem-select" formControlName="discipline">
-            <option *ngFor="let discipline of disciplines2" [ngValue]="{{discipline.id}}">{{discipline.title}}</option>
+          <div class="error-area">
+            <div class="error-text" *ngIf="(submitted || this.registerForm.controls.discipline.touched) && this.registerForm.controls.discipline.errors">Discipline is required</div>
+          </div>
+          <select [class.error-block]="(submitted || this.registerForm.controls.discipline.touched) && this.registerForm.controls.discipline.errors" class="use-elem use-elem-select" formControlName="discipline">
+			<option value="">No discipline</option>
+            <option *ngFor="let discipline of disciplines2" value="{{discipline.id}}">{{discipline.title}}</option>
           </select>
         </div>
 		<div class="form-group">
@@ -28,8 +34,11 @@
           </div>
         </div>
 		<div class="input-group">
-            <div class="error-area"></div>
-            <select class="use-elem use-elem-select" formControlName="role">
+            <div class="error-area">
+            <div class="error-text" *ngIf="(submitted || this.registerForm.controls.role.touched) && this.registerForm.controls.role.errors">Role is required</div>
+          </div>
+            <select [class.error-block]="(submitted || this.registerForm.controls.role.touched) && this.registerForm.controls.role.errors" class="use-elem use-elem-select" formControlName="role">
+			  <option value="">No role</option>
               <option value="1">Lection</option>
               <option value="2">Practice</option>
 			  <option value="3">Laboratory</option>
@@ -44,8 +53,11 @@
           </div>
         </div>
 		<div class="input-group">
-            <div class="error-area"></div>
-            <select class="use-elem use-elem-select" formControlName="semester">
+          <div class="error-area">
+            <div class="error-text" *ngIf="(submitted || this.registerForm.controls.semester.touched) && this.registerForm.controls.semester.errors">Semester is required</div>
+          </div>
+            <select [class.error-block]="(submitted || this.registerForm.controls.semester.touched) && this.registerForm.controls.semester.errors" class="use-elem use-elem-select" formControlName="semester">
+			  <option value="">No semester</option>
               <option value="1">First with winter session</option>
               <option value="2">Second with summer session</option>
             </select>

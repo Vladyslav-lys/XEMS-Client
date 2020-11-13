@@ -1,11 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnChanges, DoCheck } from '@angular/core';
 import { StudentService } from '../_services/student.service';
 import { AuthenticationService } from '../_services/authentication.service';
 //import { StubService } from '../_services/stub.service';
 import { Router } from '@angular/router';
 import { Authorization } from '../_models/authorization';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { operationStatusInfo } from '../_helpers/operationStatusInfo';
+import { operationStatusInfo, OperationStatus } from '../_helpers/operationStatusInfo';
 import { NotifyService } from '../_services/notify.service';
 import { Message } from '../_models/message';
 import { Group } from '../_models/group';
@@ -41,15 +41,15 @@ export class StudentsControlComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void>{
-	
 	if(this.serviceClient.hubConnection.state == HubConnectionState.Connected){
-	  await this.getActiveAsync();
 	  await this.getAllStudents();
     }
     else {
-      setTimeout(async () => {
-		  await this.getActiveAsync();
-		  await this.getAllStudents();
+      var interval = setInterval(async () => {
+		  if(this.serviceClient.hubConnection.state == HubConnectionState.Connected){
+			  clearInterval(interval);
+		    await this.getAllStudents();
+		  }
 		}, 500);
     }
 	
@@ -57,30 +57,19 @@ export class StudentsControlComponent implements OnInit {
       messageText: [this.messageText],
     });
   }
-  
-  async getActiveAsync() {
-    var th = this;
-    
-	await this.authenticationService.getAllActives(AccessLevel.Teacher)
-	  .then(function (operationStatus: operationStatusInfo) {
-		th.isActives = operationStatus.attachedObject;
-      }).catch(function(err) {
-        console.log("Error while fetching students");
-        alert(err);
-      });
-  }
 
-  async getAllStudents() {
+  getAllStudents() {
     var th = this;
     
-	await this.studentService.getAllStudents()
+	this.studentService.getAllStudents()
 	  .then(function (operationStatus: operationStatusInfo) {
 		var students = operationStatus.attachedObject;
-        th.students = students;
-        sessionStorage.setItem("students", JSON.stringify(students));
+        th.students = students[0];
+        sessionStorage.setItem("students", JSON.stringify(th.students));
         th.students2 = JSON.parse(sessionStorage.students).map(i => ({
           idx: i,
           id: i.id,
+		  authorization: i.authorization,
           firstName: i.firstName,
 		  lastName: i.lastName,
 		  birthday: i.birthday,
@@ -92,7 +81,6 @@ export class StudentsControlComponent implements OnInit {
         }));
       }).catch(function(err) {
         console.log("Error while fetching students");
-        alert(err);
       });
   }
 
@@ -135,15 +123,6 @@ export class StudentsControlComponent implements OnInit {
 
   deleteStudent(student) {
     var th = this;
-	this.studentService.deleteStudentAuthorization(student.id)
-	  .then(function (operationStatus: operationStatusInfo) {
-		console.log(operationStatus.attachedObject);
-        if (!JSON.stringify(operationStatus.operationStatus))
-          window.location.reload();
-      }).catch(function(err) {
-        console.log("Error while deleting the student");
-        alert(err);
-      });
 	this.studentService.deleteStudent(student.id)
 	  .then(function (operationStatus: operationStatusInfo) {
 		console.log(operationStatus.attachedObject);
@@ -151,7 +130,6 @@ export class StudentsControlComponent implements OnInit {
           window.location.reload();
       }).catch(function(err) {
         console.log("Error while deleting the student");
-        alert(err);
       });
   }
 
@@ -174,7 +152,6 @@ export class StudentsControlComponent implements OnInit {
         th.notifyForm.controls.messageText.reset();
       }).catch(function(err) {
         console.log(err);
-        alert(err);
       });
   }
 }

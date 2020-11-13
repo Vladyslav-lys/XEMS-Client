@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { TeacherService } from '../_services/teacher.service';
 import { AuthenticationService } from '../_services/authentication.service';
-import { StubService } from '../_services/stub.service';
+//import { StubService } from '../_services/stub.service';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { Authorization } from '../_models/authorization';
 import { Teacher } from '../_models/teacher';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { operationStatusInfo } from '../_helpers/operationStatusInfo';
+import { operationStatusInfo, OperationStatus } from '../_helpers/operationStatusInfo';
 
 @Component({
   selector: 'app-full-profile-teacher',
@@ -19,15 +19,13 @@ export class FullProfileTeacherComponent implements OnInit {
   currentTeacher: Teacher;
   loading = false;
   submitted = false;
-  
-  isActive = false;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-	private stub:StubService,
+	//private stub:StubService,
     private teacherService: TeacherService,
-	private authenticationService: AuthorizationService,
+	private authenticationService: AuthenticationService,
     private formBuilder: FormBuilder
   ) {
     this.router.events.subscribe(
@@ -45,38 +43,16 @@ export class FullProfileTeacherComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
-    this.currentTeacher.birthday = new Date(this.currentTeacher.birthday);
-	
-	if(this.serviceClient.hubConnection.state == HubConnectionState.Connected){
-	  await this.getActive()
-    }
-    else {
-      setTimeout(async () => {
-		  await this.getActive()
-		}, 500);
-    }
+    //this.currentTeacher.birthday = new Date(this.currentTeacher.birthday);
 
     this.profileForm = this.formBuilder.group({
-	  /*login: [this.currentTeacher.login, Validators.required],
-      password: [this.currentTeacher.password, Validators.required],*/
       lastName: [this.currentTeacher.lastName, Validators.required],
       firstName: [this.currentTeacher.firstName, Validators.required],
       birthday: [this.currentTeacher.birthday, Validators.required],
 	  phone: [this.currentTeacher.phone, Validators.required],
-	  address: [this.currentTeacher.address, Validators.required]
+	  address: [this.currentTeacher.address, Validators.required],
+	  active: [this.currentTeacher.authorization.isActive]
     });
-  }
-  
-  async getActive() {
-    var th = this;
-    
-	await this.teacherService.getActiveTeacherById(this.currentTeacherId)
-	  .then(function (operationStatus: operationStatusInfo) {
-		th.isActive = operationStatus.attachedObject;
-      }).catch(function(err) {
-        console.log("Error while fetching teachers");
-        alert(err);
-      });
   }
 
   LoadTeacherInfo(currentTeacherId: number) {
@@ -99,68 +75,104 @@ export class FullProfileTeacherComponent implements OnInit {
 
     this.loading = true;
 	
-    var newTeacher: Teacher;
-    newTeacher = this.currentTeacher;
+    //var newTeacher: Teacher;
+    //newTeacher = this.currentTeacher;
+	var newTeacher: any;
+	newTeacher = {};
 	
-	/*if (this.profileForm.controls.login.value != null)
-      newAuthorization.login = this.profileForm.controls.login.value;
-    if (this.profileForm.controls.password.value != null)
-      newAuthorization.password = this.profileForm.controls.password.value;
-	if (this.profileForm.controls.accessLevel.value != null)
-      newAuthorization.accessLevel = this.profileForm.controls.accessLevel.value;*/
-    if (this.profileForm.controls.active.value != null)
-      this.isActive = this.profileForm.controls.active.value;
+    //if (this.profileForm.controls.active.value != null)
+    //  this.currentTeacher.authorization.isActive = this.profileForm.controls.active.value;
     
-    if (this.profileForm.controls.lastName.value != null)
+	newTeacher.id = this.currentTeacher.id;
+    if (this.profileForm.controls.lastName.value != null && this.profileForm.controls.lastName.value != this.currentTeacher.lastName)
       newTeacher.lastName = this.profileForm.controls.lastName.value;
-    if (this.profileForm.controls.firstName.value != null)
+    if (this.profileForm.controls.firstName.value != null && this.profileForm.controls.firstName.value != this.currentTeacher.firstName)
       newTeacher.firstName = this.profileForm.controls.firstName.value;
-    if (this.profileForm.controls.birthday.value != null)
+    if (this.profileForm.controls.birthday.value != null && this.profileForm.controls.birthday.value != this.currentTeacher.birthday.split('T')[0])
       newTeacher.birthday = this.profileForm.controls.birthday.value;
-    if (this.profileForm.controls.phone.value != null)
+    if (this.profileForm.controls.phone.value != null && this.profileForm.controls.phone.value != this.currentTeacher.phone)
       newTeacher.phone = this.profileForm.controls.phone.value;
-    if (this.profileForm.controls.address.value != null)
+    if (this.profileForm.controls.address.value != null && this.profileForm.controls.address.value != this.currentTeacher.address)
       newTeacher.address = this.profileForm.controls.address.value;
-    newTeacher.modifyTime = new Date();
 
     var th = this;
-	this.teacherService.invokeUpdateAcitveTeacherInfo(newTeacher.id, this.isActive)
+	console.log(newTeacher);
+	
+	if(Object.keys(newTeacher).length < 2 && this.profileForm.controls.active.value == this.currentTeacher.authorization.isActive)
+	{
+		alert("Please, change any field");
+        th.loading = false;
+		return;
+	}
+	
+	if(Object.keys(newTeacher).length >= 2)
+    this.teacherService.invokeUpdateTeacherInfo(newTeacher, Object.keys(newTeacher))
       .then(function (operationStatus: operationStatusInfo) {
-        if (operationStatus.operationStatus == operationStatus.Done) {
+        if (operationStatus.operationStatus == OperationStatus.Done) {
           var message = "Teacher info updated successfully";
           console.log(message);
           alert(message);
+          th.router.navigate(['/teachers-control']);
         }
         else {
           alert(operationStatus.attachedInfo);
         }
       }).catch(function (err) {
         console.log("Error while updating teacher info");
-        alert(err);
+        th.loading = false;
       });
 	  
-    this.teacherService.invokeUpdateTeacherInfo(newTeacher)
-      .then(function (operationStatus: operationStatusInfo) {
-        if (operationStatus.operationStatus == operationStatus.Done) {
-          var message = "Teacher info updated successfully";
+	if(this.profileForm.controls.active.value == this.currentTeacher.authorization.isActive)
+	{
+		th.loading = false;
+		return;
+	}
+	
+	if(!this.profileForm.controls.active.value)
+	{
+	  this.authenticationService.blockAuthorization(this.currentTeacher.authorization.id)
+	   .then(function (operationStatusInfo: operationStatusInfo) {
+        if (operationStatusInfo.operationStatus == OperationStatus.Done) {
+          var message = "Teacher blocked successfully";
           console.log(message);
           alert(message);
-          th.router.navigate(['/teacher-control']);
+          th.router.navigate(['/teachers-control']);
         }
         else {
-          alert(operationStatus.attachedInfo);
+          alert(operationStatusInfo.attachedInfo);
         }
       }).catch(function (err) {
-        console.log("Error while updating teacher info");
-        alert(err);
+        console.log("Error while blocking Teacher");
+        th.loading = false;
       });
+	}
+	else
+	{
+	 this.authenticationService.unblockAuthorization(this.currentTeacher.authorization.id)
+	  .then(function (operationStatusInfo: operationStatusInfo) {
+        if (operationStatusInfo.operationStatus == OperationStatus.Done) {
+          var message = "Teacher unblocked successfully";
+          console.log(message);
+          alert(message);
+          th.router.navigate(['/teachers-control']);
+        }
+        else {
+          alert(operationStatusInfo.attachedInfo);
+        }
+      }).catch(function (err) {
+        console.log("Error while unblocking teacher");
+        th.loading = false;
+      });
+	}
   }
 
   enableBtn(): boolean {
-    if (/*this.profileForm.controls.login.value.length > 0 && this.profileForm.controls.password.value.length > 0 
-	  && */this.profileForm.controls.lastName.value.length > 0 && this.profileForm.controls.firstName.value.length > 0
-	  && this.profileForm.controls.phone.value.length > 0 && this.profileForm.controls.birthday.value != null 
-	  && this.profileForm.controls.address.value.length > 0)
+    if (!this.profileForm.invalid && (this.profileForm.controls.lastName.value != this.currentTeacher.lastName
+	|| this.profileForm.controls.firstName.value != this.currentTeacher.firstName
+	|| this.profileForm.controls.birthday.value != this.currentTeacher.birthday.split('T')[0]
+	|| this.profileForm.controls.phone.value != this.currentTeacher.phone
+	|| this.profileForm.controls.address.value != this.currentTeacher.address
+	|| this.profileForm.controls.active.value != this.currentTeacher.authorization.isActive))
       return true;
     return false;
   }

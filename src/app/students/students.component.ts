@@ -40,8 +40,11 @@ export class StudentsComponent implements OnInit {
 	  await this.getAllStudents();
     }
     else {
-      setTimeout(async () => {
-		  await this.getAllStudents();
+		var interval = setInterval(async () => {
+		  if(this.serviceClient.hubConnection.state == HubConnectionState.Connected){
+			  clearInterval(interval);
+		    await this.getAllStudents();
+		  }
 		}, 500);
     };
 	
@@ -74,8 +77,8 @@ export class StudentsComponent implements OnInit {
 	await this.studentService.getAllStudents()
 	  .then(function (operationStatus: operationStatusInfo) {
 		var students = operationStatus.attachedObject;
-        th.students = students;
-        sessionStorage.setItem("students", JSON.stringify(students));
+        th.students = students[0];
+        sessionStorage.setItem("students", JSON.stringify(th.students));
         th.students2 = JSON.parse(sessionStorage.students).map(i => ({
           idx: i,
           id: i.id,
@@ -88,7 +91,6 @@ export class StudentsComponent implements OnInit {
         }));
       }).catch(function(err) {
         console.log("Error while fetching students");
-        alert(err);
       });
   }
 

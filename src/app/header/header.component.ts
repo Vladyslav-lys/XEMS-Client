@@ -29,9 +29,9 @@ export class HeaderComponent implements OnInit, OnChanges, DoCheck {
   }
   
   ngDoCheck(): void {
-	if(localStorage.currentAuthorization != null)
+	if(localStorage.currentAuthentication != null)
 	{
-		this.authorization = JSON.parse(localStorage.currentAuthorization);
+		this.authorization = JSON.parse(localStorage.currentAuthentication);
 		return;
 	}
 	this.authorization = null;
@@ -39,16 +39,19 @@ export class HeaderComponent implements OnInit, OnChanges, DoCheck {
   
   logout() {
 	  var th = this;
-	  if(JSON.parse(localStorage.currentAuthorization)!= null)
+	  if(JSON.parse(localStorage.currentAuthentication)!= null)
 	  {
-		var authorization = JSON.parse(localStorage.currentAuthorization);
-		
-		this.authenticateService.logout(authorization[0])
+		this.authenticateService.logout()
 	    .then(function (operationStatus: operationStatusInfo){
-		  authorization = null;
+		  th.authorization = null;
+		  th.authenticateService.removeAuth();
+		  th.authenticateService.removeAccessAdmin();
+		  th.authenticateService.removeAccessTeacher();
+		  th.authenticateService.removeAccessStudent();
+		  localStorage.removeItem('currentAuthentication');
+		  th.router.navigate(['/login']);
         }).catch(function(err) {
           console.log("Error logging out");
-          alert(err);
         }); 
 	  }
   }

@@ -1,14 +1,16 @@
 import { Component, OnInit } from '@angular/core';
-import { UserService } from '../_services/user.service';
+import { GroupService } from '../_services/group.service';
+import { TeacherService } from '../_services/teacher.service';
 import { SignalRService } from '../_services/signalR.service';
-import { StubService } from '../_services/stub.service';
+//import { StubService } from '../_services/stub.service';
 import { Router } from '@angular/router';
 import { Authorization } from '../_models/authorization';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { operationStatusInfo } from '../_helpers/operationStatusInfo';
+import { operationStatusInfo, OperationStatus } from '../_helpers/operationStatusInfo';
 import { Teacher } from '../_models/teacher';
 import { Group } from '../_models/group';
 import { Degree } from '../_enums/degree';
+import {HubConnectionState} from '@microsoft/signalr';
 
 @Component({
   selector: 'app-sign-up-group',
@@ -21,75 +23,91 @@ export class SignUpGroupComponent implements OnInit {
   loading = false;
   submitted = false;
   
-  teachers: Teachers[];
-  teachers2: Teachers[];
+  teachers: Teacher[];
+  teachers2: Teacher[];
 
   constructor(
     private router: Router,
-    private userService: UserService,
-	private stub:StubService,
+    private groupService: GroupService,
+	private teacherService: TeacherService,
+	//private stub:StubService,
     private formBuilder: FormBuilder,
 	private serviceClient: SignalRService
   ) {
   }
 
   async ngOnInit(): Promise<void> {
-	this.registerForm = this.formBuilder.group({
-      name: ["", Validators.required],
-      curator: [1],
-      learningStartDate: ["", Validators.required],
-      learningEndDate: ["", Validators.required],
-	  degree: [1],
-    });
 	
 	if(this.serviceClient.hubConnection.state == HubConnectionState.Connected){
 	  await this.getAllTeachers()
     }
     else {
-      setTimeout(async () => {
-		  await this.getAllTeachers()
+      var interval = setInterval(async () => {
+		  if(this.serviceClient.hubConnection.state == HubConnectionState.Connected){
+			  clearInterval(interval);
+		    await this.getAllTeachers();
+		  }
 		}, 500);
     }
+	
+	this.registerForm = this.formBuilder.group({
+      name: ["", Validators.required],
+      curator: ["", Validators.required],
+      learningStartDate: ["", Validators.required],
+      learningEndDate: ["", Validators.required],
+	  degree: [1],
+    });
   }
 
   AddGroup() {
 	this.submitted = true;
 
-    if (this.registerForm.invalid) {
+    if (this.registerForm.invalid && this.registerForm.controls.curator.value.length <= 0) {
       return;
     }
 
     this.loading = true;
 
-    var newGroup: Group;
-    newGroup = new Group();
-    newGroup.curator = new Teacher();
+    //var newGroup: Group;
+    //newGroup = new Group();
+    //newGroup.curator = new Teacher();
+	var newGroup: any;
+	newGroup = {};
 
     if (this.registerForm.controls.name.value != null)
       newGroup.name = this.registerForm.controls.name.value;
 	if (this.registerForm.controls.curator.value != null && this.registerForm.controls.curator.value.length > 0)
 	{
 	  var id = this.registerForm.controls.curator.value;
-	  newGroup.curator = this.stub.getTeacherById(id);
+	  //newGroup.curator = this.getTeacherById(id);
+	  newGroup.curatorId = +id;
 	}
 	if (this.registerForm.controls.learningStartDate.value != null)
       newGroup.learningStartDate = this.registerForm.controls.learningStartDate.value;
     if (this.registerForm.controls.learningEndDate.value != null)
-      newGroup.learningEndDate = this.registerForm.controls.birthday.value;
+      newGroup.learningEndDate = this.registerForm.controls.learningEndDate.value;
     if (this.registerForm.controls.degree.value != null)
-      newGroup.degree = this.registerForm.controls.degree.value;
-
+      newGroup.qualificationLevel = +this.registerForm.controls.degree.value;
+	
     var th = this;
-	  
-	this.stub.addGroup(newGroup)
+	this.groupService.addGroup(newGroup)
 	  .then(function (operationStatus: operationStatusInfo) {
-		var message = "Group added successfully";
-        console.log(message);
-        alert(message);
-        th.router.navigate(['/groups-control']);
+		if(operationStatus.operationStatus == OperationStatus.Done)
+		{
+			var message = "Group added successfully";
+			console.log(message);
+			console.log(operationStatus);
+			alert(message);
+			th.router.navigate(['/groups-control']);
+		}
+		else
+		{
+			console.log(operationStatus.attachedInfo);
+			alert(operationStatus.attachedInfo);
+			th.loading = false;
+		}
       }).catch(function(err) {
         console.log("Error while adding new group");
-        alert(err);
 	    th.loading = false;
       });
   }
@@ -97,11 +115,11 @@ export class SignUpGroupComponent implements OnInit {
   async getAllTeachers() {
     var th = this;
     
-	await this.stub.getAllTeachers()
+	await this.teacherService.getAllTeachers()
 	  .then(function (operationStatus: operationStatusInfo) {
 		var teachers = operationStatus.attachedObject;
-        th.teachers = teachers;
-        sessionStorage.setItem("teachers", JSON.stringify(teachers));
+        th.teachers = teachers[0];
+        sessionStorage.setItem("teachers", JSON.stringify(th.teachers));
         th.teachers2 = JSON.parse(sessionStorage.teachers).map(i => ({
           idx: i,
           id: i.id,
@@ -115,8 +133,16 @@ export class SignUpGroupComponent implements OnInit {
         }));
       }).catch(function(err) {
         console.log("Error while fetching teachers");
-        alert(err);
       });
+  }
+  
+  getTeacherById(id)
+  {
+	for(let teacher of this.teachers2)
+	{
+		if(teacher.id == id)
+			return teacher;
+	}
   }
 
   enableBtn(): boolean {

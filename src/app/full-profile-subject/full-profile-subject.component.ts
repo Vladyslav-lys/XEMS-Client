@@ -1,22 +1,27 @@
 import { Component, OnInit } from '@angular/core';
-import { UserService } from '../_services/user.service';
-import { StubService } from '../_services/stub.service';
+import { SubjectService } from '../_services/subject.service';
+import { StudentService } from '../_services/student.service';
+import { DisciplineService } from '../_services/discipline.service';
+import { AuthenticationService } from '../_services/authentication.service';
+//import { StubService } from '../_services/stub.service';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { Subject } from '../_models/subject';
-import {Student} from './student';
-import {Discipline} from './discipline';
+import {Student} from '../_models/student';
+import {Discipline} from '../_models/discipline';
 import { CourseTask } from "../_enums/courseTask";
 import { ReportingBySemesterType } from "../_enums/reportingBySemesterType";
 import { Semester } from "../_enums/semester";
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { operationStatusInfo } from '../_helpers/operationStatusInfo';
+import { operationStatusInfo, OperationStatus } from '../_helpers/operationStatusInfo';
+import {HubConnectionState} from '@microsoft/signalr';
+import {SignalRService} from '../_services/signalR.service';
 
 @Component({
   selector: 'app-full-profile-subject',
   templateUrl: './full-profile-subject.component.html',
   styleUrls: ['./full-profile-subject.component.css']
 })
-export class FullProfileScheduleComponent implements OnInit {
+export class FullProfileSubjectComponent implements OnInit {
   profileForm: FormGroup;
   currentSubjectId: number;
   currentSubject: Subject;
@@ -32,8 +37,12 @@ export class FullProfileScheduleComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-	private stub:StubService,
-    private userService: UserService,
+	//private stub:StubService,
+    private authenticationService: AuthenticationService,
+	private studentService: StudentService,
+	private subjectService: SubjectService,
+	private disciplineService: DisciplineService,
+	private serviceClient: SignalRService,
     private formBuilder: FormBuilder
   ) {
     this.router.events.subscribe(
@@ -56,15 +65,18 @@ export class FullProfileScheduleComponent implements OnInit {
 	  await this.getAllDisciplines();
     }
     else {
-      setTimeout(async () => {
-		  await this.getAllStudents();
-		  await this.getAllDisciplines()
+		var interval = setInterval(async () => {
+		  if(this.serviceClient.hubConnection.state == HubConnectionState.Connected){
+			  clearInterval(interval);
+		    await this.getAllStudents();
+			await this.getAllDisciplines();
+		  }
 		}, 500);
     }
 	
     this.profileForm = this.formBuilder.group({
-      student: [this.currentSubject.student],
-	  discipline: [this.currentSubject.discipline],
+      student: [this.currentSubject.student.id, Validators.required],
+	  discipline: [this.currentSubject.discipline.id, Validators.required],
 	  year: [this.currentSubject.year, Validators.required],
 	  semester: [this.currentSubject.semester],
 	  lectureHours: [this.currentSubject.lectureHours, Validators.required],
@@ -89,11 +101,11 @@ export class FullProfileScheduleComponent implements OnInit {
   async getAllDisciplines() {
     var th = this;
     
-	await this.stub.getAllDisciplines()
+	await this.disciplineService.getAllDisciplines()
 	  .then(function (operationStatus: operationStatusInfo) {
 		var disciplines = operationStatus.attachedObject;
-        th.disciplines = disciplines;
-        sessionStorage.setItem("disciplines", JSON.stringify(disciplines));
+        th.disciplines = disciplines[0];
+        sessionStorage.setItem("disciplines", JSON.stringify(th.disciplines));
         th.disciplines2 = JSON.parse(sessionStorage.disciplines).map(i => ({
           idx: i,
           id: i.id,
@@ -108,11 +120,11 @@ export class FullProfileScheduleComponent implements OnInit {
   async getAllStudents() {
     var th = this;
     
-	await this.stub.getAllStudents()
+	await this.studentService.getAllStudents()
 	  .then(function (operationStatus: operationStatusInfo) {
 		var students = operationStatus.attachedObject;
-        th.students = students;
-        sessionStorage.setItem("students", JSON.stringify(students));
+        th.students = students[0];
+        sessionStorage.setItem("students", JSON.stringify(th.students));
         th.students2 = JSON.parse(sessionStorage.students).map(i => ({
           idx: i,
           id: i.id,
@@ -139,62 +151,77 @@ export class FullProfileScheduleComponent implements OnInit {
 
     this.loading = true;
 	
-	var newSubject: Subject;
-    newSubject = this.currentSubject;
+	//var newSubject: Subject;
+    //newSubject = this.currentSubject;
+	var newSubject: any;
+    newSubject = {};
 	
-	if (this.profileForm.controls.student.value != null)
+	newSubject.id = this.currentSubject.id;
+	if (this.profileForm.controls.student.value != null && this.profileForm.controls.student.value != this.currentSubject.student.id)
 	{
 	  var id = this.profileForm.controls.student.value;
-	  newSubject.student = this.stub.getStudentById(id);
+	  //newSubject.student = this.stub.getStudentById(id);
+	  newSubject.studentId = +id;
 	}
-	if (this.profileForm.controls.discipline.value != null)
+	if (this.profileForm.controls.discipline.value != null && this.profileForm.controls.discipline.value != this.currentSubject.discipline.id)
 	{
 	  var id = this.profileForm.controls.discipline.value;
-	  newSubject.discipline = this.stub.getDisciplineById(id);
+	  //newSubject.discipline = this.stub.getDisciplineById(id);
+	  newSubject.disciplineId = +id;
 	}
-    if (this.profileForm.controls.year.value != null && this.profileForm.controls.year.value > 0)
-      newSubject.year = this.profileForm.controls.year.value;
-	if (this.profileForm.controls.semester.value != null && this.profileForm.controls.semester.value.length > 0)
-      newSubject.semester = this.profileForm.controls.semester.value;
-	if (this.profileForm.controls.lectureHours.value != null && this.profileForm.controls.lectureHours.value > 0)
-      newSubject.lectureHours = this.profileForm.controls.lectureHours.value;
-	if (this.profileForm.controls.practiceHours.value != null && this.profileForm.controls.practiceHours.value > 0)
-      newSubject.practiceHours = this.profileForm.controls.practiceHours.value;
-	if (this.profileForm.controls.laboratoryHours.value != null && this.profileForm.controls.laboratoryHours.value > 0)
-      newSubject.laboratoryHours = this.profileForm.controls.laboratoryHours.value;
-	if (this.profileForm.controls.reporting.value != null && this.profileForm.controls.reporting.value.length > 0)
-      newSubject.reporting = this.profileForm.controls.reporting.value;
-	if (this.profileForm.controls.courseTask.value != null && this.profileForm.controls.courseTask.value.length > 0)
-      newSubject.courseTask = this.profileForm.controls.courseTask.value;
-	if (this.profileForm.controls.semesterGrade.value != null && this.profileForm.controls.semesterGrade.value > 0)
-      newSubject.semesterGrade = this.profileForm.controls.semesterGrade.value;
-  
-	this.stub.invokeUpdateSubjectInfo(newSubject)
+    if (this.profileForm.controls.year.value != null && this.profileForm.controls.year.value > 0 && this.profileForm.controls.year.value != this.currentSubject.year)
+      newSubject.year = +this.profileForm.controls.year.value;
+	if (this.profileForm.controls.semester.value != null && this.profileForm.controls.semester.value.length > 0 && this.profileForm.controls.semester.value != this.currentSubject.semester)
+      newSubject.semester = +this.profileForm.controls.semester.value;
+	if (this.profileForm.controls.lectureHours.value != null && this.profileForm.controls.lectureHours.value > 0 && this.profileForm.controls.lectureHours.value != this.currentSubject.lectureHours)
+      newSubject.lectureHours = +this.profileForm.controls.lectureHours.value;
+	if (this.profileForm.controls.practiceHours.value != null && this.profileForm.controls.practiceHours.value > 0 && this.profileForm.controls.practiceHours.value != this.currentSubject.practiceHours)
+      newSubject.practiceHours = +this.profileForm.controls.practiceHours.value;
+	if (this.profileForm.controls.laboratoryHours.value != null && this.profileForm.controls.laboratoryHours.value > 0 && this.profileForm.controls.laboratoryHours.value != this.currentSubject.laboratoryHours)
+      newSubject.laboratoryHours = +this.profileForm.controls.laboratoryHours.value;
+	if (this.profileForm.controls.reporting.value != null && this.profileForm.controls.reporting.value.length > 0 && this.profileForm.controls.reporting.value != this.currentSubject.reporting)
+      newSubject.reporting = +this.profileForm.controls.reporting.value;
+	if (this.profileForm.controls.courseTask.value != null && this.profileForm.controls.courseTask.value.length > 0 && this.profileForm.controls.courseTask.value != this.currentSubject.courseTask)
+      newSubject.courseTask = +this.profileForm.controls.courseTask.value;
+	
+	var th = this;
+	if(Object.keys(newSubject).length < 2)
+	{
+		alert("Please, change any field");
+        th.loading = false;
+		return;
+	}
+	
+	this.subjectService.invokeUpdateSubjectInfo(newSubject, Object.keys(newSubject))
       .then(function (operationStatusInfo: operationStatusInfo) {
-        if (operationStatusInfo.operationStatus == operationStatus.Done) {
+        if (operationStatusInfo.operationStatus == OperationStatus.Done) {
           var message = "Subject info updated successfully";
           console.log(message);
           alert(message);
           th.router.navigate(['/subjects-control']);
         }
         else {
+          console.log(operationStatusInfo.attachedInfo);
           alert(operationStatusInfo.attachedInfo);
+		  th.loading = false;
         }
       }).catch(function (err) {
         console.log("Error while updating subject info");
         alert(err);
+		th.loading = false;
       });
   }
 
   enableBtn(): boolean {
-	if (this.profileForm.controls.year.value.length > 0 && this.profileForm.controls.year.value > 0
-		&& this.profileForm.controls.lectureHours.value.length > 0 && this.profileForm.controls.lectureHours.value > 0
-		&& this.profileForm.controls.practiceHours.value.length > 0 && this.profileForm.controls.practiceHours.value > 0
-		&& this.profileForm.controls.laboratoryHours.value.length > 0 && this.profileForm.controls.laboratoryHours.value > 0
-		&& this.profileForm.controls.semesterGrade.length > 0 && this.profileForm.controls.semesterGrade.value > 0
-		&& this.profileForm.controls.discipline.value.length > 0 && this.profileForm.controls.student.value.length > 0
-		&& this.profileForm.controls.semester.value.length > 0 && this.profileForm.controls.reporting.value.length > 0
-		&& this.profileForm.controls.courseTask.value.length > 0)
+	if (!this.profileForm.invalid && (this.profileForm.controls.student.value != this.currentSubject.student.id
+	|| this.profileForm.controls.discipline.value != this.currentSubject.discipline.id
+	|| this.profileForm.controls.year.value != this.currentSubject.year
+	|| this.profileForm.controls.semester.value != this.currentSubject.semester
+	|| this.profileForm.controls.lectureHours.value != this.currentSubject.lectureHours
+	|| this.profileForm.controls.practiceHours.value != this.currentSubject.practiceHours
+	|| this.profileForm.controls.laboratoryHours.value != this.currentSubject.laboratoryHours
+	|| this.profileForm.controls.reporting.value != this.currentSubject.reporting
+	|| this.profileForm.controls.courseTask.value != this.currentSubject.courseTask))
       return true;
     return false;
   }

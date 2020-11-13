@@ -11,9 +11,9 @@ export class WorkingPlanService {
     ) {
     }
 
-  invokeUpdateWorkingPlanInfo(workingPlan, serviceClient = this.serviceClient) {
+  invokeUpdateWorkingPlanInfo(workingPlan, changedFields, serviceClient = this.serviceClient) {
     return new Promise(function (resolve, reject) {
-      serviceClient.hubConnection.invoke("UpdateWorkingPlan", workingPlan)
+      serviceClient.hubConnection.invoke("UpdateWorkingPlan", workingPlan, changedFields)
         .then(function (operationStatus) {
           resolve(operationStatus);
         }).catch(function (err) {
@@ -24,7 +24,7 @@ export class WorkingPlanService {
   
   getAllWorkingPlans(serviceClient = this.serviceClient) {
     return new Promise(function (resolve, reject) {
-      serviceClient.hubConnection.invoke("GetAllWorkingPlans")
+      serviceClient.hubConnection.invoke("GetWorkingPlansCatalogue")
         .then(function (operationStatus) {
           resolve(operationStatus);
         }).catch(function (err) {
@@ -33,7 +33,18 @@ export class WorkingPlanService {
     });
   }
   
-  getWorkingPlanById(id, serviceClient = this.serviceClient) 
+  getAllWorkingPlansByTeacherId(teacherId, serviceClient = this.serviceClient) {
+    return new Promise(function (resolve, reject) {
+      serviceClient.hubConnection.invoke("GetTeacherWorkingPlans", teacherId)
+        .then(function (operationStatus) {
+          resolve(operationStatus);
+        }).catch(function (err) {
+        reject(err);
+      });
+    });
+  }
+  
+  getWorkingPlanById(id, serviceClient = this.serviceClient) {
     return new Promise(function (resolve, reject) {
       serviceClient.hubConnection.invoke("GetWorkingPlanById", id)
         .then(function (operationStatus) {
@@ -46,7 +57,7 @@ export class WorkingPlanService {
 
   addWorkingPlan(workingPlan, serviceClient = this.serviceClient) {
     return new Promise(function (resolve, reject) {
-      serviceClient.hubConnection.invoke("RegistrationWorkingPlan",workingPlan)
+      serviceClient.hubConnection.invoke("CreateWorkingPlan",workingPlan)
         .then(function (operationStatus) {
           resolve(operationStatus);
         }).catch(function (err) {

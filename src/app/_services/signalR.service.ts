@@ -13,10 +13,12 @@ export class SignalRService {
   connectionEstablished$ = new BehaviorSubject<boolean>(false);
 
   public hubConnection: HubConnection;
-  authorization = JSON.parse(localStorage.currentAuthorization);
+  public authorization: any;
   private currentToken: string;
 
   constructor() {
+	if(localStorage.currentAuthentication)
+	  this.authorization = JSON.parse(localStorage.currentAuthentication);
 	
 	this.getToken();
     this.createConnection();
@@ -32,7 +34,7 @@ export class SignalRService {
 	if(this.currentToken)
 	{
 	   this.hubConnection = new HubConnectionBuilder()
-		.withUrl("'http://2428a83cca2d.ngrok.io/ServerHub'", { accessTokenFactory: () => this.currentToken })
+		.withUrl("http://0c155d26ed44.ngrok.io/ServerHub", { accessTokenFactory: () => this.currentToken })
 		.withAutomaticReconnect()
         .configureLogging(LogLevel.Information)
         .build();
@@ -40,7 +42,7 @@ export class SignalRService {
 	}
 	
     this.hubConnection = new HubConnectionBuilder()
-      .withUrl('http://2428a83cca2d.ngrok.io/ServerHub')
+      .withUrl("http://0c155d26ed44.ngrok.io/ServerHub")
       .withAutomaticReconnect()
       .configureLogging(LogLevel.Information)
       .build();
@@ -101,5 +103,24 @@ export class SignalRService {
               reject(err);
           });
 	});
+  }
+  
+  public disconnect()
+  {
+	this.hubConnection.stop();
+  }
+  
+  public makeFullConnection(authorization)
+  {
+	if(authorization)
+	{
+		this.authorization = authorization;
+		
+		this.getToken();
+		this.createConnection();
+		this.startConnection();
+	
+		this.getNewToken();  
+	}
   }
 }

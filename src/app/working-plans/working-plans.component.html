@@ -6,7 +6,6 @@
     <table>
       <tr class="border-style">
         <td>№</td>
-		<td>TEACHER</td>
 		<td>DISCIPLINE</td>
 		<td>HOURS</td>
 		<td>ROLE</td>
@@ -15,7 +14,6 @@
       </tr>
       <tr *ngFor="let workingPlan of workingPlans; let row_no = index" class="border-style">
         <td>{{row_no + 1}}</td>
-		<td>{{workingPlan.teacher.lastName}} + " " + {{workingPlan.teacher.firstName}}</td>
 		<td>{{workingPlan.discipline.title}}</td>
 		<td>{{workingPlan.hours}}</td>
 		<td>{{getRole(workingPlan.role)}}</td>

@@ -3,7 +3,7 @@
     <app-leftmenu></app-leftmenu>
   </div>
   <div class="col-register">
-
+	<alert class="error-text"></alert>
     <form [formGroup]="registerForm">
       <div class="row-another">
         <h3 class="h3">Login</h3>
@@ -68,18 +68,15 @@
             </div>
           </div>
 		  <div class="input-group">
-            <div class="error-area"></div>
-            <select class="use-elem use-elem-select" formControlName="group">
-              <option *ngFor="let group of groups2" value="{{group.id}}">{{group.name}}</option>
-            </select>
-          </div>
-          <div class="input-group">
-            <div class="error-area"></div>
-            <select class="use-elem use-elem-select" formControlName="accessLevel" value="1" disabled>
-              <option value="1">Student</option>
-              <option value="2">Teacher</option>
-              <option value="9">Administrator</option>
-            </select>
+            <div class="error-area">
+              <div class="error-text" *ngIf="(submitted || this.registerForm.controls.group.touched) && this.registerForm.controls.group.errors">Group is required</div>
+            </div>
+			<div>
+              <select [class.error-block]="(submitted || this.registerForm.controls.group.touched) && this.registerForm.controls.group.errors" class="use-elem use-elem-select" formControlName="group">
+			    <option value="" selected>No group</option>
+                <option *ngFor="let group of groups2" value="{{group.id}}">{{group.name}}</option>
+              </select>
+			</div>
           </div>
           <div class="input-group">
             <div class="error-area"></div>

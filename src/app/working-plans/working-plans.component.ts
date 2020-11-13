@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { UserService } from '../_services/user.service';
-import { StubService } from '../_services/stub.service';
+import { TeacherService } from '../_services/teacher.service';
+import { WorkingPlanService } from '../_services/workingPlan.service';
+//import { StubService } from '../_services/stub.service';
 import { Router } from '@angular/router';
 import { WorkingPlan } from '../_models/workingPlan';
 import { Semester } from '../_enums/semester';
-import { TeacherRole } from '../_enums/teacherRole';
+import { TeachersRole } from '../_enums/teachersRole';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { operationStatusInfo } from '../_helpers/operationStatusInfo';
 import { NotifyService } from '../_services/notify.service';
@@ -24,8 +25,9 @@ export class WorkingPlansComponent implements OnInit {
   
   constructor(
     private router: Router,
-    private userService: UserService,
-	private stub:StubService,
+	private teacherService: TeacherService,
+    private workingPlanService: WorkingPlanService,
+	//private stub:StubService,
 	private serviceClient: SignalRService,
     private formBuilder: FormBuilder
   ) {
@@ -36,29 +38,41 @@ export class WorkingPlansComponent implements OnInit {
 	  await this.getAllWorkingPlans();
     }
     else {
-      setTimeout(async () => {
-		  await this.getAllWorkingPlans();
+      var interval = setInterval(async () => {
+		  if(this.serviceClient.hubConnection.state == HubConnectionState.Connected){
+			  clearInterval(interval);
+		    await this.getAllWorkingPlans();
+		  }
 		}, 500);
     };
   }
   
   async getAllWorkingPlans() {
     var th = this;
-    
-	await this.stub.getAllWorkingPlans()
+	var auth = JSON.parse(localStorage.currentAuthentication);
+	var teacher;
+    await this.teacherService.getTeacherByAuthId(auth[0])
+	  .then(function (operationStatus: operationStatusInfo) {
+		var teacher1 = operationStatus.attachedObject;
+		teacher = teacher1[0];
+      }).catch(function(err) {
+        console.log("Error while fetching working plans");
+        alert(err);
+      });
+	  console.log(teacher);
+	await this.workingPlanService.getAllWorkingPlansByTeacherId(teacher.id)
 	  .then(function (operationStatus: operationStatusInfo) {
 		var workingPlans = operationStatus.attachedObject;
-        th.workingPlans = workingPlans;
-        sessionStorage.setItem("workingPlans", JSON.stringify(workingPlans));
+        th.workingPlans = workingPlans[0];
+        sessionStorage.setItem("workingPlans", JSON.stringify(th.workingPlans));
         th.workingPlans2 = JSON.parse(sessionStorage.workingPlans).map(i => ({
           idx: i,
           id: i.id,
-		  teacher: i.teacher;
-		  discipline: i.discipline;
-		  hours: i.hours;
-		  role: i.role;
-		  year: i.year;
-		  semester: i.semester;
+		  discipline: i.discipline,
+		  hours: i.hours,
+		  role: i.role,
+		  year: i.year,
+		  semester: i.semester
         }));
       }).catch(function(err) {
         console.log("Error while fetching working plans");
@@ -70,13 +84,13 @@ export class WorkingPlansComponent implements OnInit {
     var s = "";
 
     switch (role) {
-      case TeacherRole.Lection:
+      case TeachersRole.Lection:
         s = "Lection";
         break;
-      case TeacherRole.Practice:
+      case TeachersRole.Practice:
         s = "Practice";
         break;
-	  case TeacherRole.Laboratory:
+	  case TeachersRole.Laboratory:
         s = "Laboratory";
         break;
     }

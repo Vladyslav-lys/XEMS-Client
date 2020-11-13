@@ -11,20 +11,9 @@ export class StudentService {
     ) {
     }
 
-  invokeUpdateStudentInfo(student, serviceClient = this.serviceClient) {
+  invokeUpdateStudentInfo(student, changedFields, serviceClient = this.serviceClient) {
     return new Promise(function (resolve, reject) {
-      serviceClient.hubConnection.invoke("UpdateStudent", student)
-        .then(function (operationStatus) {
-          resolve(operationStatus);
-        }).catch(function (err) {
-        reject(err);
-      });
-    });
-  }
-  
-  invokeUpdateAcitveStudentInfo(id, isActive, serviceClient = this.serviceClient) {
-    return new Promise(function (resolve, reject) {
-      serviceClient.hubConnection.invoke("UpdateAcitveStudent", id, isActive)
+      serviceClient.hubConnection.invoke("UpdateStudent", student, changedFields)
         .then(function (operationStatus) {
           resolve(operationStatus);
         }).catch(function (err) {
@@ -35,11 +24,11 @@ export class StudentService {
   
   getAllStudents(serviceClient = this.serviceClient) {
     return new Promise(function (resolve, reject) {
-      serviceClient.hubConnection.invoke("GetAllStudents")
+      serviceClient.hubConnection.invoke("GetStudentsCatalogue")
         .then(function (operationStatus) {
           resolve(operationStatus);
         }).catch(function (err) {
-        reject(err);
+		  reject(err);
       });
     });
   }
@@ -57,7 +46,7 @@ export class StudentService {
   
   getStudentByAuthId(id, serviceClient = this.serviceClient) {
     return new Promise(function (resolve, reject) {
-      serviceClient.hubConnection.invoke("GetStudentByAuthId", id)
+      serviceClient.hubConnection.invoke("GetStudentByAuth", id)
         .then(function (operationStatus) {
           resolve(operationStatus);
         }).catch(function (err) {
@@ -79,7 +68,7 @@ export class StudentService {
 
   addStudent(student, serviceClient = this.serviceClient) {
     return new Promise(function (resolve, reject) {
-      serviceClient.hubConnection.invoke("RegistrationStudent", student)
+      serviceClient.hubConnection.invoke("RegisterStudent", student)
         .then(function (operationStatus) {
           resolve(operationStatus);
         }).catch(function (err) {

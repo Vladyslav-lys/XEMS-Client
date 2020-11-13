@@ -11,20 +11,9 @@ export class TeacherService {
     ) {
     }
 
-  invokeUpdateTeacherInfo(teacher, serviceClient = this.serviceClient) {
+  invokeUpdateTeacherInfo(teacher, changedFields, serviceClient = this.serviceClient) {
     return new Promise(function (resolve, reject) {
-      serviceClient.hubConnection.invoke("UpdateTeacher", teacher)
-        .then(function (operationStatus) {
-          resolve(operationStatus);
-        }).catch(function (err) {
-        reject(err);
-      });
-    });
-  }
-  
-  invokeUpdateAcitveTeacherInfo(id, isActive, serviceClient = this.serviceClient) {
-    return new Promise(function (resolve, reject) {
-      serviceClient.hubConnection.invoke("UpdateAcitveTeacher", id, isActive)
+      serviceClient.hubConnection.invoke("UpdateTeacher", teacher, changedFields)
         .then(function (operationStatus) {
           resolve(operationStatus);
         }).catch(function (err) {
@@ -35,7 +24,7 @@ export class TeacherService {
   
   getAllTeachers(serviceClient = this.serviceClient) {
     return new Promise(function (resolve, reject) {
-      serviceClient.hubConnection.invoke("GetAllTeachers")
+      serviceClient.hubConnection.invoke("GetTeachersCatalogue")
         .then(function (operationStatus) {
           resolve(operationStatus);
         }).catch(function (err) {
@@ -57,7 +46,7 @@ export class TeacherService {
   
   getTeacherByAuthId(id, serviceClient = this.serviceClient) {
     return new Promise(function (resolve, reject) {
-      serviceClient.hubConnection.invoke("GetTeacherByAuthId", id)
+      serviceClient.hubConnection.invoke("GetTeacherByAuth", id)
         .then(function (operationStatus) {
           resolve(operationStatus);
         }).catch(function (err) {
@@ -79,7 +68,7 @@ export class TeacherService {
 
   addTeacher(teacher, serviceClient = this.serviceClient) {
     return new Promise(function (resolve, reject) {
-      serviceClient.hubConnection.invoke("RegistrationTeacher", teacher)
+      serviceClient.hubConnection.invoke("RegisterTeacher", teacher)
         .then(function (operationStatus) {
           resolve(operationStatus);
         }).catch(function (err) {

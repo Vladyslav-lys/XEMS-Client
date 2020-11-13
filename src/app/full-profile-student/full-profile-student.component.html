@@ -3,7 +3,7 @@
     <app-leftmenu></app-leftmenu>
   </div>
   <div class="col-full-profile">
-
+	<alert class="error-text"></alert>
     <form [formGroup]="profileForm">
       <div class="row-another">
         ﻿<h3 class="h3">Profile</h3>
@@ -56,17 +56,9 @@
           </div>
           <div class="input-group">
             <div class="error-area"></div>
-            <select class="use-elem use-elem-select" formControlName="accessLevel" value="1" disabled>
-              <option value="1">Student</option>
-              <option value="2">Teacher</option>
-              <option value="9">Administrator</option>
-            </select>
-          </div>
-          <div class="input-group">
-            <div class="error-area"></div>
             <label class="use-active">
               <span class="use-active-span">Active</span>
-              <input type="checkbox" formControlName="active" [ngModel]="isActive">
+              <input type="checkbox" formControlName="active">
               <span class="checkmark"></span>
             </label>
           </div>

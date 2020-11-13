@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { UserService } from '../_services/user.service';
-import { StubService } from '../_services/stub.service';
+import {ReportingBySubjectService} from '../_services/reportingBySubject.service';
+import {TeacherService} from '../_services/teacher.service';
+import {DisciplineService} from '../_services/discipline.service';
+import {StudentService} from '../_services/student.service';
+//import { StubService } from '../_services/stub.service';
 import { Router } from '@angular/router';
 import {ReportingBySubject} from '../_models/reportingBySubject';
 import {ReportingBySubjectAdditionalMaterials} from '../_models/reportingBySubjectAdditionalMaterials';
@@ -9,7 +12,9 @@ import {Student} from '../_models/student';
 import {Discipline} from '../_models/discipline';
 import {ReportingBySubjectType} from '../_enums/reportingBySubjectType';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { operationStatusInfo } from '../_helpers/operationStatusInfo';
+import { operationStatusInfo, OperationStatus } from '../_helpers/operationStatusInfo';
+import {SignalRService} from '../_services/signalR.service';
+import {HubConnectionState} from '@microsoft/signalr';
 
 @Component({
   selector: 'app-sign-up-reporting-by-subject',
@@ -23,8 +28,7 @@ export class SignUpReportingBySubjectComponent implements OnInit {
   loading = false;
   submitted = false;
   
-  teachers: Teacher[];
-  teachers2: Teacher[];
+  teacher: Teacher;
   
   students: Student[];
   students2: Student[];
@@ -34,8 +38,12 @@ export class SignUpReportingBySubjectComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private userService: UserService,
-	private stub:StubService,
+    private reportingBySubjectService: ReportingBySubjectService,
+	private teacherService: TeacherService,
+	private studentService: StudentService,
+	private disciplineService: DisciplineService,
+	private serviceClient: SignalRService,
+	//private stub:StubService,
     private formBuilder: FormBuilder
   ) {
   }
@@ -43,54 +51,45 @@ export class SignUpReportingBySubjectComponent implements OnInit {
   async ngOnInit(): Promise<void> {
 	
 	if(this.serviceClient.hubConnection.state == HubConnectionState.Connected){
-	  await this.getAllTeachers();
+	  await this.getTeacher();
 	  await this.getAllStudents();
 	  await this.getAllDisciplines();
     }
     else {
-      setTimeout(async () => {
-		  await this.getAllTeachers();
-		  await this.getAllStudents();
-		  await this.getAllDisciplines()
+		var interval = setInterval(async () => {
+		  if(this.serviceClient.hubConnection.state == HubConnectionState.Connected){
+			  clearInterval(interval);
+		    await this.getTeacher();
+			await this.getAllStudents();
+			await this.getAllDisciplines()
+		  }
 		}, 500);
     }
 	
     this.registerForm = this.formBuilder.group({
-		student: [1],
-		teacher: [1],
-		discipline: [1],
+		//student: ["", Validators.required],
+		//teacher: ["", Validators.required],
+		discipline: ["", Validators.required],
 		title: ["", Validators.required],
 		description: ["", Validators.required],
-		reporting: [1],
+		reporting: ["", Validators.required],
 		dueDate: ["", Validators.required],
-		realDueDate: ["", Validators.required],
-		isCompleted: [false],
-		grade: ["0", Validators.required],
-		material: ["", Validators.required]
+		//realDueDate: ["", Validators.required],
+		//isCompleted: [false],
+		//grade: ["", Validators.required],
+		//material: ["", Validators.required]
     });
   }
   
-  async getAllTeachers() {
+  async getTeacher() {
     var th = this;
-    
-	await this.stub.getAllTeachers()
+    var auth = JSON.parse(localStorage.currentAuthentication);
+    await this.teacherService.getTeacherByAuthId(auth[0])
 	  .then(function (operationStatus: operationStatusInfo) {
-		var teachers = operationStatus.attachedObject;
-        th.teachers = teachers;
-        sessionStorage.setItem("teachers", JSON.stringify(teachers));
-        th.teachers2 = JSON.parse(sessionStorage.teachers).map(i => ({
-          idx: i,
-          id: i.id,
-		  firstName: i.firstName,
-		  lastName: i.lastName,
-		  birthday: i.birthday,
-		  phone: i.phone,
-		  address: i.address,
-		  createTime: i.createTime,
-		  modifyTime: i.modifyTime
-        }));
+		var teacher1 = operationStatus.attachedObject;
+		th.teacher = teacher1[0];
       }).catch(function(err) {
-        console.log("Error while fetching teachers");
+        console.log("Error while fetching teacher");
         alert(err);
       });
   }
@@ -98,11 +97,11 @@ export class SignUpReportingBySubjectComponent implements OnInit {
   async getAllStudents() {
     var th = this;
     
-	await this.stub.getAllStudents()
+	await this.studentService.getAllStudents()
 	  .then(function (operationStatus: operationStatusInfo) {
 		var students = operationStatus.attachedObject;
-        th.students = students;
-        sessionStorage.setItem("students", JSON.stringify(students));
+        th.students = students[0];
+        sessionStorage.setItem("students", JSON.stringify(th.students));
         th.students2 = JSON.parse(sessionStorage.students).map(i => ({
           idx: i,
           id: i.id,
@@ -122,11 +121,11 @@ export class SignUpReportingBySubjectComponent implements OnInit {
   async getAllDisciplines() {
     var th = this;
     
-	await this.stub.getAllDisciplines()
+	await this.disciplineService.getAllDisciplines()
 	  .then(function (operationStatus: operationStatusInfo) {
 		var disciplines = operationStatus.attachedObject;
-        th.disciplines = disciplines;
-        sessionStorage.setItem("disciplines", JSON.stringify(disciplines));
+        th.disciplines = disciplines[0];
+        sessionStorage.setItem("disciplines", JSON.stringify(th.disciplines));
         th.disciplines2 = JSON.parse(sessionStorage.disciplines).map(i => ({
           idx: i,
           id: i.id,
@@ -145,9 +144,6 @@ export class SignUpReportingBySubjectComponent implements OnInit {
 
       var fr = new FileReader();
       fr.onload = function () {
-        var split1 = fr.result.toString().split(":", 2);
-        var split2 = split1[1].split(";", 2);
-		
         registerComponent.fileInBase64 = fr.result.toString();
       }
       fr.readAsDataURL(file);
@@ -164,43 +160,54 @@ export class SignUpReportingBySubjectComponent implements OnInit {
 
     this.loading = true;
 
-    var newReporting: ReportingBySubject;
-    newReporting = new ReportingBySubject();
-	var newReportingAdditional: ReportingBySubjectAdditionalMaterials;
-    newReportingAdditional = new ReportingBySubjectAdditionalMaterials();
+    //var newReporting: ReportingBySubject;
+    //newReporting = new ReportingBySubject();
+	//var newReportingAdditional: ReportingBySubjectAdditionalMaterials;
+    //newReportingAdditional = new ReportingBySubjectAdditionalMaterials();
+	var newReporting: any;
+    newReporting = {};
 
-    if (this.registerForm.controls.student.value != null && this.registerForm.controls.student.value.length > 0)
-      newReporting.student = this.registerForm.controls.student.value;
-	if (this.registerForm.controls.teacher.value != null)
-      newReporting.teacher = this.registerForm.controls.teacher.value;
-	if (this.registerForm.controls.discipline.value != null)
-      newReporting.discipline = this.registerForm.controls.discipline.value;
-	if (this.registerForm.controls.title.value != null)
+    //if (this.registerForm.controls.student.value != null && this.registerForm.controls.student.value.length > 0)
+    //  newReporting.studentId = +this.registerForm.controls.student.value;
+	//if (this.registerForm.controls.teacher.value != null && this.registerForm.controls.student.value.length > 0)
+    newReporting.teacherId = this.teacher.id;
+	if (this.registerForm.controls.discipline.value != null && this.registerForm.controls.discipline.value.length > 0)
+      newReporting.disciplineId = +this.registerForm.controls.discipline.value;
+	if (this.registerForm.controls.title.value != null && this.registerForm.controls.title.value.length > 0)
       newReporting.title = this.registerForm.controls.title.value;
-	if (this.registerForm.controls.description.value != null)
+	if (this.registerForm.controls.description.value != null && this.registerForm.controls.description.value.length > 0)
       newReporting.description = this.registerForm.controls.description.value;
-	if (this.registerForm.controls.reporting.value != null)
-      newReporting.reporting = this.registerForm.controls.reporting.value;
-	if (this.registerForm.controls.dueDate.value != null)
+	if (this.registerForm.controls.reporting.value != null && this.registerForm.controls.reporting.value.length > 0)
+      newReporting.reporting = +this.registerForm.controls.reporting.value;
+	if (this.registerForm.controls.dueDate.value != null && this.registerForm.controls.dueDate.value.length > 0)
       newReporting.dueDate = this.registerForm.controls.dueDate.value;
-	if (this.registerForm.controls.realDueDate.value != null)
-      newReporting.realDueDate = this.registerForm.controls.realDueDate.value;
-	newReporting.isCompleted = this.registerForm.controls.isCompleted.value;
-	if (this.registerForm.controls.grade.value != null)
-      newReporting.grade = this.registerForm.controls.grade.value;
-	if (this.fileInBase64 != null) {
+	//if (this.registerForm.controls.realDueDate.value != null && this.registerForm.controls.student.value.length > 0)
+    //  newReporting.realDueDate = this.registerForm.controls.realDueDate.value;
+	//newReporting.isCompleted = this.registerForm.controls.isCompleted.value;
+	//if (this.registerForm.controls.grade.value != null && this.registerForm.controls.student.value.length > 0)
+    //  newReporting.grade = this.registerForm.controls.grade.value;
+	/*if (this.fileInBase64 != null) {
       var splitted = this.fileInBase64.split(",", 2);
       newReportingAdditional.material = splitted[1];
-    }
-	newReportingAdditional.reportingBySubject = newReporting;
-
+    }*/
+	//newReportingAdditional.reportingBySubject = newReporting;
+	
     var th = this;
-	this.stub.addReportingBySubjectAdditionalMaterials(newReportingAdditional)
+	this.reportingBySubjectService.addReportingBySubject(newReporting)
 		.then(function (operationStatus: operationStatusInfo) {
-			var message = "Reporting added successfully";
-			console.log(message);
-			alert(message);
-			th.router.navigate(['/reporting-by-subject-control']);
+			if(operationStatus.operationStatus == OperationStatus.Done)
+			{
+				var message = "Reporting added successfully";
+				console.log(message);
+				alert(message);
+				th.router.navigate(['/reporting-by-subject-control']);
+			}
+			else
+			{
+				console.log(operationStatus.attachedObject);
+				alert(operationStatus.attachedObject);
+				th.loading = false;
+			}
 		}).catch(function(err) {
 			console.log("Error while adding new reporting");
 			alert(err);
@@ -210,11 +217,7 @@ export class SignUpReportingBySubjectComponent implements OnInit {
   }
 
   enableBtn(): boolean {
-    if (this.registerForm.controls.student.value.length > 0 && this.registerForm.controls.teacher.value.length > 0
-		&& this.registerForm.controls.discipline.value.length > 0 && this.registerForm.controls.title.value.length > 0 
-		&& this.registerForm.controls.description.value.length > 0 && this.registerForm.controls.reporting.value.length > 0 
-		&& this.registerForm.controls.dueDate.value.length > 0 && this.registerForm.controls.realDueDate.value.length > 0 
-		&& this.registerForm.controls.grade.value.length > 0)
+    if (!this.registerForm.invalid)
       return true;
     return false;
   }

@@ -10,10 +10,10 @@
 .header-flex {
 	display:flex;
 	justify-content:center;
+	flex-wrap:wrap;
 }
 
 .logout-btn {
-	position:absolute;
   border: 1px solid rgb(150, 150, 150);
   min-width:60px;
   max-height:20px;
@@ -22,5 +22,18 @@
 .btn-pos {
 	padding: 10px 10px 10px 10px;
 	margin-top:30px;
-	margin-left:83%;
+}
+
+@media screen and (max-width: 900px) {
+  .logout-btn {
+	  position:default;
+	  margin-left:0%;
+  }
+}
+
+@media screen and (min-width: 900px) {
+  .logout-btn {
+	  position:absolute;
+	  margin-left:78%; 
+  }
 }

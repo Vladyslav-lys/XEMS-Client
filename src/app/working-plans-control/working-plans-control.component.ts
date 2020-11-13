@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { UserService } from '../_services/user.service';
-import { StubService } from '../_services/stub.service';
+import { TeacherService } from '../_services/teacher.service';
+import { DisciplineService } from '../_services/discipline.service';
+import { WorkingPlanService } from '../_services/workingPlan.service';
+//import { StubService } from '../_services/stub.service';
 import { Router } from '@angular/router';
 import {Teacher} from '../_models/teacher';
 import {Discipline} from '../_models/discipline';
@@ -29,8 +31,10 @@ export class WorkingPlansControlComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private userService: UserService,
-	private stub:StubService,
+    private teacherService: TeacherService,
+	private disciplineService: DisciplineService,
+	private workingPlanService: WorkingPlanService,
+	//private stub:StubService,
 	private serviceClient: SignalRService,
     private notifySerivce: NotifyService,
     private formBuilder: FormBuilder
@@ -42,8 +46,11 @@ export class WorkingPlansControlComponent implements OnInit {
 	  await this.getAllWorkingPlans();
     }
     else {
-      setTimeout(async () => {
-		  await this.getAllWorkingPlans()
+      var interval = setInterval(async () => {
+		  if(this.serviceClient.hubConnection.state == HubConnectionState.Connected){
+			  clearInterval(interval);
+		    await this.getAllWorkingPlans();
+		  }
 		}, 500);
     }
   }
@@ -51,20 +58,20 @@ export class WorkingPlansControlComponent implements OnInit {
   async getAllWorkingPlans() {
     var th = this;
     
-	await this.stub.getAllWorkingPlans()
+	await this.workingPlanService.getAllWorkingPlans()
 	  .then(function (operationStatus: operationStatusInfo) {
 		var workingPlans = operationStatus.attachedObject;
-        th.workingPlans = workingPlans;
-        sessionStorage.setItem("workingPlans", JSON.stringify(workingPlans));
+        th.workingPlans = workingPlans[0];
+        sessionStorage.setItem("workingPlans", JSON.stringify(th.workingPlans));
         th.workingPlans2 = JSON.parse(sessionStorage.workingPlans).map(i => ({
           idx: i,
           id: i.id,
-		  teacher: i.teacher;
-		  discipline: i.discipline;
-		  hours: i.hours;
-		  role: i.role;
-		  year: i.year;
-		  semester: i.semester;
+		  teacher: i.teacher,
+		  discipline: i.discipline,
+		  hours: i.hours,
+		  role: i.role,
+		  year: i.year,
+		  semester: i.semester
         }));
       }).catch(function(err) {
         console.log("Error while fetching working plans");
@@ -111,7 +118,7 @@ export class WorkingPlansControlComponent implements OnInit {
 
   deleteWorkingPlan(workingPlan) {
 	var th = this;
-	this.stub.deleteWorkingPlan(workingPlan.id)
+	this.workingPlanService.deleteWorkingPlan(workingPlan.id)
 	  .then(function (operationStatus: operationStatusInfo) {
 		console.log(operationStatus.attachedObject);
         if (!JSON.stringify(operationStatus.operationStatus))
@@ -123,6 +130,6 @@ export class WorkingPlansControlComponent implements OnInit {
   }
 
   openAdd() {
-	this.router.navigate(['/register-working-plan']);
+	this.router.navigate(['/register-working-plans']);
   }
 }

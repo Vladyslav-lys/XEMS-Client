@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { UserService } from '../_services/user.service';
-import { StubService } from '../_services/stub.service';
+import { GroupService } from '../_services/group.service';
+//import { StubService } from '../_services/stub.service';
 import { Router } from '@angular/router';
 import { Authorization } from '../_models/authorization';
 import { Group } from '../_models/group';
@@ -26,8 +26,8 @@ export class GroupsControlComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private userService: UserService,
-	private stub:StubService,
+    private groupService: GroupService,
+	//private stub:StubService,
 	private serviceClient: SignalRService,
     private notifySerivce: NotifyService,
     private formBuilder: FormBuilder
@@ -35,14 +35,15 @@ export class GroupsControlComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void>{
-    this.authorization = JSON.parse(localStorage.currentAuthorization);
-	
 	if(this.serviceClient.hubConnection.state == HubConnectionState.Connected){
 	  await this.getAllGroups()
     }
     else {
-      setTimeout(async () => {
-		  await this.getAllGroups()
+      var interval = setInterval(async () => {
+		  if(this.serviceClient.hubConnection.state == HubConnectionState.Connected){
+			  clearInterval(interval);
+		    await this.getAllGroups();
+		  }
 		}, 500);
     }
   }
@@ -50,11 +51,11 @@ export class GroupsControlComponent implements OnInit {
   async getAllGroups() {
     var th = this;
     
-	await this.stub.getAllGroups()
+	await this.groupService.getAllGroups()
 	  .then(function (operationStatus: operationStatusInfo) {
 		var groups = operationStatus.attachedObject;
-        th.groups = groups;
-        sessionStorage.setItem("groups", JSON.stringify(groups));
+        th.groups = groups[0];
+        sessionStorage.setItem("groups", JSON.stringify(th.groups));
         th.groups2 = JSON.parse(sessionStorage.groups).map(i => ({
           idx: i,
           id: i.id,
@@ -62,7 +63,7 @@ export class GroupsControlComponent implements OnInit {
 		  curator: i.curator,
 		  learningStartDate: i.learningStartDate,
 		  learningEndDate: i.learningEndDate,
-		  degree: i.degree
+		  qualification: i.qualification
         }));
       }).catch(function(err) {
         console.log("Error while fetching groups");
@@ -74,9 +75,6 @@ export class GroupsControlComponent implements OnInit {
     var s = "";
 
     switch (degree) {
-      case Degree.Specialist:
-        s = "Specialist";
-        break;
       case Degree.Bachelor:
         s = "Bachelor";
         break;
@@ -94,13 +92,9 @@ export class GroupsControlComponent implements OnInit {
     return s;
   }
 
-  openEdit(group) {
-    this.router.navigate(['/full-profile-group/:id']);
-  }
-
   deleteGroup(group) {
     var th = this;
-	this.stub.deleteGroup(group.id)
+	this.groupService.deleteGroup(group.id)
 	  .then(function (operationStatus: operationStatusInfo) {
 		console.log(operationStatus.attachedObject);
         if (!JSON.stringify(operationStatus.operationStatus))

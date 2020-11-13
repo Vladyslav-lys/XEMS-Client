@@ -3,12 +3,9 @@
 		<app-leftmenu></app-leftmenu>
     </div>
 	<div class="master-detail">
-	  <div class="use-elem add-user-btn btn">
-        <button type="button" class="use-elem btn" [routerLink]="['/register-reporting-by-subject']">New reporting</button>
-      </div>
 		<app-master-detail #master2>
 			<div *ngIf="items2 == null" class="no-note-text">
-				<p>There is no reporting here</p>
+				<p>There is no note here</p>
 			</div>
 			<ul>
 				<li *ngFor="let item of items2" (click)="master2.open(item)" class="use-elem">
@@ -23,7 +20,8 @@
 				<h3 class="h3">{{ item.title }}</h3>
 				<p class="note-text note-marging">Discipline: {{ item.discipline.title }}</p>
 				<p class="note-text note-marging">Description: {{ item.description }}</p>
-				<!--<p class="note-text note-marging">From who: {{ item.teacher.lastName }} {{ item.teacher.firstName }}</p>-->
+				<!--<p class="note-text note-marging">To whom: {{ item.student.lastName }} {{ item.student.firstName }}</p>-->
+				<p class="note-text note-marging">From who: {{ item.teacher.lastName }} {{ item.teacher.firstName }}</p>
 				<div class="note-date-changing note-marging note-p">
 					<p type="text">Due date: {{ item.dueDate | date : "dd.MM.y h:mm" }}</p>
 					<!--<p type="text">Real due date: {{ item.realDueDate| date : "dd.MM.y h:mm" }}</p>-->
@@ -32,9 +30,6 @@
 				<!--<p class="note-text note-marging">Completed: {{ getIsCompleted(item.isCompleted) }}</p>-->
 				<!--<p class="note-text note-marging">Grade: {{ item.grade }}</p>-->
 				<!--<button (click)="ctrl.close()">Close</button>-->
-				<!--<div class="use-elem use-elem-button-md btn">
-					<button [routerLink]="['/full-profile-reporting-by-subject', item.id]" class="btn">Edit</button>
-				</div>-->
 			</div>
 		</app-master-detail>
 	</div>

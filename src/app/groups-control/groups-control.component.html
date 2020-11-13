@@ -16,18 +16,14 @@
 		<td>LEARNING START DATE</td>
 		<td>LEARNING END DATE</td>
 		<td>DEGREE</td>
-        <td></td>
-        <td></td>
       </tr>
-      <tr *ngFor="let group of groups; let row_no = index" class="border-style">
+      <tr *ngFor="let group of groups2; let row_no = index" class="border-style">
         <td>{{row_no + 1}}</td>
         <td>{{group.name}}</td>
-		<td>{{group.curator.lastName}} + " " + {{group.curator.firstName}}</td>
-		<td>{{group.learningStartDate}}</td>
-		<td>{{group.learningEndDate}}</td>
-		<td>{{getDegree(group.degree)}}</td>
-        <td><button class="user-btn btn btn-primary" [routerLink]="['/full-profile-group', group.id]">Edit</button></td>
-        <td><button class="user-btn btn btn-primary" (click)="deleteGroup(group)">Delete</button></td>
+		<td>{{group.curator.lastName}} {{group.curator.firstName}}</td>
+		<td>{{group.learningStartDate | date : "dd.MM.y"}}</td>
+		<td>{{group.learningEndDate | date : "dd.MM.y"}}</td>
+		<td>{{getDegree(group.qualification)}}</td>
       </tr>
     </table>
   </div>

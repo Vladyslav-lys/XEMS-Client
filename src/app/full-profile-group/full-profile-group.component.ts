@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import { UserService } from '../_services/user.service';
+import { SubjectService } from '../_services/subject.service';
+import { TeacherService } from '../_services/teacher.service';
 import { SignalRService } from '../_services/signalR.service';
-import { StubService } from '../_services/stub.service';
+//import { StubService } from '../_services/stub.service';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { Authorization } from '../_models/authorization';
 import { Teacher } from '../_models/teacher';
 import { Group} from '../_models/group';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { operationStatusInfo } from '../_helpers/operationStatusInfo';
+import { operationStatusInfo, OperationStatus } from '../_helpers/operationStatusInfo';
 
 @Component({
   selector: 'app-full-profile-group',
@@ -27,8 +28,9 @@ export class FullProfileGroupComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-	private stub:StubService,
-    private userService: UserService,
+	//private stub:StubService,
+    private subjectService: SubjectService,
+	private teacherService: TeacherService,
     private formBuilder: FormBuilder,
 	private serviceClient: SignalRService
   ) {
@@ -103,9 +105,9 @@ export class FullProfileGroupComponent implements OnInit {
       newGroup.degree = this.profileForm.controls.degree.value;
 
     var th = this;
-    this.stub.invokeUpdateGroupInfo(newGroup)
+    this.subjectService.invokeUpdateGroupInfo(newGroup)
       .then(function (operationStatusInfo: operationStatusInfo) {
-        if (operationStatusInfo.operationStatus == operationStatus.Done) {
+        if (operationStatusInfo.operationStatus == OperationStatus.Done) {
           var message = "Group info updated successfully";
           console.log(message);
           alert(message);
@@ -123,11 +125,11 @@ export class FullProfileGroupComponent implements OnInit {
   async getAllTeachers() {
     var th = this;
     
-	await this.stub.getAllTeachers()
+	await this.teacherService.getAllTeachers()
 	  .then(function (operationStatus: operationStatusInfo) {
 		var teachers = operationStatus.attachedObject;
-        th.teachers = teachers;
-        sessionStorage.setItem("teachers", JSON.stringify(teachers));
+        th.teachers = teachers[0];
+        sessionStorage.setItem("teachers", JSON.stringify(th.teachers));
         th.teachers2 = JSON.parse(sessionStorage.teachers).map(i => ({
           idx: i,
           id: i.id,
@@ -141,7 +143,6 @@ export class FullProfileGroupComponent implements OnInit {
         }));
       }).catch(function(err) {
         console.log("Error while fetching teachers");
-        alert(err);
       });
   }
 
