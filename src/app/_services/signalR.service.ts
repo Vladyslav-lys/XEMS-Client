@@ -18,7 +18,9 @@ export class SignalRService {
 
   constructor() {
 	if(localStorage.currentAuthentication)
-	  this.authorization = JSON.parse(localStorage.currentAuthentication);
+	{
+		this.authorization = JSON.parse(localStorage.currentAuthentication);
+	}
 	
 	this.getToken();
     this.createConnection();
@@ -34,19 +36,32 @@ export class SignalRService {
 	if(this.currentToken)
 	{
 	   this.hubConnection = new HubConnectionBuilder()
-		.withUrl("http://0c155d26ed44.ngrok.io/ServerHub", { accessTokenFactory: () => this.currentToken })
+		.withUrl("http://754f674ec539.ngrok.io/ServerHub", { accessTokenFactory: () => this.currentToken })
 		.withAutomaticReconnect()
         .configureLogging(LogLevel.Information)
         .build();
+		
 		return;
 	}
 	
     this.hubConnection = new HubConnectionBuilder()
-      .withUrl("http://0c155d26ed44.ngrok.io/ServerHub")
+      .withUrl("http://754f674ec539.ngrok.io/ServerHub")
       .withAutomaticReconnect()
       .configureLogging(LogLevel.Information)
       .build();
   }
+  
+  loginWithToken() {
+      var th = this;
+      return new Promise(function (resolve, reject) {
+          th.hubConnection.invoke("LoginWithToken")
+            .then(function () {
+              resolve();
+            }).catch(function (err) {
+              reject(err);
+          });
+      });
+    }
 
   private startConnection() {
     if (this.hubConnection.state === HubConnectionState.Connected) {
@@ -57,6 +72,15 @@ export class SignalRService {
       () => {
         console.log('Hub connection started!');
         this.connectionEstablished$.next(true);
+		if(this.authorization == null)
+			return;
+		
+		this.loginWithToken()
+			.then(function () {
+				console.log("Loggined with token");
+			}).catch(function(err) {
+				console.log("Error while fetching students");
+			});
       },
       error => console.error(error)
     );

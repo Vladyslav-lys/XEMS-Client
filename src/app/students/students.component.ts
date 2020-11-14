@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { StudentService } from '../_services/student.service';
+import { TeacherService } from '../_services/teacher.service';
 //import { StubService } from '../_services/stub.service';
 import { Router } from '@angular/router';
 import { Student } from '../_models/student';
+import { Teacher } from '../_models/teacher';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { operationStatusInfo } from '../_helpers/operationStatusInfo';
 import { NotifyService } from '../_services/notify.service';
@@ -23,10 +25,13 @@ export class StudentsComponent implements OnInit {
 
   students: Student[];
   students2: Student[];
+  
+  teacher:Teacher;
 
   constructor(
     private router: Router,
     private studentService: StudentService,
+	private teacherService: TeacherService,
 	//private stub:StubService,
 	private serviceClient: SignalRService,
     private notifySerivce: NotifyService,
@@ -37,12 +42,14 @@ export class StudentsComponent implements OnInit {
   async ngOnInit(): Promise<void>  {
 	  
 	if(this.serviceClient.hubConnection.state == HubConnectionState.Connected){
+		await this.getTeacher();
 	  await this.getAllStudents();
     }
     else {
 		var interval = setInterval(async () => {
 		  if(this.serviceClient.hubConnection.state == HubConnectionState.Connected){
 			  clearInterval(interval);
+			  await this.getTeacher();
 		    await this.getAllStudents();
 		  }
 		}, 500);
@@ -69,6 +76,20 @@ export class StudentsComponent implements OnInit {
     }
 
     return s;
+  }
+  
+  async getTeacher() {
+    var th = this;
+    var auth = JSON.parse(localStorage.currentAuthentication);
+	var teacher;
+    await this.teacherService.getTeacherByAuthId(auth[0])
+	  .then(function (operationStatus: operationStatusInfo) {
+		var teacher1 = operationStatus.attachedObject;
+		th.teacher = teacher1[0];
+      }).catch(function(err) {
+        console.log("Error while fetching working plans");
+        alert(err);
+      });
   }
 
   async getAllStudents() {
@@ -99,10 +120,10 @@ export class StudentsComponent implements OnInit {
 
     var message: Message;
     message = new Message();
-    message.senderName = this.getAccessLevel(AccessLevel.Teacher);
+    message.senderName = this.teacher.lastName + " " + this.teacher.firstName;
     message.text = this.notifyForm.controls.messageText.value;
 	
-	this.notifySerivce.sendNotifyAllEnteredText(message)
+	this.notifySerivce.sendNotifyAllEnteredStudentsText(message)
 	  .then(function (operationStatus: operationStatusInfo) {
 		console.log("Message is sent:" + th.notifyForm.controls.messageText.value);
         th.messageText = "";
@@ -118,7 +139,7 @@ export class StudentsComponent implements OnInit {
 
     var message: Message;
     message = new Message();
-    message.senderName = this.getAccessLevel(AccessLevel.Teacher);
+    message.senderName = this.teacher.lastName + " " + this.teacher.firstName;
     message.text = txt;
 	
 	this.notifySerivce.sendNotifyOneText(student.id, message)

@@ -12,7 +12,7 @@ export class NotifyService {
   ) {
   }
 
-  public sendNotifyAllConnectedText(message: Message, serviceClient = this.serviceClient) {
+  public sendNotifyAllConnectedText(message, serviceClient = this.serviceClient) {
 	return new Promise(function (resolve, reject) {
         serviceClient.hubConnection.invoke("BroadcastToAllConnected", message)
           .then(function (operationStatus) {
@@ -23,7 +23,7 @@ export class NotifyService {
     });
   }
   
-  public sendNotifyAllEnteredText(message: Message, serviceClient = this.serviceClient) {
+  public sendNotifyAllEnteredText(message, serviceClient = this.serviceClient) {
 	return new Promise(function (resolve, reject) {
         serviceClient.hubConnection.invoke("BroadcastToAllEntered", message)
           .then(function (operationStatus) {
@@ -34,7 +34,18 @@ export class NotifyService {
     });
   }
   
-  public sendNotifyOneText(id, message: Message, serviceClient = this.serviceClient) {
+  public sendNotifyAllEnteredStudentsText(message, serviceClient = this.serviceClient) {
+	return new Promise(function (resolve, reject) {
+        serviceClient.hubConnection.invoke("BroadcastToAllEntered", message)
+          .then(function (operationStatus) {
+            resolve(operationStatus);
+          }).catch(function (err) {
+            reject(err);
+        });
+    });
+  }
+  
+  public sendNotifyOneText(id, message, serviceClient = this.serviceClient) {
 	return new Promise(function (resolve, reject) {
         serviceClient.hubConnection.invoke("Unicast", id, message)
           .then(function (operationStatus) {

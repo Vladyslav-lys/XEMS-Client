@@ -19,10 +19,9 @@ export class HomeComponent implements OnInit {
     private serviceClient: SignalRService,
     private router: Router
 	) {
-	  
   }
 
-  ngOnInit() {
+  async ngOnInit(): Promise<void> {
 	this.authorization = JSON.parse(localStorage.currentAuthentication);
 	
 	switch(this.authorization[1])

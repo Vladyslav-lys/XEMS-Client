@@ -5,7 +5,7 @@
 	<div class="master-detail">
 		<app-master-detail #master2>
 			<div *ngIf="items2 == null" class="no-note-text">
-				<p>There is no note here</p>
+				<p>There is no reporting here</p>
 			</div>
 			<ul>
 				<li *ngFor="let item of items2" (click)="master2.open(item)" class="use-elem">

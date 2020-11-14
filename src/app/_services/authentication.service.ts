@@ -1,5 +1,6 @@
 ﻿import { Injectable } from '@angular/core';
 import { SignalRService } from './signalR.service';
+import {HubConnectionState} from '@microsoft/signalr';
 import {Router} from '@angular/router';
 
 @Injectable({ providedIn: 'root' })
