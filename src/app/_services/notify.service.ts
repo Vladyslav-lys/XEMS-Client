@@ -36,7 +36,7 @@ export class NotifyService {
   
   public sendNotifyAllEnteredStudentsText(message, serviceClient = this.serviceClient) {
 	return new Promise(function (resolve, reject) {
-        serviceClient.hubConnection.invoke("BroadcastToAllEntered", message)
+        serviceClient.hubConnection.invoke("BroadcastToAllStudents", message)
           .then(function (operationStatus) {
             resolve(operationStatus);
           }).catch(function (err) {
@@ -59,6 +59,18 @@ export class NotifyService {
   public getNotifyEnteredText(toastrService: ToastrService, serviceClient = this.serviceClient) {
 	var th = this;
     serviceClient.hubConnection.on('BroadcastToAllEntered', (message) => {
+      th.showNotification(toastrService, message);
+    });
+	
+	/*var message = new Message();
+	message.text = "Message is sentssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss!";
+	message.senderName = "Admin";
+	this.showNotification(toastrService, message);*/
+  }
+  
+  public getNotifyEnteredStudentsText(toastrService: ToastrService, serviceClient = this.serviceClient) {
+	var th = this;
+    serviceClient.hubConnection.on('BroadcastToAllStudents', (message) => {
       th.showNotification(toastrService, message);
     });
 	

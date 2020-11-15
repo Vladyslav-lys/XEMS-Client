@@ -22,10 +22,15 @@ export class NotificationComponent implements OnInit {
   ngOnInit(){
 	this.callNotificationUnicastText();
 	this.callNotificationEnteredText();
+	this.callNotificationEnteredStudentsText();
   }
 
   callNotificationEnteredText() {
     this.notifySerivce.getNotifyEnteredText(this.toastrService);
+  }
+  
+  callNotificationEnteredStudentsText() {
+    this.notifySerivce.getNotifyEnteredStudentsText(this.toastrService);
   }
   
   callNotificationConnectedText() {
