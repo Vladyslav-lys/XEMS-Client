@@ -19,12 +19,20 @@
 			<input type="password" formControlName="password" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.password.errors }" placeholder="Password" />
 		</div>
     </div>
+	<!--<a routerLink="/reporting-by-subject" class="list-link">Forget the password?</a>-->
     <div class="form-group">
 		<div [class.btn]="enableBtn()" class="use-elem use-elem-button btn">
-			<button [disabled]="loading" [class.btn]="enableBtn()" class="btn-primary btn">
+			<button [disabled]="loading" [class.btn]="enableBtn()" (keydown.enter)="onSubmit()" type="submit" class="btn-primary btn">
 				Login
 			</button>
 	  </div>
     </div>
   </form>
+  <div class="form-group">
+		<div class="use-elem use-elem-button btn">
+			<button class="btn-primary btn" (click)="setTeams()">
+				Login via Teams
+			</button>
+	  </div>
+    </div>
 </div>

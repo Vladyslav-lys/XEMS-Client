@@ -19,7 +19,7 @@
 
       <div class="input-group">
         <div [class.btn]="enableBtn()" class="use-elem use-elem-button">
-          <button type="submit" [class.btn]="enableBtn()" [disabled]="loading" class="btn-primary" (click)="AddDiscipline()">Add</button>
+          <button type="submit" [class.btn]="enableBtn()" [disabled]="loading" (keydown.enter)="AddDiscipline()" class="btn-primary" (click)="AddDiscipline()">Add</button>
         </div>
       </div>
     </form>

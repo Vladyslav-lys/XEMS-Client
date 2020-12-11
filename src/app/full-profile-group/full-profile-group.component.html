@@ -41,18 +41,17 @@
           <div class="input-group">
             <div class="error-area"></div>
             <select class="use-elem use-elem-select" formControlName="degree">
-              <option value="1">Specialist</option>
-              <option value="2">Bachelor</option>
-              <option value="3">Master</option>
-              <option value="4">DoctorOfPhilosophy</option>
-			  <option value="5">DoctorOfScience</option>
+              <option value="1">Bachelor</option>
+              <option value="2">Master</option>
+              <option value="3">DoctorOfPhilosophy</option>
+			  <option value="4">DoctorOfScience</option>
             </select>
           </div>
         </div>
 	  </div>
       <div class="input-group">
         <div [class.btn]="enableBtn()" class="use-elem use-elem-button">
-          <button type="submit" [class.btn]="enableBtn()" [disabled]="loading" class="btn-primary" (click)="EditGroup()">Edit</button>
+          <button type="submit" [class.btn]="enableBtn()" [disabled]="loading" (keydown.enter)="EditGroup()" class="btn-primary" (click)="EditGroup()">Edit</button>
         </div>
       </div>
     </form>

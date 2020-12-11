@@ -65,6 +65,50 @@ export class WorkingPlanService {
       });
     });
   }
+  
+  completeSubject(subjectId, teacherId, grade, serviceClient = this.serviceClient) {
+    return new Promise(function (resolve, reject) {
+      serviceClient.hubConnection.invoke("CompleteSubject", subjectId, teacherId, grade)
+        .then(function (operationStatus) {
+          resolve(operationStatus);
+        }).catch(function (err) {
+        reject(err);
+      });
+    });
+  }
+  
+  setTeachersToSubjects(setTeachersToSubjects, serviceClient = this.serviceClient) {
+    return new Promise(function (resolve, reject) {
+      serviceClient.hubConnection.invoke("SetTeachersToSubjects", setTeachersToSubjects)
+        .then(function (operationStatus) {
+          resolve(operationStatus);
+        }).catch(function (err) {
+        reject(err);
+      });
+    });
+  }
+  
+  getReportingPlans(serviceClient = this.serviceClient) {
+    return new Promise(function (resolve, reject) {
+      serviceClient.hubConnection.invoke("GetReportingPlansByTeacherCatalogue")
+        .then(function (operationStatus) {
+          resolve(operationStatus);
+        }).catch(function (err) {
+        reject(err);
+      });
+    });
+  }
+  
+  getReportingPlansByTeacher(teacherId, year = null, semester = null, groupId = null, serviceClient = this.serviceClient) {
+    return new Promise(function (resolve, reject) {
+      serviceClient.hubConnection.invoke("GetReportingPlansByTeacher", teacherId, year, semester, groupId)
+        .then(function (operationStatus) {
+          resolve(operationStatus);
+        }).catch(function (err) {
+        reject(err);
+      });
+    });
+  }
 
   deleteWorkingPlan(id, serviceClient = this.serviceClient) {
     return new Promise(function (resolve, reject) {

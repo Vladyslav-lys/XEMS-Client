@@ -54,6 +54,17 @@ export class SubjectService {
       });
     });
   }
+  
+  addSubjectForMultipleStudents(subject, serviceClient = this.serviceClient) {
+    return new Promise(function (resolve, reject) {
+      serviceClient.hubConnection.invoke("CreateSubjectForMultipleStudents",subject)
+        .then(function (operationStatus) {
+          resolve(operationStatus);
+        }).catch(function (err) {
+        reject(err);
+      });
+    });
+  }
 
   deleteSubject(id, serviceClient = this.serviceClient) {
     return new Promise(function (resolve, reject) {

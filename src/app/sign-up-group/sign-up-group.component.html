@@ -54,7 +54,7 @@
           </div>
       <div class="input-group">
         <div [class.btn]="enableBtn()" class="use-elem btn use-elem-button">
-          <button type="submit" [class.btn]="enableBtn()" [disabled]="loading" class="btn-primary btn" (click)="AddGroup()">Add</button>
+          <button type="submit" [class.btn]="enableBtn()" [disabled]="loading" (keydown.enter)="AddGroup()" class="btn-primary btn" (click)="AddGroup()">Add</button>
         </div>
       </div>
     </form>

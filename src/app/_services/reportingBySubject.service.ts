@@ -24,7 +24,7 @@ export class ReportingBySubjectService {
   
   getReportingBySubjectsByTeacherId(teacherId, serviceClient = this.serviceClient) {
     return new Promise(function (resolve, reject) {
-      serviceClient.hubConnection.invoke("GetReportsByTeacherId", teacherId)
+      serviceClient.hubConnection.invoke("GetActualReportsByTeacherId", teacherId)
         .then(function (operationStatus) {
           resolve(operationStatus);
         }).catch(function (err) {
@@ -35,7 +35,29 @@ export class ReportingBySubjectService {
   
   getReportingBySubjectsByStudentId(studentId, serviceClient = this.serviceClient) {
     return new Promise(function (resolve, reject) {
-      serviceClient.hubConnection.invoke("GetReportsByStudentId", studentId)
+      serviceClient.hubConnection.invoke("GetActualReportsByStudentId", studentId)
+        .then(function (operationStatus) {
+          resolve(operationStatus);
+        }).catch(function (err) {
+        reject(err);
+      });
+    });
+  }
+  
+  getReportingPlanByModulesByTeacherId(teacherId, serviceClient = this.serviceClient) {
+    return new Promise(function (resolve, reject) {
+      serviceClient.hubConnection.invoke("GetReportingsByTeacherIdFromDate", teacherId, null)
+        .then(function (operationStatus) {
+          resolve(operationStatus);
+        }).catch(function (err) {
+        reject(err);
+      });
+    });
+  }
+  
+  getReportingPlanByModulesByStudentId(studentId, serviceClient = this.serviceClient) {
+    return new Promise(function (resolve, reject) {
+      serviceClient.hubConnection.invoke("GetReportingsByStudentIdFromDate", studentId, null)
         .then(function (operationStatus) {
           resolve(operationStatus);
         }).catch(function (err) {
@@ -87,10 +109,32 @@ export class ReportingBySubjectService {
       });
     });
   }
+  
+  addStudentsToReport(reportingBySubjectId, students, serviceClient = this.serviceClient) {
+    return new Promise(function (resolve, reject) {
+      serviceClient.hubConnection.invoke("AddStudentsToReport",reportingBySubjectId,students)
+        .then(function (operationStatus) {
+          resolve(operationStatus);
+        }).catch(function (err) {
+        reject(err);
+      });
+    });
+  }
 
   deleteReportingBySubject(id, serviceClient = this.serviceClient) {
     return new Promise(function (resolve, reject) {
       serviceClient.hubConnection.invoke("DeleteReportingBySubject", id)
+        .then(function (operationStatus) {
+          resolve(operationStatus);
+        }).catch(function (err) {
+        reject(err);
+      });
+    });
+  }
+  
+  completeReport(completeReport, serviceClient = this.serviceClient) {
+    return new Promise(function (resolve, reject) {
+      serviceClient.hubConnection.invoke("CompleteReport",completeReport)
         .then(function (operationStatus) {
           resolve(operationStatus);
         }).catch(function (err) {

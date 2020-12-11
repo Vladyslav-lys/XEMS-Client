@@ -22,6 +22,7 @@ import { SignUpGroupComponent } from './sign-up-group/sign-up-group.component';
 import { SignUpTeacherComponent } from './sign-up-teacher/sign-up-teacher.component';
 import { SignUpWorkingPlansComponent } from './sign-up-working-plan/sign-up-working-plan.component';
 import { SignUpReportingBySubjectComponent } from './sign-up-reporting-by-subject/sign-up-reporting-by-subject.component';
+import { SignUpSubjectForMultipleStudentsComponent } from './sign-up-subject-for-multiple-students/sign-up-subject-for-multiple-students.component';
 
 import { FullProfileStudentComponent } from './full-profile-student/full-profile-student.component';
 import { FullProfileSubjectComponent } from './full-profile-subject/full-profile-subject.component';
@@ -29,15 +30,21 @@ import { FullProfileDisciplineComponent } from './full-profile-discipline/full-p
 //import { FullProfileGroupComponent } from './full-profile-group/full-profile-group.component';
 import { FullProfileTeacherComponent } from './full-profile-teacher/full-profile-teacher.component';
 import { FullProfileWorkingPlansComponent } from './full-profile-working-plan/full-profile-working-plan.component';
+import { SyncGroupsWithTeamsComponent } from './sync-groups-with-teams/sync-groups-with-teams.component';
+import { FilterWorkingPlansComponent } from './filter-working-plan/filter-working-plan.component';
+import { JournalComponent } from './journal/journal.component';
 //import { FullProfileReportingBySubjectComponent } from './full-profile-reporting-by-subject/full-profile-reporting-by-subject.component';
 //import { ProfileAdminComponent } from './profile-admin/profile-admin.component';
 //import { ProfileTeacherComponent } from './profile-teacher/profile-teacher.component';
 //import { ProfileStudentComponent } from './profile-student/profile-student.component';
 
+import { FirstEnterDataComponent } from './first-enter-data/first-enter-data.component';
+
 import { AuthGuard } from './_guards/auth.guard';
 import { AdminGuard } from './_guards/admin.guard';
 import { TeacherGuard } from './_guards/teacher.guard';
 import { StudentGuard } from './_guards/student.guard';
+import { MsalGuard } from '@azure/msal-angular';
 
 const routes: Routes = [
   { path: '', component: HomeComponent, canActivate: [AuthGuard]},
@@ -59,16 +66,21 @@ const routes: Routes = [
   { path: 'register-teacher', component: SignUpTeacherComponent, canActivate: [AuthGuard, AdminGuard] },
   { path: 'register-working-plans', component: SignUpWorkingPlansComponent, canActivate: [AuthGuard, AdminGuard] },
   { path: 'register-reporting-by-subject', component: SignUpReportingBySubjectComponent, canActivate: [AuthGuard, TeacherGuard] },
+  { path: 'register-subject-for-multiple-students', component: SignUpSubjectForMultipleStudentsComponent, canActivate: [AuthGuard, AdminGuard] },
   { path: 'full-profile-student/:id', component: FullProfileStudentComponent, canActivate: [AuthGuard, AdminGuard] },
   { path: 'full-profile-subject/:id', component: FullProfileSubjectComponent, canActivate: [AuthGuard, AdminGuard] },
   { path: 'full-profile-discipline/:id', component: FullProfileDisciplineComponent, canActivate: [AuthGuard, AdminGuard] },
   //{ path: 'full-profile-group/:id', component: FullProfileGroupComponent, canActivate: [AuthGuard, AdminGuard] },
   { path: 'full-profile-teacher/:id', component: FullProfileTeacherComponent, canActivate: [AuthGuard, AdminGuard] },
   { path: 'full-profile-working-plans/:id', component: FullProfileWorkingPlansComponent, canActivate: [AuthGuard, AdminGuard] },
+  { path: 'sync-groups-with-teams', component: SyncGroupsWithTeamsComponent, canActivate: [AuthGuard, AdminGuard] },
+  { path: 'filter-working-plan', component: FilterWorkingPlansComponent, canActivate: [AuthGuard, TeacherGuard] },
+  { path: 'journal', component: JournalComponent, canActivate: [AuthGuard, TeacherGuard] },
   //{ path: 'full-profile-reporting-by-subject/:id', component: FullProfileReportingBySubjectComponent, canActivate: [AuthGuard, TeacherGuard] }
   //{ path: 'profile-admin', component: ProfileAdminComponent, canActivate: [AuthGuard, AdminGuard] }
   //{ path: 'profile-teacher', component: ProfileTeacherComponent, canActivate: [AuthGuard, TeacherGuard] }
   //{ path: 'profile-student', component: ProfileStudentComponent, canActivate: [AuthGuard, StudentGuard] }
+  { path: 'first-enter-data', component: FirstEnterDataComponent, canActivate: [MsalGuard] },
 ];
 
 export const appRoutingModule = RouterModule.forRoot(routes);

@@ -4,9 +4,40 @@
   </div>
   <div class="col-register">
 	<alert class="error-text"></alert>
+	<h3 class="h3">Working plan</h3>
+	<div class="input-group">
+			<table>
+			  <tr class="border-style">
+				<td></td>
+				<td>№</td>
+				<td>STUDENT</td>
+				<td>DISCIPLINE</td>
+				<td>GROUP</td>
+				<td>YEAR</td>
+				<td>SEMESTER</td>
+				<td>REPORTING</td>
+				<td>COURSE TASK</td>
+			  </tr>
+			  <tr *ngFor="let subject of subjects2; let row_no = index" class="border-style">
+				<td>
+					<label class="use-active">
+					  <input type="checkbox" [(ngModel)]="subject.checked">
+					  <span class="checkmark"></span>
+					</label>
+				</td>
+				<td>{{row_no + 1}}</td>
+				<td>{{subject.student.lastName}} {{subject.student.firstName}}</td>
+				<td>{{subject.discipline.title}}</td>
+				<td>{{subject.student.group.name}}</td>
+				<td>{{subject.year}}</td>
+				<td>{{getSemester(subject.semester)}}</td>
+				<td>{{getReportingBySemesterType(subject.reporting)}}</td>
+				<td>{{getCourseTask(subject.courseTask)}}</td>
+			  </tr>
+			</table>
+        </div>
     <form [formGroup]="registerForm">
       <div class="row-another">
-	  <h3 class="h3">Working plan</h3>
 		<div class="input-group">
           <div class="error-area">
             <div class="error-text" *ngIf="(submitted || this.registerForm.controls.teacher.touched) && this.registerForm.controls.teacher.errors">Teacher is required</div>
@@ -63,10 +94,10 @@
             </select>
         </div>
       </div>
-
+	  
       <div class="input-group">
         <div [class.btn]="enableBtn()" class="use-elem use-elem-button">
-          <button type="submit" [class.btn]="enableBtn()" [disabled]="loading" class="btn-primary" (click)="AddWorkingPlan()">Add</button>
+          <button type="submit" [class.btn]="enableBtn()" [disabled]="loading" (keydown.enter)="AddWorkingPlan()" class="btn-primary" (click)="AddWorkingPlan()">Add</button>
         </div>
       </div>
     </form>

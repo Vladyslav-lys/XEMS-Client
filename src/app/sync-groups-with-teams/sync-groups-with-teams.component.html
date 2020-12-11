@@ -1,0 +1,68 @@
+<div class="users">
+  <div class="">
+    <app-leftmenu></app-leftmenu>
+  </div>
+  <div class="col-users">
+    <div class="row-fit-users">
+      <div class="use-elem add-user-btn btn">
+        <button type="button" [disabled]="loading || curGroups.length == 0" class="use-elem btn" (click)="sync()">Synchronize</button>
+      </div>
+    </div>
+    <table>
+      <tr class="border-style">
+        <td>№</td>
+        <td>NAME</td>
+		<td>CURATOR</td>
+		<td>LEARNING START DATE</td>
+		<td>LEARNING END DATE</td>
+		<td>DEGREE</td>
+      </tr>
+      <tr *ngFor="let group of curGroups; let row_no = index" class="border-style">
+        <td>{{(row_no + 1)}}</td>
+        <td>
+			<div class="use-elem use-elem-input">
+              <input type="text" disabled class="form-control" placeholder="Name" [(ngModel)]="group.name">
+            </div>
+			<!--{{group.name}}-->
+		</td>
+		<td>
+			<select class="use-elem use-elem-select" [(ngModel)]="group.curatorId">
+			  <option *ngFor="let teacher of teachers" [ngValue]="teacher.id">{{teacher.lastName}} {{teacher.firstName}}</option>
+            </select>
+			<!--{{group.curator.lastName}} {{group.curator.firstName}}-->
+		</td>
+		<td>
+			<div class="use-elem use-elem-input">
+              <input type="date" class="form-control" [(ngModel)]="group.learningStartDate"/>
+            </div>
+			<!--{{group.learningStartDate | date : "dd.MM.y"}}-->
+		</td>
+		<td>
+			<div class="use-elem use-elem-input">
+              <input type="date" class="form-control" [(ngModel)]="group.learningEndDate"/>
+            </div>
+			<!--{{group.learningEndDate | date : "dd.MM.y"}}-->
+		</td>
+		<td>
+			<select class="use-elem use-elem-select" [(ngModel)]="group.qualificationLevel">
+              <option value="1">Bachelor</option>
+              <option value="2">Master</option>
+              <option value="3">DoctorOfPhilosophy</option>
+			  <option value="4">DoctorOfScience</option>
+            </select>
+			<!--{{getDegree(group.qualificationLevel)}}-->
+		</td>
+      </tr>
+    </table>
+	<div class="row-fit-users">
+      <div *ngIf="curPage > minPage" class="use-elem add-user-btn btn">
+        <button type="button" class="use-elem btn" (click)="prev()">Prev</button>
+      </div>
+	  <div [class.shift-btn]="curPage > minPage" *ngIf="curPage < maxPage" class="use-elem add-user-btn btn">
+        <button type="button" class="use-elem btn" (click)="next()">Next</button>
+      </div>
+    </div>
+  </div>
+  <div class="another-side">
+  </div>
+</div>

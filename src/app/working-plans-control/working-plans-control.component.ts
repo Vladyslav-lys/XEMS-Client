@@ -6,6 +6,9 @@ import { WorkingPlanService } from '../_services/workingPlan.service';
 import { Router } from '@angular/router';
 import {Teacher} from '../_models/teacher';
 import {Discipline} from '../_models/discipline';
+import { ReportingPlanByTeachers } from '../_models/reportingPlanByTeachers';
+import { ReportingBySemesterType } from '../_enums/reportingBySemesterType';
+import { CourseTask } from '../_enums/courseTask';
 import { Semester } from "../_enums/semester";
 import { TeachersRole } from "../_enums/teachersRole";
 import {WorkingPlan} from '../_models/workingPlan';
@@ -26,8 +29,10 @@ export class WorkingPlansControlComponent implements OnInit {
   messageText: string;
   notifyForm: FormGroup;
 
-  workingPlans: WorkingPlan[];
-  workingPlans2: WorkingPlan[];
+  //workingPlans: WorkingPlan[];
+  //workingPlans2: WorkingPlan[];
+  workingPlans: ReportingPlanByTeachers[];
+  workingPlans2: ReportingPlanByTeachers[];
 
   constructor(
     private router: Router,
@@ -58,7 +63,22 @@ export class WorkingPlansControlComponent implements OnInit {
   async getAllWorkingPlans() {
     var th = this;
     
-	await this.workingPlanService.getAllWorkingPlans()
+	await this.workingPlanService.getReportingPlans()
+	  .then(function (operationStatus: operationStatusInfo) {
+		var workingPlans = operationStatus.attachedObject;
+        th.workingPlans = workingPlans[0];
+        sessionStorage.setItem("workingPlans", JSON.stringify(th.workingPlans));
+        th.workingPlans2 = JSON.parse(sessionStorage.workingPlans).map(i => ({
+          idx: i,
+          id: i.workingPlan.id,
+		  workingPlan: i.workingPlan,
+		  subject: i.subject
+        }));
+      }).catch(function(err) {
+        console.log("Error while fetching working plans");
+        alert(err);
+      });
+	/*await this.workingPlanService.getAllWorkingPlans()
 	  .then(function (operationStatus: operationStatusInfo) {
 		var workingPlans = operationStatus.attachedObject;
         th.workingPlans = workingPlans[0];
@@ -76,7 +96,7 @@ export class WorkingPlansControlComponent implements OnInit {
       }).catch(function(err) {
         console.log("Error while fetching working plans");
         alert(err);
-      });
+      });*/
   }
   
   getRole(role) {
@@ -106,6 +126,47 @@ export class WorkingPlansControlComponent implements OnInit {
         break;
       case Semester.SecondWithSummerSession:
         s = "Second with summer session";
+        break;
+    }
+
+    return s;
+  }
+  
+  getReportingBySemesterType(reportingBySemesterType) {
+    var s = "";
+	
+    switch (reportingBySemesterType) {
+	  case ReportingBySemesterType.None:
+        s = "None";
+        break;
+      case ReportingBySemesterType.Credit:
+        s = "Credit";
+        break;
+      case ReportingBySemesterType.DifferentialCredit:
+        s = "Differential credit";
+        break;
+	  case ReportingBySemesterType.Exam:
+        s = "Exam";
+        break;
+	  default:
+		return "None";
+    }
+
+    return s;
+  }
+  
+  getCourseTask(courseTask) {
+    var s = "";
+
+    switch (courseTask) {
+      case CourseTask.None:
+        s = "None";
+        break;
+      case CourseTask.CourseWork:
+        s = "Course work";
+        break;
+      case CourseTask.CourseProject:
+        s = "Course project";
         break;
     }
 

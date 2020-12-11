@@ -1,0 +1,39 @@
+<div class="register">
+  <div class="">
+    <app-leftmenu></app-leftmenu>
+  </div>
+  <div class="col-register">
+	<alert class="error-text"></alert>
+    <form [formGroup]="registerForm">
+      <div class="row-another">
+	  <h3 class="h3">Choose filter data</h3>
+		<div class="form-group">
+          <div class="use-elem use-elem-input">
+            <input type="number" formControlName="year" class="form-control" placeholder="Year"/>
+          </div>
+        </div>
+		<div class="input-group">
+            <select class="use-elem use-elem-select" formControlName="semester">
+			  <option value="">No semester</option>
+              <option value="1">First with winter session</option>
+              <option value="2">Second with summer session</option>
+            </select>
+        </div>
+		<div class="input-group">
+          <select class="use-elem use-elem-select" formControlName="group">
+			<option value="">No group</option>
+            <option *ngFor="let group of groups2" value="{{group.id}}">{{group.name}}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <div class="use-elem use-elem-button btn">
+          <button type="submit" [disabled]="loading" (keydown.enter)="ConfirmFilter()" class="btn-primary btn" (click)="ConfirmFilter()">Show</button>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="another-side">
+  </div>
+</div>

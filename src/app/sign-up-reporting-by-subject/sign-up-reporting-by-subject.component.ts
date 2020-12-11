@@ -67,7 +67,7 @@ export class SignUpReportingBySubjectComponent implements OnInit {
     }
 	
     this.registerForm = this.formBuilder.group({
-		//student: ["", Validators.required],
+		student: ["", Validators.required],
 		//teacher: ["", Validators.required],
 		discipline: ["", Validators.required],
 		title: ["", Validators.required],
@@ -167,8 +167,8 @@ export class SignUpReportingBySubjectComponent implements OnInit {
 	var newReporting: any;
     newReporting = {};
 
-    //if (this.registerForm.controls.student.value != null && this.registerForm.controls.student.value.length > 0)
-    //  newReporting.studentId = +this.registerForm.controls.student.value;
+    if (this.registerForm.controls.student.value != null && this.registerForm.controls.student.value.length > 0)
+      newReporting.studentId = +this.registerForm.controls.student.value;
 	//if (this.registerForm.controls.teacher.value != null && this.registerForm.controls.student.value.length > 0)
     newReporting.teacherId = this.teacher.id;
 	if (this.registerForm.controls.discipline.value != null && this.registerForm.controls.discipline.value.length > 0)
@@ -197,15 +197,37 @@ export class SignUpReportingBySubjectComponent implements OnInit {
 		.then(function (operationStatus: operationStatusInfo) {
 			if(operationStatus.operationStatus == OperationStatus.Done)
 			{
-				var message = "Reporting added successfully";
-				console.log(message);
-				alert(message);
-				th.router.navigate(['/reporting-by-subject-control']);
+				var result = operationStatus.attachedObject;
+				var studentIds:any;
+				studentIds=[];
+				studentIds[0]=newReporting.studentId;
+				console.log(result[0]);
+				console.log(studentIds);
+				th.reportingBySubjectService.addStudentsToReport(result[0],studentIds)
+				.then(function (operationStatus: operationStatusInfo) {
+					if(operationStatus.operationStatus == OperationStatus.Done)
+					{
+						var message = "Reporting added successfully";
+						console.log(message);
+						alert(message);
+						th.router.navigate(['/reporting-by-subject-control']);
+					}
+					else
+					{
+						console.log(operationStatus.attachedInfo);
+						alert(operationStatus.attachedInfo);
+						th.loading = false;
+					}
+				}).catch(function(err) {
+					console.log("Error while adding new reporting");
+					alert(err);
+					th.loading = false;
+				});
 			}
 			else
 			{
-				console.log(operationStatus.attachedObject);
-				alert(operationStatus.attachedObject);
+				console.log(operationStatus.attachedInfo);
+				alert(operationStatus.attachedInfo);
 				th.loading = false;
 			}
 		}).catch(function(err) {

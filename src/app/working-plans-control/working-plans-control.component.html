@@ -13,20 +13,32 @@
         <td>№</td>
 		<td>TEACHER</td>
 		<td>DISCIPLINE</td>
+		<td>GROUP</td>
 		<td>HOURS</td>
 		<td>ROLE</td>
 		<td>YEAR</td>
 		<td>SEMESTER</td>
+		<td>LECTURE HOURS</td>
+		<td>PRACTICE HOURS</td>
+		<td>LABORATORY HOURS</td>
+		<td>REPORTING</td>
+		<td>COURSE TASK</td>
         <td></td>
       </tr>
       <tr *ngFor="let workingPlan of workingPlans; let row_no = index" class="border-style">
         <td>{{row_no + 1}}</td>
-		<td>{{workingPlan.teacher.lastName}} {{workingPlan.teacher.firstName}}</td>
-		<td>{{workingPlan.discipline.title}}</td>
-		<td>{{workingPlan.hours}}</td>
-		<td>{{getRole(workingPlan.role)}}</td>
-		<td>{{workingPlan.year}}</td>
-		<td>{{getSemester(workingPlan.semester)}}</td>
+		<td>{{workingPlan.workingPlan.teacher.lastName}} {{workingPlan.workingPlan.teacher.firstName}}</td>
+		<td>{{workingPlan.workingPlan.discipline.title}}</td>
+		<td>{{workingPlan.subject.student.group.name}}</td>
+		<td>{{workingPlan.workingPlan.hours}}</td>
+		<td>{{getRole(workingPlan.workingPlan.role)}}</td>
+		<td>{{workingPlan.workingPlan.year}}</td>
+		<td>{{getSemester(workingPlan.subject.semester)}}</td>
+		<td>{{workingPlan.subject.lectureHours}}</td>
+		<td>{{workingPlan.subject.practiceHours}}</td>
+		<td>{{workingPlan.subject.laboratoryHours}}</td>
+		<td>{{getReportingBySemesterType(workingPlan.subject.reporting)}}</td>
+		<td>{{getCourseTask(workingPlan.subject.courseTask)}}</td>
         <td><button class="user-btn btn btn-primary" [routerLink]="['/full-profile-working-plans', workingPlan.id]">Edit</button></td>
       </tr>
     </table>

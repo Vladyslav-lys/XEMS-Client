@@ -7,6 +7,9 @@
       <div class="use-elem add-user-btn btn">
         <button type="button" class="use-elem btn" (click)="openAdd()">New subject</button>
       </div>
+	  <div class="use-elem add-user-btn add-user-btn1 btn shift-btn">
+        <button type="button" class="use-elem btn" (click)="openAddForMultipleStudents()">New subject for multiple students</button>
+      </div>
     </div>
     <table>
       <tr class="border-style">
@@ -38,6 +41,22 @@
         <td><button class="user-btn btn btn-primary" [routerLink]="['/full-profile-subject', subject.id]">Edit</button></td>
       </tr>
     </table>
+	<br/>
+	<h3 class="h3">Subject data by hours</h3>
+	<div class="row-fit-selects">
+		<select [(ngModel)]="selectedDisciplineId" class="chart-elem-select" (change)="createChart()">
+			<option value="0">None</option>
+            <option *ngFor="let discipline of disciplines2" value="{{discipline.id}}">{{discipline.title}}</option>
+        </select>
+		<select [(ngModel)]="selectedTypeId" class="chart-elem-select" (change)="createChart()">
+			<option value="0">None</option>
+            <option value="1">Total</option>
+            <option value="2">Lecture</option>
+			<option value="3">Practice</option>
+			<option value="4">Laboratory</option>
+        </select>
+	</div>
+	<canvas id="subjectHoursComparison"></canvas>
   </div>
   <div class="another-side">
   </div>

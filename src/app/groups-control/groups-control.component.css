@@ -48,3 +48,19 @@ table {
   margin-bottom: 20px;
   padding: 10px 10px 10px 10px;
 }
+
+.add-user-btn1 {
+  width:250px;
+}
+
+@media screen and (max-width: 1130px) {
+  .shift-btn {
+	  margin-left:0px;
+  }
+}
+
+@media screen and (min-width: 1130px) {
+  .shift-btn {
+	  margin-left:120px; 
+  }
+}

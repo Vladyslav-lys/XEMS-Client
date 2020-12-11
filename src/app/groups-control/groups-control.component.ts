@@ -108,4 +108,8 @@ export class GroupsControlComponent implements OnInit {
   openAdd() {
     this.router.navigate(['/register-group']);
   }
+  
+  syncGroupsWithTeams() {
+	this.router.navigate(['/sync-groups-with-teams']);
+  }
 }

@@ -11,39 +11,24 @@ import { operationStatusInfo } from '../_helpers/operationStatusInfo';
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css']
 })
-export class HeaderComponent implements OnInit, OnChanges, DoCheck {
-  
-  authorization:any;
+export class HeaderComponent implements OnInit {
   
   constructor(
 	private serviceClient: SignalRService,
-    private authenticateService: AuthenticationService,
+    public authenticateService: AuthenticationService,
 	//private stub:StubService,
     private router: Router
   ) { }
-  
-  ngOnChanges() {
-  }
 
   ngOnInit(): void {
   }
   
-  ngDoCheck(): void {
-	if(localStorage.currentAuthentication != null)
-	{
-		this.authorization = JSON.parse(localStorage.currentAuthentication);
-		return;
-	}
-	this.authorization = null;
-  }
-  
   logout() {
 	  var th = this;
-	  if(JSON.parse(localStorage.currentAuthentication)!= null)
+	  if(this.authenticateService.getAuth())
 	  {
 		this.authenticateService.logout()
 	    .then(function (operationStatus: operationStatusInfo){
-		  th.authorization = null;
 		  th.authenticateService.removeAuth();
 		  th.authenticateService.removeAccessAdmin();
 		  th.authenticateService.removeAccessTeacher();

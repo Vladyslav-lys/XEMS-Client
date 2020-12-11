@@ -9,7 +9,6 @@
 
 .master-detail {
 	margin-top:20px;
-	
 }
 
 li {
@@ -78,4 +77,18 @@ li {
   width:110px;
   margin-bottom: 20px;
   padding: 10px 10px 10px 10px;
+}
+
+.send-one-btn {
+  background-color: transparent;
+  border: 1px solid rgb(150, 150, 150);
+  height: 30px;
+}
+
+.div-send-one-btn {
+	margin: 0px 5px 5px 5px;
+}
+
+.canvas-date {
+	width: 250px;
 }

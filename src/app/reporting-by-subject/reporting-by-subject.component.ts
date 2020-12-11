@@ -5,6 +5,8 @@ import {StudentService} from '../_services/student.service';
 import {operationStatusInfo, OperationStatus} from '../_helpers/operationStatusInfo';
 import {ReportingBySubject} from '../_models/reportingBySubject';
 import {ReportingBySubjectAdditionalMaterials} from '../_models/reportingBySubjectAdditionalMaterials';
+import {ReportingPlanByModules} from '../_models/reportingPlanByModules';
+import {Student} from '../_models/student';
 import {SignalRService} from '../_services/signalR.service';
 //import { StubService } from '../_services/stub.service';
 import {HubConnectionState} from '@microsoft/signalr';
@@ -19,8 +21,10 @@ export class ReportingBySubjectComponent implements OnInit {
 
   //items:ReportingBySubjectAdditionalMaterials[];
   //items2:ReportingBySubjectAdditionalMaterials[];
-  items:ReportingBySubject[];
-  items2:ReportingBySubject[];
+  items:ReportingPlanByModules[];
+  items2:ReportingPlanByModules[];
+  
+  student:Student;
   
 	constructor(
     private serviceClient: SignalRService,
@@ -71,6 +75,21 @@ export class ReportingBySubjectComponent implements OnInit {
 	}		
   }
   
+  getSemester(semester) {
+    var s = "";
+
+    switch (semester) {
+      case semester.FirstWithWinterSession:
+        s = "First with winter session";
+        break;
+      case semester.SecondWithSummerSession:
+        s = "Second with summer session";
+        break;
+    }
+
+    return s;
+  }
+  
   getIsCompleted(isCompleted)
   {
 	switch(isCompleted)
@@ -87,17 +106,43 @@ export class ReportingBySubjectComponent implements OnInit {
   async getReporting() {
     var th = this;
 	var auth = JSON.parse(localStorage.currentAuthentication);
-	var student;
     await this.studentService.getStudentByAuthId(auth[0])
 	  .then(function (operationStatus: operationStatusInfo) {
 		var student1 = operationStatus.attachedObject;
-		student = student1[0];
+		th.student = student1[0];
       }).catch(function(err) {
         console.log("Error while fetching student");
         alert(err);
       });
 	  
-    await this.reportingBySubjectService.getReportingBySubjectsByStudentId(student.id)
+	  await this.reportingBySubjectService.getReportingPlanByModulesByStudentId(this.student.id)
+	 .then(function (operationStatus: operationStatusInfo){
+      if (operationStatus.operationStatus == OperationStatus.Done) {
+          var reportings = operationStatus.attachedObject;
+          th.items = reportings[0];
+          sessionStorage.setItem("reportingBySubject", JSON.stringify(th.items));
+		  th.items2 = JSON.parse(sessionStorage.reportingBySubject).map(i => ({ 
+			idx: i, 
+			id: i.id, 
+			subject: i.subject,
+			reportingBySubject: i.reportingBySubject, 
+			realDueDate: i.realDueDate, 
+			//isCompleted: i.isCompleted, 
+			grade: i.grade, 
+			//material: i.material
+			}));
+        }
+        else {
+          console.log(operationStatus.attachedInfo);
+          //sessionStorage.setItem("reportingBySubject", JSON.stringify(""));
+          alert(operationStatus.attachedInfo);
+        }
+      }).catch(function(err) {
+        console.log("Error loading reportingBySubjectAdditionalMaterials");
+        alert(err);
+      });
+	  
+    /*await this.reportingBySubjectService.getReportingBySubjectsByStudentId(student.id)
 	 .then(function (operationStatus: operationStatusInfo){
       if (operationStatus.operationStatus == OperationStatus.Done) {
           var reportings = operationStatus.attachedObject;
@@ -116,7 +161,8 @@ export class ReportingBySubjectComponent implements OnInit {
 			//realDueDate: i.realDueDate, 
 			//isCompleted: i.isCompleted, 
 			//grade: i.grade, 
-			/*material: i.material*/}));
+			//material: i.material
+			}));
         }
         else {
           console.log(operationStatus.attachedInfo);
@@ -126,6 +172,6 @@ export class ReportingBySubjectComponent implements OnInit {
       }).catch(function(err) {
         console.log("Error loading reportingBySubjectAdditionalMaterials");
         alert(err);
-      });
+      });*/
   }
 }

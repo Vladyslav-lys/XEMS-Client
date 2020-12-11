@@ -5,7 +5,7 @@
      <a class="link" routerLink="/">EDUCATION MANEGMENT SYSTEM</a>
    </div>
  </div>
- <div *ngIf="authorization != null" class="use-elem btn-pos btn logout-btn">
+ <div *ngIf="authenticateService.getAuth()" class="use-elem btn-pos btn logout-btn">
     <button (click)="logout()" class="btn-primary btn">Log out</button>
  </div>
 </div>

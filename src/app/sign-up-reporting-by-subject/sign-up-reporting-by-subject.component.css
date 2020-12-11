@@ -27,3 +27,8 @@
 .another-side {
   width: 100px;
 }
+
+.textarea-notify {
+	height:100px;
+	resize:none;
+}

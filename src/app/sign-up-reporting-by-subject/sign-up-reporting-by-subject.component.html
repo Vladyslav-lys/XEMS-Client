@@ -7,7 +7,7 @@
     <form [formGroup]="registerForm">
       <div class="row-another">
         <h3 class="h3">Reporting by subject</h3>
-		<!--<div class="input-group">
+		<div class="input-group">
           <div class="error-area">
               <div class="error-text" *ngIf="(submitted || this.registerForm.controls.student.touched) && this.registerForm.controls.student.errors">Student is required</div>
             </div>
@@ -15,7 +15,7 @@
 			<option value="">No student</option>
             <option *ngFor="let student of students2" value="{{student.id}}">{{student.lastName}} {{student.firstName}}</option>
           </select>
-        </div>-->
+        </div>
 		<!--<div class="input-group">
             <div class="error-area">
               <div class="error-text" *ngIf="(submitted || this.registerForm.controls.teacher.touched) && this.registerForm.controls.teacher.errors">Teacher is required</div>
@@ -47,7 +47,7 @@
               <div class="error-text" *ngIf="(submitted || this.registerForm.controls.description.touched) && this.registerForm.controls.description.errors">Description is required</div>
             </div>
             <div [class.error-block]="(submitted || this.registerForm.controls.description.touched) && this.registerForm.controls.description.errors" class="use-elem use-elem-input">
-              <input type="text" class="form-control" placeholder="Description" formControlName="description" value="">
+              <textarea class="form-control textarea-notify" cols="50" rows="2" placeholder="Description" formControlName="description" value=""></textarea>
             </div>
           </div>
 		<div class="input-group">
@@ -89,7 +89,7 @@
 
       <div class="input-group">
         <div [class.btn]="enableBtn()" class="use-elem use-elem-button">
-          <button type="submit" [class.btn]="enableBtn()" [disabled]="loading" class="btn-primary" (click)="AddReporting()">Add</button>
+          <button type="submit" [class.btn]="enableBtn()" [disabled]="loading" (keydown.enter)="AddReporting()" class="btn-primary" (click)="AddReporting()">Add</button>
         </div>
       </div>
     </form>

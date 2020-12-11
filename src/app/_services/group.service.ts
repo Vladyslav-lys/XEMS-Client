@@ -22,6 +22,28 @@ export class GroupService {
     });
   }
   
+  syncGroupsWithTeams(serviceClient = this.serviceClient) {
+    return new Promise(function (resolve, reject) {
+      serviceClient.hubConnection.invoke("SynchronizeGroupsWithTeams")
+        .then(function (operationStatus) {
+          resolve(operationStatus);
+        }).catch(function (err) {
+        reject(err);
+      });
+    });
+  }
+  
+  createGroupsList(groupsList, serviceClient = this.serviceClient) {
+    return new Promise(function (resolve, reject) {
+      serviceClient.hubConnection.invoke("CreateGroupsList", groupsList)
+        .then(function (operationStatus) {
+          resolve(operationStatus);
+        }).catch(function (err) {
+        reject(err);
+      });
+    });
+  }
+  
   getAllGroups(serviceClient = this.serviceClient) {
     return new Promise(function (resolve, reject) {
       serviceClient.hubConnection.invoke("GetGroupsCatalogue")

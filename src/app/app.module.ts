@@ -6,6 +6,7 @@ import { RouterModule } from '@angular/router';
 import { StoreModule } from '@ngrx/store';
 import { ToastrModule } from 'ngx-toastr';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MsalModule, MsalInterceptor } from '@azure/msal-angular';
 
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
@@ -38,6 +39,7 @@ import { SignUpGroupComponent } from './sign-up-group/sign-up-group.component';
 import { SignUpTeacherComponent } from './sign-up-teacher/sign-up-teacher.component';
 import { SignUpWorkingPlansComponent } from './sign-up-working-plan/sign-up-working-plan.component';
 import { SignUpReportingBySubjectComponent } from './sign-up-reporting-by-subject/sign-up-reporting-by-subject.component';
+import { SignUpSubjectForMultipleStudentsComponent } from './sign-up-subject-for-multiple-students/sign-up-subject-for-multiple-students.component';
 
 import { FullProfileStudentComponent } from './full-profile-student/full-profile-student.component';
 import { FullProfileSubjectComponent } from './full-profile-subject/full-profile-subject.component';
@@ -45,15 +47,22 @@ import { FullProfileDisciplineComponent } from './full-profile-discipline/full-p
 //import { FullProfileGroupComponent } from './full-profile-group/full-profile-group.component';
 import { FullProfileTeacherComponent } from './full-profile-teacher/full-profile-teacher.component';
 import { FullProfileWorkingPlansComponent } from './full-profile-working-plan/full-profile-working-plan.component';
+import { SyncGroupsWithTeamsComponent } from './sync-groups-with-teams/sync-groups-with-teams.component';
+import { FilterWorkingPlansComponent } from './filter-working-plan/filter-working-plan.component';
+import { JournalComponent } from './journal/journal.component';
 //import { FullProfileReportingBySubjectComponent } from './full-profile-reporting-by-subject/full-profile-reporting-by-subject.component';
 //import { ProfileAdminComponent } from './profile-admin/profile-admin.component';
 //import { ProfileTeacherComponent } from './profile-teacher/profile-teacher.component';
 //import { ProfileStudentComponent } from './profile-student/profile-student.component';
 
+import { FirstEnterDataComponent } from './first-enter-data/first-enter-data.component';
+
 import { AuthGuard } from './_guards/auth.guard';
 import { AdminGuard } from './_guards/admin.guard';
 import { TeacherGuard } from './_guards/teacher.guard';
 import { StudentGuard } from './_guards/student.guard';
+
+const isIE = window.navigator.userAgent.indexOf('MSIE ') > -1 || window.navigator.userAgent.indexOf('Trident/') > -1;
 
 @NgModule({
   declarations: [
@@ -83,16 +92,21 @@ import { StudentGuard } from './_guards/student.guard';
 	SignUpTeacherComponent,
 	SignUpWorkingPlansComponent,
 	SignUpReportingBySubjectComponent,
+	SignUpSubjectForMultipleStudentsComponent,
 	FullProfileStudentComponent,
 	FullProfileSubjectComponent,
 	FullProfileDisciplineComponent,
 	//FullProfileGroupComponent,
 	FullProfileTeacherComponent,
 	FullProfileWorkingPlansComponent,
+	SyncGroupsWithTeamsComponent,
+	FilterWorkingPlansComponent,
+	JournalComponent,
 	//FullProfileReportingBySubjectComponent,
 	//ProfileAdminComponent,
 	//ProfileTeacherComponent,
 	//ProfileStudentComponent
+	FirstEnterDataComponent
   ],
   imports: [
     BrowserModule,
@@ -103,9 +117,39 @@ import { StudentGuard } from './_guards/student.guard';
 	ToastrModule.forRoot(),
     FormsModule,
 	MasterDetailModule,
-    StoreModule.forRoot({}, {})
+    StoreModule.forRoot({}, {}),
+	MsalModule.forRoot({
+      auth: {
+        clientId: 'e09f0ab1-1679-4a98-aaac-677edbcb99d1',
+        authority: 'https://login.microsoftonline.com/72e42a61-9cee-4b78-8828-29b226163bd7',
+        redirectUri: 'http://localhost:4200/',
+      },
+      cache: {
+        cacheLocation: 'localStorage',
+        storeAuthStateInCookie: isIE, // set to true for IE 11
+      },
+    },
+    {
+      popUp: !isIE,
+      consentScopes: [
+        'user.read',
+        'openid',
+        'profile',
+      ],
+      unprotectedResources: [],
+      protectedResourceMap: [
+        ['https://graph.microsoft.com/v1.0/me', ['user.read']]
+      ],
+      extraQueryParameters: {}
+    })
   ],
-  providers: [],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: MsalInterceptor,
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

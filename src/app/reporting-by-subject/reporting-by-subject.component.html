@@ -4,29 +4,31 @@
     </div>
 	<div class="master-detail">
 		<app-master-detail #master2>
-			<div *ngIf="items2 == null" class="no-note-text">
+			<div *ngIf="items2 == null || items2.length <= 0" class="no-note-text">
 				<p>There is no reporting here</p>
 			</div>
 			<ul>
 				<li *ngFor="let item of items2" (click)="master2.open(item)" class="use-elem">
 					<a href="javascript:void(0);">
 						<div class="use-elem-link">
-							{{ item.id }}. {{ item.title }}
+							{{ item.reportingBySubject.id }}. {{ item.reportingBySubject.title }}
 						</div>
 					</a>
 				</li>
 			</ul>
 			<div *appDetailView="let item; let ctrl = controller">
-				<h3 class="h3">{{ item.title }}</h3>
-				<p class="note-text note-marging">Discipline: {{ item.discipline.title }}</p>
-				<p class="note-text note-marging">Description: {{ item.description }}</p>
-				<!--<p class="note-text note-marging">To whom: {{ item.student.lastName }} {{ item.student.firstName }}</p>-->
-				<p class="note-text note-marging">From who: {{ item.teacher.lastName }} {{ item.teacher.firstName }}</p>
+				<h3 class="h3">{{ item.reportingBySubject.title }}</h3>
+				<p class="note-text note-marging">Discipline: {{ item.reportingBySubject.discipline.title }}</p>
+				<p class="note-text note-marging">Description: {{ item.reportingBySubject.description }}</p>
+				<p class="note-text note-marging">From who: {{ item.reportingBySubject.teacher.lastName }} {{ item.reportingBySubject.teacher.firstName }}</p>
+				<p class="note-text note-marging">Year: {{ item.subject.year }}</p>
+				<p class="note-text note-marging">Semester: {{ getSemester(item.subject.semester) }}</p>
 				<div class="note-date-changing note-marging note-p">
-					<p type="text">Due date: {{ item.dueDate | date : "dd.MM.y h:mm" }}</p>
-					<!--<p type="text">Real due date: {{ item.realDueDate| date : "dd.MM.y h:mm" }}</p>-->
+					<p type="text">Due date: {{ item.reportingBySubject.dueDate | date : "dd.MM.y" }}</p>
+					<p *ngIf="item.realDueDate != null && item.realDueDate != '0001-01-01T00:00:00'" type="text">Real due date: {{ item.realDueDate| date : "dd.MM.y" }}</p>
 				</div>
-				<p class="note-text note-marging">Reporting type: {{ getReportingBySubjectType(item.reporting) }}</p>
+				<p class="note-text note-marging">Reporting type: {{ getReportingBySubjectType(item.reportingBySubject.reporting) }}</p>
+				<p *ngIf="item.grade > 0 && item.grade != null && item.grade < 100" class="note-text note-marging">Grade: {{ item.grade }}</p>
 				<!--<p class="note-text note-marging">Completed: {{ getIsCompleted(item.isCompleted) }}</p>-->
 				<!--<p class="note-text note-marging">Grade: {{ item.grade }}</p>-->
 				<!--<button (click)="ctrl.close()">Close</button>-->

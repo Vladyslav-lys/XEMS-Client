@@ -2,12 +2,16 @@ import { Component, OnInit } from '@angular/core';
 import { TeacherService } from '../_services/teacher.service';
 import { DisciplineService } from '../_services/discipline.service';
 import { WorkingPlanService } from '../_services/workingPlan.service';
+import { SubjectService } from '../_services/subject.service';
 //import { StubService } from '../_services/stub.service';
 import { Router } from '@angular/router';
 import {Teacher} from '../_models/teacher';
+import {Subject} from '../_models/subject';
 import {Discipline} from '../_models/discipline';
 import { Semester } from "../_enums/semester";
 import { TeachersRole } from "../_enums/teachersRole";
+import { ReportingBySemesterType } from '../_enums/reportingBySemesterType';
+import { CourseTask } from '../_enums/courseTask';
 import {WorkingPlan} from '../_models/workingPlan';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { operationStatusInfo, OperationStatus } from '../_helpers/operationStatusInfo';
@@ -30,12 +34,18 @@ export class SignUpWorkingPlansComponent implements OnInit {
   
   teachers: Teacher[];
   teachers2: Teacher[];
+  
+  subjects: any;
+  subjects2: any;
+  
+  //checkedSubjects: boolean[];
 	
   constructor(
     private router: Router,
     private teacherService: TeacherService,
 	private disciplineService: DisciplineService,
 	private workingPlanService: WorkingPlanService,
+	private subjectService: SubjectService,
 	//private stub:StubService,
 	private serviceClient: SignalRService,
     private formBuilder: FormBuilder
@@ -43,9 +53,13 @@ export class SignUpWorkingPlansComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
+	  this.subjects = [];
+	  this.subjects2 = [];
+	  
 	if(this.serviceClient.hubConnection.state == HubConnectionState.Connected){
 	  await this.getAllTeachers();
 	  await this.getAllDisciplines();
+	  await this.getAllSubjects();
     }
     else {
 		var interval = setInterval(async () => {
@@ -53,6 +67,7 @@ export class SignUpWorkingPlansComponent implements OnInit {
 			  clearInterval(interval);
 		    await this.getAllTeachers();
 			await this.getAllDisciplines();
+			await this.getAllSubjects();
 		  }
 		}, 500);
     }
@@ -110,11 +125,94 @@ export class SignUpWorkingPlansComponent implements OnInit {
         alert(err);
       });
   }
+  
+  async getAllSubjects() {
+    var th = this;
+    
+	await this.subjectService.getAllSubjects()
+	  .then(function (operationStatus: operationStatusInfo) {
+		var subjects = operationStatus.attachedObject;
+        th.subjects = subjects[0];
+        sessionStorage.setItem("subjects", JSON.stringify(th.subjects));
+        th.subjects2 = JSON.parse(sessionStorage.subjects).map(i => ({
+          idx: i,
+          id: i.id,
+		  student: i.student,
+		  discipline: i.discipline,
+		  year: i.year,
+		  semester: i.semester,
+		  lectureHours: i.lectureHours,
+		  practiceHours: i.practiceHours,
+		  laboratoryHours: i.laboratoryHours,
+		  reporting: i.reportingBySemesterType,
+		  courseTask: i.courseTask,
+		  semesterGrade: i.semesterGrade,
+		  checked:false
+        }));
+      }).catch(function(err) {
+		  alert(err);
+        console.log("Error while fetching subjects");
+      });
+  }
+  
+  getCourseTask(courseTask) {
+    var s = "";
+
+    switch (courseTask) {
+      case CourseTask.None:
+        s = "None";
+        break;
+      case CourseTask.CourseWork:
+        s = "Course work";
+        break;
+      case CourseTask.CourseProject:
+        s = "Course project";
+        break;
+    }
+
+    return s;
+  }
+  
+  getSemester(semester) {
+    var s = "";
+
+    switch (semester) {
+      case Semester.FirstWithWinterSession:
+        s = "First with winter session";
+        break;
+      case Semester.SecondWithSummerSession:
+        s = "Second with summer session";
+        break;
+    }
+
+    return s;
+  }
+  
+  getReportingBySemesterType(reportingBySemesterType) {
+    var s = "";
+
+    switch (reportingBySemesterType) {
+	  case ReportingBySemesterType.None:
+        s = "None";
+        break;
+      case ReportingBySemesterType.Credit:
+        s = "Credit";
+        break;
+      case ReportingBySemesterType.DifferentialCredit:
+        s = "Differential credit";
+        break;
+	  case ReportingBySemesterType.Exam:
+        s = "Exam";
+        break;
+    }
+
+    return s;
+  }
 
   AddWorkingPlan() {
 	this.submitted = true;
 
-    if (this.registerForm.invalid) {
+    if (this.registerForm.invalid /*|| this.checkedSubjects.length <= 0*/) {
       return;
     }
 
@@ -124,6 +222,8 @@ export class SignUpWorkingPlansComponent implements OnInit {
     //newWorkingPlan = new WorkingPlan();
 	var newWorkingPlan: any;
     newWorkingPlan = {};
+	var subjects: number[];
+    subjects = [];
 	
 	if (this.registerForm.controls.teacher.value != null)
 	{
@@ -145,16 +245,58 @@ export class SignUpWorkingPlansComponent implements OnInit {
       newWorkingPlan.year = +this.registerForm.controls.year.value;
 	if (this.registerForm.controls.semester.value != null && this.registerForm.controls.semester.value.length > 0)
       newWorkingPlan.semester = +this.registerForm.controls.semester.value;
-  
+	for(var subjectIndex in this.subjects2)
+	{
+	  if(this.subjects2[subjectIndex].checked)
+		subjects.push(this.subjects2[subjectIndex].id);
+	}
+	if(subjects.length == 0)
+	{
+		alert("Please, choose one or more subjects!");
+		return;
+	}
+	/*if (this.checkedSubjects.length > 0)
+	{
+	  for(var checkedSubjectIndex in this.checkedSubjects)
+	  {
+		if(this.checkedSubjects[checkedSubjectIndex])
+		  subjectIds.push(this.subjects2[checkedSubjectIndex].id);
+	  }
+	}*/
+	
 	var th = this;
 	this.workingPlanService.addWorkingPlan(newWorkingPlan)
 	  .then(function (operationStatus: operationStatusInfo) {
 		if(operationStatus.operationStatus == OperationStatus.Done)
 		{
-			var message = "Working plan added successfully";
-			console.log(message);
-			alert(message);
-			th.router.navigate(['/working-plans-control']);
+			var result = operationStatus.attachedObject;
+			var workingPlans: number[];
+			workingPlans = [];
+			workingPlans.push(result[0]);
+			var setTeachersToSubjects:any;
+			setTeachersToSubjects = {};
+			setTeachersToSubjects.subjects = subjects;
+			setTeachersToSubjects.workingPlans = workingPlans;
+			th.workingPlanService.setTeachersToSubjects(setTeachersToSubjects)
+			.then(function (operationStatus: operationStatusInfo) {
+			  if(operationStatus.operationStatus == OperationStatus.Done)
+			  {
+				var message = "Working plan added successfully";
+				console.log(message);
+				alert(message);
+				th.router.navigate(['/working-plans-control']);
+			  }
+			  else
+			  {
+				console.log(operationStatus.attachedInfo);
+				alert(operationStatus.attachedInfo);
+				th.loading = false;
+			  }
+			}).catch(function(err) {
+			  console.log("Error while adding new working plan");
+			  alert(err);
+			  th.loading = false;
+			});
 		}
 		else
 		{
@@ -170,7 +312,7 @@ export class SignUpWorkingPlansComponent implements OnInit {
   }
 
   enableBtn(): boolean {
-	if (!this.registerForm.invalid)
+	if (!this.registerForm.invalid /*&& this.checkedSubjects.length > 0*/)
       return true;
     return false;
   }

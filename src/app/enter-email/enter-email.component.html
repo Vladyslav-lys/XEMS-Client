@@ -1,0 +1,28 @@
+<div class="register">
+  <div class="">
+  </div>
+  <div class="col-register">
+	<alert class="error-text"></alert>
+    <form [formGroup]="registerForm">
+      <div class="row-another">
+        <h3 class="h3">Enter e-mail where to send temporary password</h3>
+        <div class="form-group">
+          <div class="error-area">
+            <div class="error-text" *ngIf="(submitted || this.registerForm.controls.email.touched) && this.registerForm.controls.email.errors">E-mail is required</div>
+          </div>
+          <div [class.error-block]="(submitted || this.registerForm.controls.email.touched) && this.registerForm.controls.email.errors" class="use-elem use-elem-input">
+            <input type="text" formControlName="email" class="form-control" [ngClass]="{ 'is-invalid': submitted && this.registerForm.controls.email.errors }" placeholder="E-mail" />
+          </div>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <div [class.btn]="enableBtn()" class="use-elem use-elem-button">
+          <button type="submit" [class.btn]="enableBtn()" [disabled]="loading" class="btn-primary" (click)="SendEMail()">Confirm</button>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="another-side">
+  </div>
+</div>

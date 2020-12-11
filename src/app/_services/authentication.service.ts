@@ -147,6 +147,61 @@ export class AuthenticationService {
       });
     });
   }
+  
+  loginViaTeams(guid, serviceClient = this.serviceClient) {
+    return new Promise(function (resolve, reject) {
+      serviceClient.hubConnection.invoke("LoginViaTeams", guid)
+        .then(function (operationStatus) {
+          resolve(operationStatus);
+        }).catch(function (err) {
+        reject(err);
+      });
+    });
+  }
+  
+  teamsGetUserFirstLogin(guid, serviceClient = this.serviceClient) {
+    return new Promise(function (resolve, reject) {
+      serviceClient.hubConnection.invoke("TeamsGetUserFirstLogin", guid)
+        .then(function (operationStatus) {
+          resolve(operationStatus);
+        }).catch(function (err) {
+        reject(err);
+      });
+    });
+  }
+  
+  registerAzureUser(user, serviceClient = this.serviceClient) {
+    return new Promise(function (resolve, reject) {
+      serviceClient.hubConnection.invoke("RegisterViaTeams", user)
+        .then(function (operationStatus) {
+          resolve(operationStatus);
+        }).catch(function (err) {
+        reject(err);
+      });
+    });
+  }
+  
+  sendEmail(email, serviceClient = this.serviceClient) {
+    return new Promise(function (resolve, reject) {
+      serviceClient.hubConnection.invoke("RegisterAzureUser", email)
+        .then(function (operationStatus) {
+          resolve(operationStatus);
+        }).catch(function (err) {
+        reject(err);
+      });
+    });
+  }
+  
+  sendNewPassword(password, serviceClient = this.serviceClient) {
+    return new Promise(function (resolve, reject) {
+      serviceClient.hubConnection.invoke("RegisterAzureUser", password)
+        .then(function (operationStatus) {
+          resolve(operationStatus);
+        }).catch(function (err) {
+        reject(err);
+      });
+    });
+  }
 
   /*addAuthorization(authorization, serviceClient = this.serviceClient) {
     return new Promise(function (resolve, reject) {

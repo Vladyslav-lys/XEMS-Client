@@ -44,6 +44,17 @@ export class StudentService {
     });
   }
   
+  getStudentByGroupId(groupId, serviceClient = this.serviceClient) {
+    return new Promise(function (resolve, reject) {
+      serviceClient.hubConnection.invoke("GetStudentsByGroup", groupId)
+        .then(function (operationStatus) {
+          resolve(operationStatus);
+        }).catch(function (err) {
+        reject(err);
+      });
+    });
+  }
+  
   getStudentByAuthId(id, serviceClient = this.serviceClient) {
     return new Promise(function (resolve, reject) {
       serviceClient.hubConnection.invoke("GetStudentByAuth", id)

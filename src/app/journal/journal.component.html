@@ -1,0 +1,45 @@
+<div class="users">
+  <div class="">
+    <app-leftmenu></app-leftmenu>
+  </div>
+  <div class="col-users">
+    <table>
+      <tr class="border-style">
+        <td>№</td>
+		<td>DISCIPLINE</td>
+		<td>STUDENT</td>
+		<td>GROUP</td>
+		<td>ROLE</td>
+		<td>YEAR</td>
+		<td>SEMESTER</td>
+		<td>REPORTING</td>
+		<td>COURSE TASK</td>
+		<td>SEMESTER GRADE</td>
+      </tr>
+      <tr *ngFor="let workingPlan of workingPlans; let row_no = index" class="border-style">
+        <td>{{row_no + 1}}</td>
+		<td>{{workingPlan.workingPlan.discipline.title}}</td>
+		<td>{{workingPlan.subject.student.lastName}} {{workingPlan.subject.student.firstName}}</td>
+		<td>{{workingPlan.subject.student.group.name}}</td>
+		<td>{{getRole(workingPlan.workingPlan.role)}}</td>
+		<td>{{workingPlan.workingPlan.year}}</td>
+		<td>{{getSemester(workingPlan.workingPlan.semester)}}</td>
+		<td>{{getReportingBySemesterType(workingPlan.subject.reporting)}}</td>
+		<td>{{getCourseTask(workingPlan.subject.courseTask)}}</td>
+		<td>
+			<div *ngIf="workingPlan.subject.semesterGrade != 0 && workingPlan.subject.semesterGrade != null" class="cell-grid">{{workingPlan.subject.semesterGrade}}</div>
+			<div *ngIf="workingPlan.subject.semesterGrade == 0 || workingPlan.subject.semesterGrade == null" class="cell-grid">
+				<div class="use-elem use-elem-input notify-pos">
+					<input type="number" value="0" #grade placeholder="Type a semester grade here"/>
+				</div>
+				<div class="use-elem div-send-one-btn ">
+					<button class="send-one-btn btn btn-primary" (click)="completeSubject(workingPlan.subject, grade.value)">Set</button>
+				</div>
+			</div>
+		</td>
+      </tr>
+    </table>
+  </div>
+  <div class="another-side">
+  </div>
+</div>
