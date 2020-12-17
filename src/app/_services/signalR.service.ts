@@ -36,7 +36,7 @@ export class SignalRService {
 	if(this.currentToken)
 	{
 	   this.hubConnection = new HubConnectionBuilder()
-		.withUrl("http://7c7966ce0d96.ngrok.io/ServerHub", { accessTokenFactory: () => this.currentToken })
+		.withUrl("http://8736fc782375.ngrok.io/ServerHub", { accessTokenFactory: () => this.currentToken })
 		.withAutomaticReconnect()
         .configureLogging(LogLevel.Information)
         .build();
@@ -45,7 +45,7 @@ export class SignalRService {
 	}
 	
     this.hubConnection = new HubConnectionBuilder()
-      .withUrl("http://7c7966ce0d96.ngrok.io/ServerHub")
+      .withUrl("http://8736fc782375.ngrok.io/ServerHub")
       .withAutomaticReconnect()
       .configureLogging(LogLevel.Information)
       .build();

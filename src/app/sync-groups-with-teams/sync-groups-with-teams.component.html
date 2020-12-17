@@ -23,25 +23,21 @@
 			<div class="use-elem use-elem-input">
               <input type="text" disabled class="form-control" placeholder="Name" [(ngModel)]="group.name">
             </div>
-			<!--{{group.name}}-->
 		</td>
 		<td>
 			<select class="use-elem use-elem-select" [(ngModel)]="group.curatorId">
 			  <option *ngFor="let teacher of teachers" [ngValue]="teacher.id">{{teacher.lastName}} {{teacher.firstName}}</option>
             </select>
-			<!--{{group.curator.lastName}} {{group.curator.firstName}}-->
 		</td>
 		<td>
 			<div class="use-elem use-elem-input">
               <input type="date" class="form-control" [(ngModel)]="group.learningStartDate"/>
             </div>
-			<!--{{group.learningStartDate | date : "dd.MM.y"}}-->
 		</td>
 		<td>
 			<div class="use-elem use-elem-input">
               <input type="date" class="form-control" [(ngModel)]="group.learningEndDate"/>
             </div>
-			<!--{{group.learningEndDate | date : "dd.MM.y"}}-->
 		</td>
 		<td>
 			<select class="use-elem use-elem-select" [(ngModel)]="group.qualificationLevel">
@@ -50,7 +46,6 @@
               <option value="3">DoctorOfPhilosophy</option>
 			  <option value="4">DoctorOfScience</option>
             </select>
-			<!--{{getDegree(group.qualificationLevel)}}-->
 		</td>
       </tr>
     </table>

@@ -68,9 +68,9 @@ export class WorkingPlansComponent implements OnInit {
         alert(err);
       });
 	  
-	  var filterData = JSON.parse(sessionStorage.getItem("workingPlanFilterData"));
+	  //var filterData = JSON.parse(sessionStorage.getItem("workingPlanFilterData"));
 	  var workingPlans2:ReportingPlanByTeachers[];
-	await this.workingPlanService.getReportingPlansByTeacher(this.teacher.id,filterData.year,filterData.semester,filterData.group)
+	await this.workingPlanService.getReportingPlansByTeacher(this.teacher.id,null,null,null)
 	  .then(function (operationStatus: operationStatusInfo) {
 		var workingPlans = operationStatus.attachedObject;
         th.workingPlans = workingPlans[0];

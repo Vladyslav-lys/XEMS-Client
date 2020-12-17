@@ -11,10 +11,10 @@ import { operationStatusInfo } from './_helpers/operationStatusInfo';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-	title = 'app';
+	/*title = 'app';
   currentAuthorization: Authorization;
 
   constructor(private serviceClient: SignalRService,
   ) {
-  }
+  }*/
 }

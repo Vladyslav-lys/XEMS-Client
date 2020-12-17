@@ -120,7 +120,7 @@ export class FilterWorkingPlansComponent implements OnInit {
 	}
 	
 	sessionStorage.setItem("workingPlanFilterData", JSON.stringify(filterData));
-	this.router.navigate(['/working-plans']);
+	this.router.navigate(['/journal']);
   }
 
   enableBtn(): boolean {

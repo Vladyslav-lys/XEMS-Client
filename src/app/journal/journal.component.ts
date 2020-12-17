@@ -183,6 +183,9 @@ export class JournalComponent implements OnInit {
 	  case ReportingBySemesterType.Exam:
         s = "Exam";
         break;
+	  default:
+		s = "None";
+		break;
     }
 
     return s;

@@ -8,7 +8,7 @@
 			<div class="error-text" *ngIf="(submitted || f.username.touched) && f.username.errors">Username is required</div>
 		</div>
 		<div [class.error-block]="(submitted || f.username.touched) && f.username.errors" class="use-elem use-elem-input">
-			<input type="text" formControlName="username" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.username.errors }" placeholder="Username" />
+			<input type="text" formControlName="username" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.username.errors }" placeholder="E-mail" />
 		</div>
     </div>
     <div class="form-group">
