@@ -102,7 +102,7 @@ export class FilterWorkingPlansComponent implements OnInit {
     return s;
   }
 
-  ConfirmFilter() {
+  confirmFilter() {
 	this.submitted = true;
     this.loading = true;
 	

@@ -181,7 +181,7 @@ export class AuthenticationService {
     });
   }
   
-  sendEmail(email, serviceClient = this.serviceClient) {
+  /*sendEmail(email, serviceClient = this.serviceClient) {
     return new Promise(function (resolve, reject) {
       serviceClient.hubConnection.invoke("RegisterAzureUser", email)
         .then(function (operationStatus) {
